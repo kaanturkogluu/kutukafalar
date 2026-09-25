@@ -3,10 +3,10 @@
 /android/
 
 # Export builds
-builds/
+builds/*
+!builds/KutuKafalar.pck
 dist/
 *.exe
-*.pck
 *.apk
 *.aab
 

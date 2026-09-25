@@ -1,6 +1,6 @@
 {
   "version": "v1.1.0",
-  "download_url": "https://github.com/kaanturkogluu/kutukafalar/releases/download/v1.1.0/KutuKafalar.pck",
+  "download_url": "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
   "pck_size": 247292,
   "changelog": "- ESC Duraklatma Menüsü (Devam Et, Yeniden Başlat, Lobiye Dön, Çıkış) eklendi.\n- TAB Skor ve Takım Tablosu (Leş, Kafadan Vuruş, Altın, Can ve Durum) eklendi.\n- Dost ateşi (Friendly Fire) tamamen kapatıldı.\n- Zıplama yüksekliği ve temposu dengelendi (Vortex ve strateji ön plana çıkarıldı).\n- Havaya fırlayan zombilerin uzaktan vurma hatası düzeltildi.\n- Bixi (PKM) Ağır Makineli silahı eklendi.\n- Silah mermi kapasitesi sınırlandırıldı (Sonsuz cephane birikimi önlendi).\n- Zombi ganimet düşme oranı dengelendi ve Mağazaya 'Ganimet Şansı' yükseltmesi eklendi.\n- Buzcu ve Mühendis büyüleri yenilendi ve çok oyunculu ağ senkronizasyonu sağlandı.\n- Temiz oyun sıfırlama (Yeniden Başla) sistemi entegre edildi."
 }
