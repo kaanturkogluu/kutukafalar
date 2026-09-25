@@ -13,6 +13,7 @@ signal update_failed(reason: String)
 const REPO_OWNER: String = "kaanturkogluu"
 const REPO_NAME: String = "kutukafalar"
 const CURRENT_VERSION: String = "v1.0.1"
+const RAW_VERSION_URL: String = "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/version.json"
 const GITHUB_API_URL: String = "https://api.github.com/repos/kaanturkogluu/kutukafalar/releases/latest"
 
 var check_http: HTTPRequest = null
@@ -53,7 +54,7 @@ func _process(_delta: float) -> void:
 			var pct = clamp(float(downloaded) / float(total) * 100.0, 0.0, 100.0)
 			download_progress.emit(pct, downloaded, total)
 
-## GitHub'dan en son sürümü sorgula
+## GitHub'dan en son sürümü sorgula (Önce limitsiz raw JSON, gerekirse API)
 func check_for_updates() -> void:
 	if is_checking or is_downloading:
 		return
@@ -62,25 +63,37 @@ func check_for_updates() -> void:
 	
 	var headers = [
 		"User-Agent: KutuKafalar-AutoUpdater",
-		"Accept: application/vnd.github.v3+json"
+		"Accept: application/json"
 	]
 	
-	print("[AutoUpdater] Güncellemeler denetleniyor: ", GITHUB_API_URL)
-	var err = check_http.request(GITHUB_API_URL, headers, HTTPClient.METHOD_GET)
+	print("[AutoUpdater] Güncellemeler denetleniyor: ", RAW_VERSION_URL)
+	var err = check_http.request(RAW_VERSION_URL, headers, HTTPClient.METHOD_GET)
 	if err != OK:
 		is_checking = false
 		update_failed.emit("Ağ isteği başlatılamadı (Hata: " + str(err) + ")")
 
-func _on_check_request_completed(_result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+func _on_check_request_completed(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
 	is_checking = false
 	
+	if result != HTTPRequest.RESULT_SUCCESS:
+		var err_msg = "İnternet bağlantınızı kontrol edin."
+		match result:
+			HTTPRequest.RESULT_CANT_CONNECT: err_msg = "Sunucuya bağlanılamadı."
+			HTTPRequest.RESULT_CANT_RESOLVE: err_msg = "DNS çözülemedi (İnternet bağlantısı yok)."
+			HTTPRequest.RESULT_TLS_HANDSHAKE_ERROR: err_msg = "Güvenli SSL bağlantısı kurulamadı."
+			HTTPRequest.RESULT_NO_RESPONSE: err_msg = "Sunucudan yanıt alınamadı."
+			HTTPRequest.RESULT_TIMEOUT: err_msg = "Bağlantı zaman aşımına uğradı."
+		print("[AutoUpdater] İstek hatası: ", err_msg, " (result: ", result, ")")
+		update_failed.emit(err_msg)
+		return
+	
 	if response_code == 404:
-		print("[AutoUpdater] GitHub'da henüz yayınlanmış bir Release bulunamadı.")
+		print("[AutoUpdater] Sürüm dosyası bulunamadı.")
 		update_not_available.emit(CURRENT_VERSION)
 		return
 	
 	if response_code != 200:
-		print("[AutoUpdater] GitHub API yanıt vermedi, kod: ", response_code)
+		print("[AutoUpdater] Sunucu yanıt vermedi, kod: ", response_code)
 		update_failed.emit("Sunucu yanıt kodu: " + str(response_code))
 		return
 	
@@ -96,34 +109,34 @@ func _on_check_request_completed(_result: int, response_code: int, _headers: Pac
 		update_failed.emit("Geçersiz API verisi.")
 		return
 	
-	var tag_name: String = data.get("tag_name", "")
-	var changelog: String = data.get("body", "Yama detayları belirtilmedi.")
-	var assets: Array = data.get("assets", [])
+	# Hem version.json hem de GitHub API Releases formatını destekle
+	var tag_name: String = data.get("version", data.get("tag_name", ""))
+	var changelog: String = data.get("changelog", data.get("body", "Yama detayları belirtilmedi."))
+	var pck_url: String = data.get("download_url", "")
+	var pck_size: int = int(data.get("pck_size", 0))
 	
-	print("[AutoUpdater] Mevcut sürüm: ", CURRENT_VERSION, " | En son GitHub sürümü: ", tag_name)
+	if pck_url.is_empty():
+		var assets: Array = data.get("assets", [])
+		for asset in assets:
+			if asset.get("name", "") == "KutuKafalar.pck":
+				pck_url = asset.get("browser_download_url", "")
+				pck_size = int(asset.get("size", 0))
+				break
+	
+	print("[AutoUpdater] Mevcut sürüm: ", CURRENT_VERSION, " | En son sürüm: ", tag_name)
 	
 	# Sürüm karşılaştırması
 	if tag_name.is_empty() or tag_name == CURRENT_VERSION:
 		update_not_available.emit(CURRENT_VERSION)
 		return
 	
-	# Assets içinden KutuKafalar.pck dosyasını ara
-	var found_pck_url = ""
-	var pck_size = 0
-	for asset in assets:
-		var asset_name = asset.get("name", "")
-		if asset_name == "KutuKafalar.pck":
-			found_pck_url = asset.get("browser_download_url", "")
-			pck_size = int(asset.get("size", 0))
-			break
-	
-	if found_pck_url.is_empty():
+	if pck_url.is_empty():
 		print("[AutoUpdater] Sürüm bulundu ancak KutuKafalar.pck eklenmemiş.")
 		update_not_available.emit(CURRENT_VERSION)
 		return
 	
-	latest_pck_url = found_pck_url
-	update_available.emit(tag_name, changelog, found_pck_url, pck_size)
+	latest_pck_url = pck_url
+	update_available.emit(tag_name, changelog, pck_url, pck_size)
 
 ## Yeni PCK dosyasını indir
 func start_download(pck_url: String = "") -> void:

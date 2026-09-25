@@ -1,0 +1,6 @@
+{
+  "version": "v1.0.1",
+  "download_url": "https://github.com/kaanturkogluu/kutukafalar/releases/download/v1.0.1/KutuKafalar.pck",
+  "pck_size": 237832,
+  "changelog": "- İki aşamalı lobi ve hazır (Ready) sistemi eklendi.\n- 3. şahıs izleyici modu (Spectator) eklendi.\n- Geç katılanların oyunu bozması engellendi."
+}
