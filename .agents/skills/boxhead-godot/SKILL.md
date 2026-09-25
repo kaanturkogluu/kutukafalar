@@ -58,22 +58,27 @@ res://
   - **Camera Trauma & Punch:** Apply camera trauma (`trauma = clamp(trauma + amount/30.0, 0.35, 1.0)`) and subtle angular flinch (`head.rotation_degrees.x`, `camera.rotation_degrees.z`). Decay quadratically in `_physics_process`.
   - **3D Mesh Hit Flash:** `MeshInstance3D` has **NO `modulate` property**. Always use `material_override = hurt_material` and restore to `null` after 0.1-0.12s.
 - **Voxel Gibs / Destruction:**
-  - Use `GPUParticles3D` for small blood/cube splatter (lightweight).
-  - Use `RigidBody3D` cube pieces (`cube_gibs.tscn`) on death and explosions, with an auto-queue_free timer (2-3 seconds).
+  - Use `GPUParticles3D` for small blood/cube splatter (lightweight, GPU-instanced).
+  - Use multi-cube rigidbodies only for critical boss deaths or limited debris count.
 
-## 5. Character Death & Revive Architecture
+## 5. Character Death & In-Combat Revive Architecture
 - **State Guarding:** Guard all movement, input, shooting, kicking, barrel placement, spell casting, and pickups with `if is_dead: return`.
-- **Death Handling:**
-  - Set `is_dead = true`, reset combo, hide weapon (`gun.visible = false`).
-  - Disable collisions (`collision_layer = 0`) so entities do not get stuck.
-  - Tilt 3D mesh flat on floor (`rotation_degrees.z = 85`), update `NameLabel` to `[ÖLDÜ] Name` in red.
-  - First-person camera: tumble to floor (`position:y = -0.5`, `rotation_degrees:z = 40`).
-  - Show `DeathScreen` UI, unlock mouse cursor (`Input.mouse_mode = Input.MOUSE_MODE_VISIBLE`), enable `[R]` retry shortcut.
-- **Enemy AI Integration:**
-  - `_find_closest_player()` and `_attack_player()` must filter out dead players (`not p.get("is_dead")`).
-- **Revival & Restart:**
-  - Elevator clears dead players via `p.revive.rpc(half_health, elevator_pos)`.
-  - Server restart resets floor, clears zombies, and revives squad at spawn points.
+- **Authoritative Death RPC:**
+  - When player health reaches `<= 0`, the server calls `@rpc("call_local", "reliable") func die()`.
+  - Sets `is_dead = true`, `current_health = 0.0`, `velocity = Vector3.ZERO`, resets revive timers, hides weapon (`gun.visible = false`).
+  - Preserves body collision (`collision_layer = 2`, `collision_mask = 1`) so teammates can target and revive the corpse.
+  - Tilts 3D mesh flat on floor (`rotation_degrees.z = 85`), updates `NameLabel` to `💀 [Oyuncu] \n[E] Canlandır (10 sn)` in red.
+  - Spawns cube destruction gibs (`cube_gibs.tscn`) and unlocks mouse cursor.
+  - If living teammates exist, immediately calls `_start_spectating()`. If all teammates are dead, sets `all_players_dead = true` and shows Game Over.
+- **10-Second In-Combat Revive System (`_handle_revive_interaction`):**
+  - Living players aiming within 3.2m of a downed teammate see `❤️ [E'YE BASILI TUT] Canlandır (10 sn)`.
+  - Holding `[E]` charges `revive_progress_timer` for 10.0 seconds with a real-time progress bar.
+  - Notifies downed player via `nearest_downed.notify_being_revived.rpc(player_name, pct)`.
+  - When timer reaches 10s: calls `target_player.revive.rpc(50.0, t_pos)` and plays pickup SFX.
+  - Weapon shooting, kicking, and tactical spells are locked during revive channeling.
+- **Elevator Level-End Revive & Full Squad Reset:**
+  - Elevator transition calls `p.revive.rpc(p.max_health * 0.5, elevator_pos)` for all dead players.
+  - Full game restart calls `@rpc("call_local", "reliable") func reset_to_default_loadout(spawn_pos)` to restore default weapon inventory, full health, camera, and mouse capture cleanly.
 
 ## 6. Input Action Mapping Standard
 - `move_forward`, `move_backward`, `move_left`, `move_right`
@@ -84,6 +89,8 @@ res://
 - `spell_ultimate` (Q key)
 - `interact` (G key for explosive barrels)
 - Weapon Switch: Mouse Scroll Wheel (`MOUSE_BUTTON_WHEEL_UP`, `MOUSE_BUTTON_WHEEL_DOWN`) and Number keys (`1`, `2`, `3`, `4`)
+- Spectator UI Toggle: `H` key / `👁 Arayüzü Gizle / Göster` button
+- Spectator Cycle: Left Click / Space (Next), Right Click (Previous)
 
 ## 7. Weapon Arsenal, Inventory & Audio Architecture
 - **Sound System (`SoundManager` Autoload):**
@@ -107,12 +114,29 @@ res://
   - Server tracks `is_game_in_progress: bool`.
   - Any connection after match start is rejected via `_reject_connection.rpc_id()` with user notification and clean disconnection, preventing scene desynchronization.
 
-## 9. Multiplayer Spectator Mode & Death Restart Guarding
+## 9. Multiplayer Spectator Mode & Hideable Death HUD
 - **Restart Lockout:**
-  - Dead players cannot trigger restart while teammates are alive (`if not all_players_dead and multiplayer.get_peers().size() > 0: return`).
+  - Dead players cannot trigger restart while teammates are alive (`if not all_players_dead and not _get_living_teammates().is_empty(): return`).
   - `RestartBtn` is hidden and shortcut `[R]` / `Space` is disabled until `all_players_dead` is true.
+  - Only the host (`multiplayer.is_server()`) can restart the game once everyone is dead.
 - **Spectator Camera:**
-  - Dead player camera detaches (`top_level = true`) and smoothly tracks behind living teammates in 3rd person (`camera.global_position.lerp(target_cam_pos, 10.0 * delta)`).
-  - `[Left Click]` or `[Space]` cycles between living teammates.
-  - When all teammates die, `_announce_game_over.rpc()` sets `all_players_dead = true` on all players, displaying the Game Over overlay and enabling restart.
+  - Dead player camera detaches (`top_level = true`, `camera.current = true`) and smoothly tracks behind living teammates in 3rd person:
+    `target_cam_pos = spectator_target.global_position + Vector3(0, 2.2, 0) - spectator_target.transform.basis.z * 3.2`
+  - `[Left Click]` or `[Space]` cycles forward; `[Right Click]` cycles backward.
+- **Hideable Death/Spectator Overlay ([H] Toggle):**
+  - Pressing `[H]` or clicking `👁 Arayüzü Gizle [H]` toggles `is_death_ui_hidden`.
+  - When hidden: `CenterContainer` and `Backdrop` are hidden; a minimal floating button `👁 Arayüzü Göster [H]` stays in the top-right corner.
+  - `Backdrop` and `DeathScreen` use `mouse_filter = Control.MOUSE_FILTER_IGNORE` so viewport mouse clicks are not blocked from cycling players.
+
+## 10. GDScript Safety, Elevator Sync & AutoUpdater Rules
+- **GDScript Object.get() Constraint:**
+  - In Godot 4 GDScript, `Object.get(property)` takes **AT MOST 1 argument**. Passing a second default argument (e.g. `p.get("prop", default)`) causes a fatal parse error on scene reload. Always check `if p.get("prop") != null and float(p.get("prop")) > 0`.
+- **Level Start Server Notify:**
+  - At level `_ready()`, server must call `_notify_peer_level_ready(1)` directly rather than using loopback `rpc_id(1)`. This avoids dropped RPC frames and ensures the host immediately spawns and initial barrels/waves begin.
+- **Elevator Synchronization:**
+  - `set_elevator_state` must be `@rpc("call_local", "reliable")` so door openings and signs synchronize across all client screens even if the host dies.
+  - `_check_all_players_inside()` must filter only LIVING players (`p.current_health > 0 and not p.get("is_dead")`).
+- **AutoUpdater & Windows File Locks:**
+  - Always download update PCK files to `user://` (`OS.get_user_data_dir()`) to avoid program directory permission errors.
+  - `apply_update.bat` must implement a retry loop (`:wait_loop` up to 20 seconds) before replacing `KutuKafalar.pck` to prevent Windows file-sharing lock violations (`Error 32`).art.
   - When teammates reach the elevator, dead players are revived via `revive.rpc()`, resetting camera transforms and collisions cleanly.

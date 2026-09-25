@@ -117,5 +117,23 @@ Projeyi geliştirirken token tüketimini minimumda tutmak ve hızlı ilerlemek i
     * `[Sol Tık]` veya `[Boşluk]` tuşuna basarak hayattaki diğer takım arkadaşları arasında geçiş yapılabilir.
     * Takım arkadaşları katı temizleyip asansöre ulaştığında ölen oyuncular asansörde otomatik olarak canlanır.
     * Ancak **tüm takım elendiğinde** Oyun Bitti (Game Over) ekranı gelir ve `[R]` tuşuyla 1. Kattan baştan başlatmaya izin verilir.
+* [x] **Faz 8: Çatışma İçi Canlandırma (10 sn [E] Revive), Gizlenebilir İzleyici Arayüzü ([H]), Asansör Ağ Senkronizasyonu ve Kararlı Başlangıç (v1.1.0 - v1.1.6):**
+  * **Yerde Kalan Ceset ve 10 sn Canlandırma (`FPSController.gd`):**
+    * Ölen oyuncunun 3D kutu modeli yerde 85 derece yatık durur (`collision_layer = 2`), başının üzerinde `💀 [Oyuncu Adı] \n[E] Canlandır (10 sn)` etiketi görünür.
+    * Hayattaki oyuncu cesedin 3.2m yakınına gelip baktığında ekranında canlandırma arayüzü çıkar; `[E]` tuşuna 10 saniye basılı tutulduğunda yerdeki oyuncu 50 Canla ayağa kaldırılır. Canlandırma sırasında silah ateşleme ve büyü kullanımı kilitlenir.
+    * Ölen oyuncu izleyici ekranında arkadaşının canlandırma yüzdesini (`💚 [Arkadaş] seni canlandırıyor! %...`) anlık olarak izler.
+  * **Gizlenebilir İzleyici Arayüzü ([H] Tuşu):**
+    * İzleyici modundayken ekrandaki karartma, başlıklar ve bildirimler klavyeden **`[H]`** tuşuna veya ekrandaki **`👁 Arayüzü Gizle [H]`** butonuna basılarak tamamen gizlenebilir. Sağ üst köşedeki minimal `👁 Arayüzü Göster [H]` butonuyla tekrar açılabilir.
+    * İzleyici ekranındaki arka plan panelleri `mouse_filter = Control.MOUSE_FILTER_IGNORE` yapılarak farenin `[Sol Tık]` / `[Sağ Tık]` tıklamalarını engellemesi önlenmiş, takım arkadaşları arasında akıcı geçiş sağlanmıştır.
+  * **Asansör Ağ Senkronizasyonu (`Elevator.gd` & `MainLevel.gd`):**
+    * Asansörün açılması ve kilitlenmesi `@rpc("call_local", "reliable") func set_elevator_state` ile tüm ekranlarda senkronize edilir. Lobi sahibi ölse bile kat temizlendiğinde diğer oyuncuların ekranında asansör kapıları ve tabelası anında yeşile döner.
+    * Asansör sonraki kata geçiş kontrolü yalnızca **yaşayan** oyuncuları (`current_health > 0 and not is_dead`) sayar. Yaşayan tüm oyuncular bindiğinde sonraki kata geçilir ve ölen oyuncular yeni katta otomatik diriltilir.
+  * **Temiz Oyun Sıfırlama (`reset_to_default_loadout`):**
+    * Lobi sahibi tüm takım elendiğinde oyunu baştan başlattığında `reset_to_default_loadout.rpc` ile tüm oyuncuların canı (100 HP), sınırsız tabancası, varilleri, doğuş noktaları ve kameraları sıfırlanır; yaşayan oyuncuların erken ölmesi veya kilitlenmesi önlenmiştir.
+    * Takım arkadaşları hayattayken lobi sahibinin kazara oyunu yeniden başlatması engellenmiştir.
+  * **GDScript & Seviye Başlangıç Güvenliği:**
+    * GDScript `Object.get()` tek parametre kuralı (`p.get("current_health") != null`) uygulanarak parse hataları önlenmiştir.
+    * Seviye yüklendiğinde sunucunun `_notify_peer_level_ready(1)` metodunu doğrudan yerel çağırması sağlanarak döngüsel RPC takılmaları ve haritanın üstten boş kamerasında asılı kalma sorunu tamamen giderilmiştir.
+    * `AutoUpdater.gd` ve `apply_update.bat` 20 saniyelik dosya kilitleme bekleme döngüsü (`:wait_loop`) ve `user://` indirme yolu ile Windows yetki ve paylaşım ihlali hatalarına karşı zırhlanmıştır.
 
 

@@ -35,10 +35,12 @@
    * Mermi bittiğinde veya sıkışıldığında zombilere sert bir tekme atarak onları geriye savurma.
    * Zombileri kırmızı patlayıcı varillerin üzerine tekmeleyip tek mermiyle havaya uçurma taktiği!
    * **Doom Tarzı Mühimmat Düşürme:** Tekmeyle veya varil patlamasıyla ölen zombilerden parlayan renkli mermi küpleri saçılır; oyuncu sürekli hücumda kalır.
-6. **Ölüm ve Canlanma Döngüsü (Seyirci Kalmama Garantisi):**
-   * **Yere Düşme (Downed):** Canı sıfırlanan oyuncu diz çöker ve eline acil durum tabancası verilir; takım arkadaşı 4 saniye basılı tutup kaldırabilir.
-   * **Hayalet Kutu Modu (Ghost Box):** Tamamen ölen oyuncu kenarda beklemez; minik bir "Uçan Hayalet Kutu"ya dönüşür. Haritadaki gizli mermileri işaretleyebilir (ping) ve arkadaşlarına moral/hız desteği verir.
-   * **Asansörde Yeniden Doğma (Elevator Respawn):** Kat temizlenip asansör kapısı açıldığında, ölen tüm oyuncular asansörün içinde yarım canla yeniden doğar.
+6. **Ölüm, Yerde Kalan Ceset ve Canlanma Döngüsü (Revive & Spectator):**
+   * **Yerde Kalan Ceset (Downed Body):** Canı sıfırlanan oyuncu ölür ve kutu modeli yere devrilmiş (85 derece yatık) şekilde haritada kalır. Başının üstünde `💀 [Oyuncu] \n[E] Canlandır (10 sn)` rozeti belirir.
+   * **10 Saniyelik [E] ile Canlandırma:** Hayattaki takım arkadaşı yerdeki cesedin 3.2m yakınına gelip baktığında ekranda canlandırma arayüzü çıkar. `[E]` tuşuna 10 saniye basılı tutarak takım arkadaşını bulunduğu noktada 50 Canla ayağa kaldırabilir. Canlandırma esnasında ölü oyuncunun ekranında arkadaşının kurtarma ilerlemesi anlık yüzde olarak gösterilir.
+   * **İzleyici Modu & Gizlenebilir Arayüz (Spectator Mode & [H] Toggle):** Ölen oyuncu hemen 3. şahıs izleyici moduna geçer; kamera hayattaki arkadaşını arkadan takip eder. `[Sol Tık]` / `[Sağ Tık]` ile oyuncular arasında geçiş yapılır. `[H]` tuşu veya butona basılarak ekrandaki tüm yazılar gizlenip temiz görüntü alınabilir.
+   * **Asansörde Yeniden Doğma (Elevator Respawn):** Kat temizlenip hayattaki tüm oyuncular asansöre bindiğinde, ölen oyuncular sonraki katta otomatik olarak canlandırılır.
+   * **Tüm Takım Elenme (Game Over):** Yalnızca tüm takım arkadaşları öldüğünde oyun biter ve lobi sahibine `[R]` tuşuyla sıfırdan başlatma yetkisi verilir. Hayatta oyuncu varken kazara oyun sıfırlanamaz.
 7. **Dost Ateşi ve Kaos Fiziği (Friendly Fire - Lobi Tercihine Bağlı):**
    * Lobi kurucusu dost ateşini açıp kapatabilir.
    * Kapalıyken bile varil patlamaları arkadaşları komik bir şekilde havaya fırlatır (Ragdoll/İtişme fiziği - hasar almazlar ama kaos ve eğlence korunur).
@@ -153,11 +155,16 @@ $$\text{Toplam Skor} = (\text{Ulaşılan Kat} \times 10.000) + (\text{Öldürül
   * Ekran üstü çarpan (multiplier) barı.
 * [x] **Faz 4: Sınıf & Büyü (Spell) Mekanikleri**
   * `E` ve `Q` yetenek altyapısı, sınıfların kodlanması.
-* [x] **Faz 5: Kat, Ölüm/Canlanma ve Asansör Döngüsü (Floor Progression)**
-  * Kat temizleme $\rightarrow$ Asansöre binme $\rightarrow$ Kart seçme $\rightarrow$ Yeni kat akışı.
-  * Ölüm durumu (`is_dead`), ölüm kamerası, `DeathScreen` arayüzü ve `[R]` tuşuyla yeniden başlama.
-  * Kat tamamlandığında ölen oyuncuların asansörde yarım canla yeniden diriltilmesi (`revive.rpc`).
-* [ ] **Faz 6: Bosslar, Steam Entegrasyonu & Skor Tablosu**
+* [x] **Faz 5: Kat, Çatışma İçi Canlandırma ve Asansör Senkronizasyonu (Floor & Revive)**
+  * Kat temizleme $\rightarrow$ Asansör kapılarının tüm istemcilerde senkronize açılması (`set_elevator_state.rpc`) $\rightarrow$ Kart seçme $\rightarrow$ Yeni kat akışı.
+  * Yerde kalan ceset, 10 saniye boyunca `[E]` basılı tutarak takım arkadaşını ayağa kaldırma (`_handle_revive_interaction`).
+  * 3. Şahıs takip kamerasıyla izleyici modu, `[H]` tuşuyla açılıp kapanabilen temiz izleme arayüzü.
+  * Yaşayan tüm oyuncular asansöre bindiğinde sonraki kata geçiş ve ölü oyuncuların asansörde otomatik dirilmesi.
+* [x] **Faz 6: Bağımsız EXE, GitHub Güncelleyici ve Kesintisiz Lobi Deneyimi**
+  * Tek tık derleyici scripti (`build_release.ps1`) ile Windows standalone exe ve pck üretimi.
+  * Oyun içi GitHub Releases otomatik güncelleyicisi (`AutoUpdater.gd`) ve Windows dosya kilitleme engelleme döngüsü.
+  * İki aşamalı lobi, hazır olma durumu, geç katılım reddi ve yetkisiz yeniden başlatma kilidi.
+* [ ] **Faz 7: Bosslar, Steam Entegrasyonu & Skor Tablosu**
   * Kırmızı Şeytanlar ve Boss yapay zekası.
   * Steam Leaderboard bağlantısı ve ses/görsel cilalama (Polish).
 
