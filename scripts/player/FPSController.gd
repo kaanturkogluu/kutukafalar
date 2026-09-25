@@ -280,7 +280,9 @@ func _physics_process(delta: float) -> void:
 		
 		# İzleyici Kamera Takibi (Spectator Follow)
 		if is_multiplayer_authority() and spectator_target and is_instance_valid(spectator_target):
-			if spectator_target.get("is_dead") or spectator_target.get("current_health", 0.0) <= 0:
+			var t_dead = spectator_target.get("is_dead")
+			var t_hp = spectator_target.get("current_health")
+			if t_dead or (t_hp != null and float(t_hp) <= 0):
 				_cycle_spectator_target(1)
 			else:
 				var target_cam_pos = spectator_target.global_position + Vector3(0, 1.8, 0) - spectator_target.transform.basis.z * 2.2
@@ -845,8 +847,11 @@ func _get_living_teammates() -> Array[CharacterBody3D]:
 	var list: Array[CharacterBody3D] = []
 	var players = get_tree().get_nodes_in_group("players")
 	for p in players:
-		if is_instance_valid(p) and p != self and not p.get("is_dead") and p.get("current_health", 0.0) > 0:
-			list.append(p)
+		if is_instance_valid(p) and p != self:
+			var p_dead = p.get("is_dead")
+			var p_hp = p.get("current_health")
+			if not p_dead and (p_hp == null or float(p_hp) > 0):
+				list.append(p)
 	return list
 
 func _start_spectating() -> void:
@@ -984,3 +989,123 @@ func _on_lobby_pressed() -> void:
 		return
 	NetworkManager.disconnect_game()
 	get_tree().change_scene_to_file("res://scenes/ui/lobby.tscn")
+
+# --- Duraklatma Menüsü (Pause Menu) ---
+
+func _open_pause_menu() -> void:
+	if not is_multiplayer_authority() or not pause_menu:
+		return
+	pause_menu.visible = true
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+func _close_pause_menu() -> void:
+	if not is_multiplayer_authority() or not pause_menu:
+		return
+	pause_menu.visible = false
+	if not is_in_shop and not is_dead and not (scoreboard and scoreboard.visible):
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+func _on_pause_resume_pressed() -> void:
+	_close_pause_menu()
+
+func _on_pause_quit_pressed() -> void:
+	get_tree().quit()
+
+# --- Skor Tablosu (Scoreboard) ---
+
+func _set_scoreboard_visible(visible_state: bool) -> void:
+	if not is_multiplayer_authority() or not scoreboard:
+		return
+	scoreboard.visible = visible_state
+	if visible_state:
+		_refresh_scoreboard()
+
+func _refresh_scoreboard() -> void:
+	if not scoreboard_list:
+		return
+	for child in scoreboard_list.get_children():
+		child.queue_free()
+	
+	var players = get_tree().get_nodes_in_group("players")
+	for p in players:
+		if not is_instance_valid(p):
+			continue
+		var row = HBoxContainer.new()
+		row.add_theme_constant_override("separation", 12)
+		
+		# İsim
+		var lbl_name = Label.new()
+		lbl_name.custom_minimum_size = Vector2(160, 0)
+		var p_display = p.player_name
+		if p == self:
+			p_display += " (Sen)"
+		lbl_name.text = p_display
+		if p == self:
+			lbl_name.modulate = Color(1.0, 0.85, 0.3)
+		row.add_child(lbl_name)
+		
+		# Sınıf
+		var lbl_cls = Label.new()
+		lbl_cls.custom_minimum_size = Vector2(110, 0)
+		match p.player_class:
+			"Pyromancer": lbl_cls.text = "🔥 Büyücü"
+			"Engineer": lbl_cls.text = "⚙️ Mühendis"
+			"Cryomancer": lbl_cls.text = "❄️ Buzcu"
+			"Medic": lbl_cls.text = "💚 Sıhhiye"
+			_: lbl_cls.text = p.player_class
+		row.add_child(lbl_cls)
+		
+		# Leş
+		var lbl_kills = Label.new()
+		lbl_kills.custom_minimum_size = Vector2(70, 0)
+		lbl_kills.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lbl_kills.text = str(p.kill_count)
+		row.add_child(lbl_kills)
+		
+		# Kafadan Vuruş
+		var lbl_hs = Label.new()
+		lbl_hs.custom_minimum_size = Vector2(80, 0)
+		lbl_hs.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lbl_hs.text = str(p.headshot_count)
+		row.add_child(lbl_hs)
+		
+		# Altın
+		var lbl_gold = Label.new()
+		lbl_gold.custom_minimum_size = Vector2(75, 0)
+		lbl_gold.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lbl_gold.text = str(p.gold)
+		row.add_child(lbl_gold)
+		
+		# Durum
+		var lbl_status = Label.new()
+		lbl_status.custom_minimum_size = Vector2(100, 0)
+		lbl_status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		lbl_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		if p.is_dead:
+			lbl_status.text = "💀 ÖLÜ"
+			lbl_status.modulate = Color(0.9, 0.2, 0.2)
+		else:
+			lbl_status.text = "❤️ " + str(int(p.current_health)) + " HP"
+			lbl_status.modulate = Color(0.2, 0.9, 0.3)
+		row.add_child(lbl_status)
+		
+		scoreboard_list.add_child(row)
+
+# --- İstatistik ve Ağ Senkronizasyonu ---
+
+func record_kill(is_headshot: bool) -> void:
+	kill_count += 1
+	if is_headshot:
+		headshot_count += 1
+	if is_multiplayer_authority():
+		sync_player_stats.rpc(gold, kill_count, headshot_count)
+
+@rpc("any_peer", "call_local", "reliable")
+func sync_player_stats(p_gold: int, p_kills: int = -1, p_headshots: int = -1) -> void:
+	gold = p_gold
+	if p_kills >= 0:
+		kill_count = p_kills
+	if p_headshots >= 0:
+		headshot_count = p_headshots
+	if is_multiplayer_authority():
+		_update_hud()

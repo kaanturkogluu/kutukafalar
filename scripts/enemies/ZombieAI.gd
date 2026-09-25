@@ -194,7 +194,10 @@ func _die(is_headshot: bool, attacker_id: int = 1) -> void:
 		var luck_bonus = 0.0
 		var players = get_tree().get_nodes_in_group("players")
 		for p in players:
-			luck_bonus = max(luck_bonus, p.get("stat_drop_luck", 0.0))
+			if is_instance_valid(p):
+				var p_luck = p.get("stat_drop_luck")
+				if p_luck != null:
+					luck_bonus = max(luck_bonus, float(p_luck))
 		
 		# Dengeli Düşüş Oranları (Taban ~%15, Şans Kartı ile artar)
 		var base_chance = 0.15 * (1.0 + luck_bonus)

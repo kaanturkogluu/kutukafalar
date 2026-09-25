@@ -1,6 +1,6 @@
 {
-  "version": "v1.1.1",
+  "version": "v1.1.2",
   "download_url": "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-  "pck_size": 249132,
-  "changelog": "- Lobi sınıf seçimi ve NetworkManager bağlantı hatası düzeltildi.\n- Çok oyunculu odada canlı sınıf değiştirme ve senkronizasyon eklendi.\n- RPC tabanlı kesin ve güvenilir oyuncu/eşya/zombi doğma sistemi entegre edildi.\n- ESC Duraklatma Menüsü ve TAB Skor Tablosu iyileştirildi."
+  "pck_size": 252380,
+  "changelog": "- Seviye başlatma (MainLevel parse) hatası düzeltildi.\n- ESC Duraklatma Menüsü buton fonksiyonları eksiksiz bağlandı.\n- TAB Skor Tablosu senkronizasyonu ve leş/altın takibi tamamlandı.\n- Oyuncular artık haritada sorunsuz doğuyor ve oyun akışı başlıyor."
 }

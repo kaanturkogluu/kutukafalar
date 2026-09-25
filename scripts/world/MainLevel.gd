@@ -72,8 +72,12 @@ func _notify_peer_level_ready(peer_id: int) -> void:
 		
 	# 4) Sahnede zaten mevcut olan zombileri bu oyuncuya doğurt:
 	for existing_zombie in enemies_container.get_children():
-		var speed_val = existing_zombie.get("speed", 3.6)
-		var hp_val = existing_zombie.get("current_health", 100.0)
+		var speed_val: float = 3.6
+		if "speed" in existing_zombie and existing_zombie.speed != null:
+			speed_val = float(existing_zombie.speed)
+		var hp_val: float = 100.0
+		if "current_health" in existing_zombie and existing_zombie.current_health != null:
+			hp_val = float(existing_zombie.current_health)
 		sync_spawn_zombie.rpc_id(peer_id, existing_zombie.name, existing_zombie.global_position, speed_val, hp_val)
 	
 	# 5) Güncel dalga/kat durumunu bildir:
