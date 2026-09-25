@@ -94,11 +94,11 @@ func cast_ultimate() -> void:
 			# Adrenalin ve Toplu Şifa: Tüm takımı %100 cana getirir
 			_request_cast_spell.rpc_id(1, "medic_overdrive", player.global_position, Vector3.ZERO)
 		"Cryomancer":
-			# Küresel Buzul Fırtınası: Haritadaki tüm zombileri dondurur
-			_request_cast_spell.rpc_id(1, "blizzard", player.global_position, Vector3.ZERO)
+			# Buz Fırtınası / Glacial Blast: Hedef alana devasa buz sarkıtları patlatır
+			_request_cast_spell.rpc_id(1, "frost_storm", target_pos, Vector3.ZERO)
 		"Engineer":
-			# İkiz Manyetik Vortex Alanı
-			_request_cast_spell.rpc_id(1, "thrown_vortex", target_pos, Vector3.ZERO)
+			# Graviton EMP Blast: Hedef alandaki tüm zombileri ezip patlatır
+			_request_cast_spell.rpc_id(1, "emp_blast", target_pos, Vector3.ZERO)
 		_:
 			var meteor_start = target_pos + Vector3.UP * 22.0
 			_request_cast_spell.rpc_id(1, "meteor", meteor_start, Vector3.DOWN, target_pos.y)
@@ -109,55 +109,15 @@ func _request_cast_spell(spell_type: String, pos: Vector3, dir: Vector3, extra_y
 		return
 
 	var current_scene = player.get_tree().current_scene
-	var spell_instance = null
-
-	match spell_type:
-		"fire_wave":
-			var scene = load(FIRE_WAVE_PATH)
-			if scene:
-				spell_instance = scene.instantiate()
-				spell_instance.position = pos
-				spell_instance.direction = dir
-				spell_instance.look_at(pos + dir, Vector3.UP)
-		"thrown_vortex":
-			var scene = load(THROWN_VORTEX_PATH)
-			if scene:
-				spell_instance = scene.instantiate()
-				spell_instance.position = pos
-				spell_instance.setup(dir)
-		"thrown_frost":
-			var scene = load(THROWN_FROST_PATH)
-			if scene:
-				spell_instance = scene.instantiate()
-				spell_instance.position = pos
-				spell_instance.setup(dir)
-		"thrown_heal":
-			var scene = load(THROWN_HEAL_PATH)
-			if scene:
-				spell_instance = scene.instantiate()
-				spell_instance.position = pos
-				spell_instance.setup(dir)
-		"meteor":
-			var scene = load(METEOR_PATH)
-			if scene:
-				spell_instance = scene.instantiate()
-				spell_instance.position = pos
-				spell_instance.target_y = extra_y
-		"medic_overdrive":
-			# Tüm oyuncuların canını yenile
-			var players = player.get_tree().get_nodes_in_group("players")
-			for p in players:
-				if p.has_method("take_damage"):
-					p.current_health = p.max_health
-					p._update_hud()
-			print("[Sıhhiye Ulti] Tüm takımın canı tamamen dolduruldu!")
-		"blizzard":
-			# Tüm zombileri 6 saniyeliğine dondur
-			var enemies = player.get_tree().get_nodes_in_group("enemies")
-			for e in enemies:
-				if e.has_method("freeze"):
-					e.freeze(6.0)
-			print("[Buz Muhafızı Ulti] Tüm haritadaki zombiler donduruldu!")
-
-	if spell_instance:
-		current_scene.add_child(spell_instance, true)
+	if current_scene and current_scene.has_method("sync_spawn_spell"):
+		current_scene.sync_spawn_spell.rpc(spell_type, pos, dir, extra_y)
+	
+	if spell_type == "medic_overdrive":
+		var players = player.get_tree().get_nodes_in_group("players")
+		for p in players:
+			if p.has_method("heal"):
+				p.heal(p.max_health)
+			elif p.has_method("take_damage"):
+				p.current_health = p.max_health
+				p._update_hud()
+		print("[Sıhhiye Ulti] Tüm takımın canı tamamen yenilendi!")

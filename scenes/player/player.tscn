@@ -422,5 +422,177 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "🚪 LOBİYE DÖN"
 
+[node name="PauseMenu" type="Control" parent="HUD"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PauseBackdrop" type="ColorRect" parent="HUD/PauseMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.05, 0.08, 0.8)
+
+[node name="CenterContainer" type="CenterContainer" parent="HUD/PauseMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="HUD/PauseMenu/CenterContainer"]
+custom_minimum_size = Vector2(340, 340)
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="HUD/PauseMenu/CenterContainer/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="HUD/PauseMenu/CenterContainer/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.25, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_font_sizes/font_size = 28
+text = "⏸️ OYUN DURAKLATILDI"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="HUD/PauseMenu/CenterContainer/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.75, 0.85, 1)
+theme_override_font_sizes/font_size = 14
+text = "Kutu Kafalar Multiplayer"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="HUD/PauseMenu/CenterContainer/Panel/VBox"]
+layout_mode = 2
+
+[node name="ResumeBtn" type="Button" parent="HUD/PauseMenu/CenterContainer/Panel/VBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "▶ DEVAM ET [ESC]"
+
+[node name="RestartBtn" type="Button" parent="HUD/PauseMenu/CenterContainer/Panel/VBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "🔄 YENİDEN BAŞLAT"
+
+[node name="LobbyBtn" type="Button" parent="HUD/PauseMenu/CenterContainer/Panel/VBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "🚪 LOBİYE DÖN"
+
+[node name="QuitBtn" type="Button" parent="HUD/PauseMenu/CenterContainer/Panel/VBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "❌ OYUNDAN ÇIK"
+
+[node name="Scoreboard" type="Control" parent="HUD"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="HUD/Scoreboard"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Panel" type="PanelContainer" parent="HUD/Scoreboard/CenterContainer"]
+custom_minimum_size = Vector2(680, 300)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="HUD/Scoreboard/CenterContainer/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+mouse_filter = 2
+
+[node name="TitleLabel" type="Label" parent="HUD/Scoreboard/CenterContainer/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "📊 TAKIM VE SKOR TABLOSU [TAB]"
+horizontal_alignment = 1
+
+[node name="HeaderBox" type="HBoxContainer" parent="HUD/Scoreboard/CenterContainer/Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ColName" type="Label" parent="HUD/Scoreboard/CenterContainer/Panel/VBox/HeaderBox"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "OYUNCU"
+
+[node name="ColClass" type="Label" parent="HUD/Scoreboard/CenterContainer/Panel/VBox/HeaderBox"]
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "SINIF"
+
+[node name="ColKills" type="Label" parent="HUD/Scoreboard/CenterContainer/Panel/VBox/HeaderBox"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "LEŞ"
+horizontal_alignment = 1
+
+[node name="ColHeadshots" type="Label" parent="HUD/Scoreboard/CenterContainer/Panel/VBox/HeaderBox"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "KAFADAN"
+horizontal_alignment = 1
+
+[node name="ColGold" type="Label" parent="HUD/Scoreboard/CenterContainer/Panel/VBox/HeaderBox"]
+custom_minimum_size = Vector2(75, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "ALTIN"
+horizontal_alignment = 1
+
+[node name="ColStatus" type="Label" parent="HUD/Scoreboard/CenterContainer/Panel/VBox/HeaderBox"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "DURUM"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="HUD/Scoreboard/CenterContainer/Panel/VBox"]
+layout_mode = 2
+
+[node name="PlayerList" type="VBoxContainer" parent="HUD/Scoreboard/CenterContainer/Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+mouse_filter = 2
+
 [node name="SpellManager" type="Node" parent="."]
 script = ExtResource("2_spell")

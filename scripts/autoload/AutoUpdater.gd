@@ -12,7 +12,7 @@ signal update_failed(reason: String)
 
 const REPO_OWNER: String = "kaanturkogluu"
 const REPO_NAME: String = "kutukafalar"
-const CURRENT_VERSION: String = "v1.0.1"
+const CURRENT_VERSION: String = "v1.1.0"
 const RAW_VERSION_URL: String = "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/version.json"
 const GITHUB_API_URL: String = "https://api.github.com/repos/kaanturkogluu/kutukafalar/releases/latest"
 

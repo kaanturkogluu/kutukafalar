@@ -6,7 +6,8 @@ signal player_died
 
 @export var speed: float = 7.0
 @export var sprint_speed: float = 11.0
-@export var jump_velocity: float = 6.5
+@export var jump_velocity: float = 4.4 # Zıplama dengelendi (zombilerin üzerinden rastgele uçulamaz)
+var jump_cooldown_timer: float = 0.0
 @export var mouse_sensitivity: float = 0.0025
 
 # Can ve Hasar
@@ -14,11 +15,20 @@ signal player_died
 var current_health: float = 100.0
 
 # Silah ve Cephane Sistemi (Envanter & Çoklu Silah)
+const WEAPON_MAX_AMMO: Dictionary = {
+	"pistol": -1,   # Sonsuz mermi
+	"shotgun": 64,  # Pompalı mermi sınırı
+	"uzi": 120,     # Uzi mermi sınırı
+	"bixi": 350,    # Bixi (PKM) Ağır makineli mermi sınırı
+	"rocket": 16    # Roket mermi sınırı
+}
+
 var weapon_inventory: Array[String] = ["pistol"]
 var weapon_ammo_dict: Dictionary = {
-	"pistol": -1, # Sonsuz mermi
+	"pistol": -1,
 	"shotgun": 0,
 	"uzi": 0,
+	"bixi": 0,
 	"rocket": 0
 }
 var current_weapon: String = "pistol"
@@ -30,6 +40,7 @@ var weapon_notice_tween: Tween = null
 # Kalıcı Mağaza Yükseltmeleri (Stat Multipliers)
 var stat_damage_mult: float = 1.0
 var stat_firerate_mult: float = 1.0
+var stat_drop_luck: float = 0.0 # Zombi ganimet düşürme şansı çarpanı
 
 # Ekonomi
 var gold: int = 0
@@ -43,6 +54,7 @@ var combo_multiplier: int = 1
 var combo_timer: float = 0.0
 const COMBO_DURATION: float = 4.5
 var kill_count: int = 0
+var headshot_count: int = 0
 
 # Envanter: Patlayıcı Variller (G Tuşu)
 var barrel_count: int = 3
@@ -98,6 +110,17 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 @onready var restart_btn: Button = $HUD/DeathScreen/CenterContainer/VBox/Buttons/RestartBtn
 @onready var lobby_btn: Button = $HUD/DeathScreen/CenterContainer/VBox/Buttons/LobbyBtn
 
+# Duraklatma Menüsü UI (ESC Menu)
+@onready var pause_menu: Control = $HUD/PauseMenu
+@onready var pause_resume_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/VBox/ResumeBtn
+@onready var pause_restart_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/VBox/RestartBtn
+@onready var pause_lobby_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/VBox/LobbyBtn
+@onready var pause_quit_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/VBox/QuitBtn
+
+# Skor Tablosu UI (TAB Scoreboard)
+@onready var scoreboard: Control = $HUD/Scoreboard
+@onready var scoreboard_list: VBoxContainer = $HUD/Scoreboard/CenterContainer/Panel/VBox/PlayerList
+
 var player_id: int = 1
 var player_name: String = "Oyuncu"
 var player_class: String = "Pyromancer"
@@ -123,6 +146,15 @@ func _ready() -> void:
 		restart_btn.pressed.connect(_on_restart_pressed)
 	if lobby_btn:
 		lobby_btn.pressed.connect(_on_lobby_pressed)
+	
+	if pause_resume_btn:
+		pause_resume_btn.pressed.connect(_on_pause_resume_pressed)
+	if pause_restart_btn:
+		pause_restart_btn.pressed.connect(_on_restart_pressed)
+	if pause_lobby_btn:
+		pause_lobby_btn.pressed.connect(_on_lobby_pressed)
+	if pause_quit_btn:
+		pause_quit_btn.pressed.connect(_on_pause_quit_pressed)
 	
 	if NetworkManager.players.has(player_id):
 		player_name = NetworkManager.players[player_id].get("name", "Kutu Kafa")
@@ -155,6 +187,28 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not is_multiplayer_authority():
 		return
 	
+	# TAB TUŞU: Skor / Takım Tablosu
+	if event is InputEventKey and event.keycode == KEY_TAB:
+		_set_scoreboard_visible(event.pressed)
+		get_viewport().set_input_as_handled()
+		return
+
+	# ESC TUŞU: Duraklatma Menüsü Aç/Kapat
+	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE):
+		if scoreboard and scoreboard.visible:
+			_set_scoreboard_visible(false)
+			get_viewport().set_input_as_handled()
+			return
+		
+		if not is_in_shop and not (death_screen and death_screen.visible):
+			if pause_menu:
+				if pause_menu.visible:
+					_close_pause_menu()
+				else:
+					_open_pause_menu()
+				get_viewport().set_input_as_handled()
+				return
+	
 	if is_dead:
 		if all_players_dead:
 			if event is InputEventKey and event.pressed and (event.keycode == KEY_R or event.keycode == KEY_SPACE):
@@ -164,10 +218,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				_cycle_spectator_target(1)
 		return
 	
-	# Mağaza açıkken veya fare görünürken silah ve kamera girdilerini engelle
-	if is_in_shop or Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
-		if event.is_action_pressed("ui_cancel") and not is_in_shop:
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	# Pause menüsü, Mağaza açıkken veya fare görünürken silah ve kamera girdilerini engelle
+	if (pause_menu and pause_menu.visible) or is_in_shop or Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 		return
 
 	# Fare Tekerleği ile Silah Geçişi (Mouse Scroll Wheel)
@@ -177,21 +229,19 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			_cycle_weapon(1)
 	
-	# Sayı Tuşları ile Silah Seçimi (1, 2, 3, 4)
+	# Sayı Tuşları ile Silah Seçimi (1, 2, 3, 4, 5)
 	if event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:
 			KEY_1: _select_weapon_slot(0)
 			KEY_2: _select_weapon_slot(1)
 			KEY_3: _select_weapon_slot(2)
 			KEY_4: _select_weapon_slot(3)
+			KEY_5: _select_weapon_slot(4)
 	
 	if event is InputEventMouseMotion:
 		rotate_y(-event.relative.x * mouse_sensitivity)
 		head.rotate_x(-event.relative.y * mouse_sensitivity)
 		head.rotation.x = clamp(head.rotation.x, deg_to_rad(-89), deg_to_rad(89))
-	
-	if event.is_action_pressed("ui_cancel"):
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
@@ -238,8 +288,8 @@ func _physics_process(delta: float) -> void:
 				camera.look_at(spectator_target.global_position + Vector3(0, 1.2, 0), Vector3.UP)
 		return
 
-	# Mağazadayken hareket ve aksiyonları durdur
-	if is_in_shop:
+	# Duraklatma Menüsü veya Mağazadayken hareket ve aksiyonları durdur
+	if (pause_menu and pause_menu.visible) or is_in_shop:
 		velocity.x = move_toward(velocity.x, 0, 15.0 * delta)
 		velocity.z = move_toward(velocity.z, 0, 15.0 * delta)
 		move_and_slide()
@@ -247,6 +297,7 @@ func _physics_process(delta: float) -> void:
 
 	fire_timer -= delta
 	kick_timer -= delta
+	jump_cooldown_timer = max(0.0, jump_cooldown_timer - delta)
 	
 	# Kombo Sayacı
 	if combo_timer > 0:
@@ -275,9 +326,10 @@ func _physics_process(delta: float) -> void:
 	if gun:
 		gun.position = gun.position.lerp(original_gun_pos, 15.0 * delta)
 
-	# Zıplama
-	if Input.is_action_just_pressed("jump") and is_on_floor():
+	# Zıplama (Düşürüldü ve bekleme süresi eklendi - Vortex ve takım taktiği değer kazandı)
+	if Input.is_action_just_pressed("jump") and is_on_floor() and jump_cooldown_timer <= 0:
 		velocity.y = jump_velocity
+		jump_cooldown_timer = 0.35
 
 	# Hız (Kombo Bonusu Dahil)
 	var speed_bonus = 1.0 + (combo_multiplier * 0.04)
@@ -325,6 +377,11 @@ func _shoot() -> void:
 			var spread = Vector3(randf_range(-0.02, 0.02), randf_range(-0.02, 0.02), 0)
 			_fire_bullet(25.0 * stat_damage_mult, spread)
 			weapon_ammo_dict["uzi"] = max(0, weapon_ammo_dict.get("uzi", 0) - 1)
+		"bixi":
+			fire_timer = 0.10 / stat_firerate_mult
+			var spread = Vector3(randf_range(-0.022, 0.022), randf_range(-0.022, 0.022), 0)
+			_fire_bullet(34.0 * stat_damage_mult, spread)
+			weapon_ammo_dict["bixi"] = max(0, weapon_ammo_dict.get("bixi", 0) - 1)
 		"shotgun":
 			fire_timer = 0.65 / stat_firerate_mult
 			for i in range(6):
@@ -354,6 +411,13 @@ func _fire_bullet(dmg: float, spread: Vector3) -> void:
 	if not shoot_ray or not shoot_ray.is_colliding():
 		return
 	var hit_collider = shoot_ray.get_collider()
+	if hit_collider == null:
+		return
+
+	# DOST ATEŞİ KAPALI: Takım arkadaşına hasar verme!
+	if hit_collider.is_in_group("players") or (hit_collider.get_parent() and hit_collider.get_parent().is_in_group("players")):
+		return
+
 	var hit_point = shoot_ray.get_collision_point() + spread
 	var hit_normal = shoot_ray.get_collision_normal()
 	
@@ -367,7 +431,7 @@ func _fire_bullet(dmg: float, spread: Vector3) -> void:
 		target = hit_collider
 
 	if target and target.has_method("take_damage"):
-		target.take_damage(dmg, is_headshot, hit_point)
+		target.take_damage(dmg, is_headshot, hit_point, player_id)
 		_register_kill_streak()
 	
 	_spawn_hit_effect.rpc(hit_point, hit_normal)
@@ -391,17 +455,25 @@ func apply_pickup(p_type: String, p_amount: int) -> void:
 		"gold":
 			gold += p_amount
 			SoundManager.play_sfx("pickup")
-		"shotgun", "uzi", "rocket":
-			SoundManager.play_sfx("pickup")
+			sync_player_stats.rpc(gold)
+		"shotgun", "uzi", "bixi", "rocket":
+			var max_cap = WEAPON_MAX_AMMO.get(p_type, 250)
+			var current_ammo = weapon_ammo_dict.get(p_type, 0)
 			var is_new = not weapon_inventory.has(p_type)
+			
+			if not is_new and current_ammo >= max_cap:
+				_show_weapon_notice("⚠️ " + _get_weapon_display_name(p_type).to_upper() + " CEPHANESİ DOLU! (" + str(max_cap) + ")")
+				return
+			
+			SoundManager.play_sfx("pickup")
 			if is_new:
 				weapon_inventory.append(p_type)
-				weapon_ammo_dict[p_type] = p_amount
+				weapon_ammo_dict[p_type] = min(p_amount, max_cap)
 				# Toplanan silaha hemen geçiş yap
 				switch_to_weapon(p_type)
 			else:
-				weapon_ammo_dict[p_type] += p_amount
-			_show_weapon_notice("🎁 " + _get_weapon_display_name(p_type).to_upper() + " ALINDI! (+" + str(p_amount) + ")")
+				weapon_ammo_dict[p_type] = min(max_cap, current_ammo + p_amount)
+			_show_weapon_notice("🎁 " + _get_weapon_display_name(p_type).to_upper() + " ALINDI! (+" + str(p_amount) + ") [" + str(weapon_ammo_dict[p_type]) + "/" + str(max_cap) + "]")
 		"barrel":
 			barrel_count += p_amount
 			SoundManager.play_sfx("pickup")
@@ -419,6 +491,12 @@ func _kick() -> void:
 	
 	if kick_ray and kick_ray.is_colliding():
 		var collider = kick_ray.get_collider()
+		if collider == null:
+			return
+		# DOST ATEŞİ KAPALI: Takım arkadaşına tekme vurma
+		if collider.is_in_group("players") or (collider.get_parent() and collider.get_parent().is_in_group("players")):
+			return
+		
 		var kick_dir = -transform.basis.z
 		kick_dir.y = 0.2
 		kick_dir = kick_dir.normalized()
@@ -427,7 +505,7 @@ func _kick() -> void:
 			collider.kick(kick_dir, 22.0)
 		elif collider.is_in_group("enemies"):
 			if collider.has_method("take_damage"):
-				collider.take_damage(25.0 * stat_damage_mult, false, global_position)
+				collider.take_damage(25.0 * stat_damage_mult, false, global_position, player_id)
 			collider.velocity += kick_dir * 18.0
 
 ## Varil Yerleştirme (G Tuşu)
@@ -501,6 +579,7 @@ func _update_hud() -> void:
 				"pistol": weapon_label.modulate = Color(0.9, 0.9, 0.9)
 				"shotgun": weapon_label.modulate = Color(1.0, 0.45, 0.2)
 				"uzi": weapon_label.modulate = Color(0.3, 1.0, 0.4)
+				"bixi": weapon_label.modulate = Color(0.95, 0.75, 0.2)
 				"rocket": weapon_label.modulate = Color(1.0, 0.25, 0.9)
 
 		if weapon_slots_label:
@@ -587,6 +666,8 @@ func _update_gun_visuals() -> void:
 			gun.scale = Vector3(1.3, 1.3, 1.4)
 		"uzi":
 			gun.scale = Vector3(0.9, 0.9, 0.85)
+		"bixi":
+			gun.scale = Vector3(1.35, 1.2, 1.85)
 		"rocket":
 			gun.scale = Vector3(1.5, 1.5, 1.6)
 
@@ -595,6 +676,7 @@ func _get_weapon_display_name(w_name: String) -> String:
 		"pistol": return "Tabanca"
 		"shotgun": return "Pompalı"
 		"uzi": return "Uzi"
+		"bixi": return "Bixi (PKM)"
 		"rocket": return "Roketatar"
 		_: return w_name.capitalize()
 

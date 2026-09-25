@@ -27,12 +27,13 @@ func _create_player_pool() -> void:
 ## Tüm ses efektlerini saf matematiksel dalga formlarıyla üret
 func _generate_all_sounds() -> void:
 	var sample_rate = 22050
-	var sound_names = ["pistol", "shotgun", "uzi", "rocket", "switch", "empty", "pickup"]
+	var sound_names = ["pistol", "shotgun", "uzi", "bixi", "rocket", "switch", "empty", "pickup"]
 	
 	for s_name in sound_names:
 		var dur = 0.2
 		if s_name == "shotgun": dur = 0.36
 		elif s_name == "uzi": dur = 0.10
+		elif s_name == "bixi": dur = 0.16
 		elif s_name == "rocket": dur = 0.50
 		elif s_name == "switch" or s_name == "empty": dur = 0.08
 		
@@ -64,6 +65,12 @@ func _generate_all_sounds() -> void:
 					var tone = sin(t * freq * TAU)
 					var noise = randf_range(-1.0, 1.0) * exp(-prog * 35.0)
 					sample = (tone * 0.5 + noise * 0.5) * env
+				"bixi":
+					var env = exp(-prog * 18.0)
+					var freq = lerp(260.0, 60.0, prog)
+					var tone = sin(t * freq * TAU)
+					var noise = randf_range(-1.0, 1.0) * exp(-prog * 22.0)
+					sample = (tone * 0.65 + noise * 0.45) * env
 				"rocket":
 					var env = sin(prog * PI) * exp(-prog * 3.0)
 					var tone = sin(t * 70.0 * TAU) * 0.5

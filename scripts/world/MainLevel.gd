@@ -27,6 +27,7 @@ var zombies_remaining_to_spawn: int = 0
 var active_zombie_count: int = 0
 var zombie_id_counter: int = 0
 var barrel_id_counter: int = 0
+var wave_loop_token: int = 0
 
 @onready var floor_label: Label = $WaveUI/WaveInfo/FloorLabel
 @onready var wave_label: Label = $WaveUI/WaveInfo/WaveLabel
@@ -135,19 +136,23 @@ func _start_next_wave() -> void:
 	if not multiplayer.is_server():
 		return
 
-	# Kat ve Dalga çarpanına göre zombi sayısı
+	wave_loop_token += 1
+	var current_token = wave_loop_token
 	zombies_remaining_to_spawn = 4 + (current_floor * 2) + (current_wave * 2)
 	active_zombie_count = 0
 	_sync_floor_ui.rpc(current_floor, current_wave, zombies_remaining_to_spawn)
-	_spawn_zombie_loop()
+	_spawn_zombie_loop(current_token)
 
-func _spawn_zombie_loop() -> void:
+func _spawn_zombie_loop(token: int) -> void:
 	while zombies_remaining_to_spawn > 0:
-		if not is_instance_valid(self):
+		if not is_instance_valid(self) or token != wave_loop_token:
 			return
 		
-		var spawn_delay = max(0.6, 1.3 - (current_floor * 0.1))
+		var spawn_delay = max(0.5, 1.2 - (current_floor * 0.08))
 		await get_tree().create_timer(spawn_delay).timeout
+		if token != wave_loop_token:
+			return
+		
 		_spawn_single_zombie()
 		zombies_remaining_to_spawn -= 1
 		active_zombie_count += 1
@@ -181,12 +186,14 @@ func _on_zombie_died(_zombie_ref) -> void:
 	_sync_floor_ui.rpc(current_floor, current_wave, active_zombie_count + zombies_remaining_to_spawn)
 
 	if zombies_remaining_to_spawn == 0 and active_zombie_count == 0:
+		var token = wave_loop_token
 		if current_wave < WAVES_PER_FLOOR:
 			# Kat içindeki bir sonraki dalga
 			current_wave += 1
 			_announce_wave_cleared.rpc()
 			await get_tree().create_timer(3.5).timeout
-			_start_next_wave()
+			if token == wave_loop_token:
+				_start_next_wave()
 		else:
 			# KAT TAMAMEN TEMİZLENDİ! ASANSÖR AÇILIR!
 			_on_floor_cleared()
@@ -313,25 +320,92 @@ func _request_server_restart() -> void:
 		_restart_game()
 
 func _restart_game() -> void:
-	print("[MainLevel] Oyun yeniden başlatılıyor...")
+	print("[MainLevel] Oyun sıfırlanıyor ve baştan başlatılıyor...")
+	wave_loop_token += 1
 	current_floor = 1
 	current_wave = 1
 	active_zombie_count = 0
 	zombies_remaining_to_spawn = 0
 	
+	_close_shop_ui.rpc()
+	
 	# Sahnedeki tüm düşmanları temizle
 	for child in enemies_container.get_children():
 		child.queue_free()
 	
-	# Tüm oyuncuları doğuş noktalarında canlandır
+	# Sahnedeki tüm varilleri temizle
+	for child in barrels_container.get_children():
+		child.queue_free()
+	
+	# Sahnedeki tüm toplanabilir eşyaları temizle
+	var pickups = get_tree().get_nodes_in_group("pickups")
+	for p in pickups:
+		p.queue_free()
+	
+	# Başlangıç varillerini yeniden doğur
+	_spawn_initial_barrels()
+	
+	# Tüm oyuncuları doğuş noktalarında canlandır ve envanterlerini sıfırla
 	var players = get_tree().get_nodes_in_group("players")
 	for i in range(players.size()):
 		var p = players[i]
 		var spawn_pos = spawn_points[i % spawn_points.size()].global_position if spawn_points.size() > 0 else Vector3(0, 1.5, 0)
-		if p.has_method("revive"):
+		if p.has_method("reset_to_default_loadout"):
+			p.reset_to_default_loadout.rpc(spawn_pos)
+		elif p.has_method("revive"):
 			p.revive.rpc(p.max_health, spawn_pos)
 	
 	elevator.set_elevator_state(false)
 	_sync_floor_ui.rpc(current_floor, current_wave, 0)
-	await get_tree().create_timer(1.5).timeout
+	await get_tree().create_timer(1.8).timeout
 	_start_next_wave()
+
+## Çok Oyunculu Senkronize Büyü Oluşturma (Tüm ekranlarda görünür!)
+@rpc("call_local", "reliable")
+func sync_spawn_spell(spell_type: String, pos: Vector3, dir: Vector3, extra_y: float = 0.0) -> void:
+	var spell_instance = null
+	match spell_type:
+		"fire_wave":
+			var scene = load("res://scenes/spells/fire_wave.tscn")
+			if scene:
+				spell_instance = scene.instantiate()
+				spell_instance.position = pos
+				spell_instance.direction = dir
+				spell_instance.look_at(pos + dir, Vector3.UP)
+		"thrown_vortex":
+			var scene = load("res://scenes/spells/thrown_vortex.tscn")
+			if scene:
+				spell_instance = scene.instantiate()
+				spell_instance.position = pos
+				spell_instance.setup(dir)
+		"thrown_frost":
+			var scene = load("res://scenes/spells/thrown_frost.tscn")
+			if scene:
+				spell_instance = scene.instantiate()
+				spell_instance.position = pos
+				spell_instance.setup(dir)
+		"thrown_heal":
+			var scene = load("res://scenes/spells/thrown_heal.tscn")
+			if scene:
+				spell_instance = scene.instantiate()
+				spell_instance.position = pos
+				spell_instance.setup(dir)
+		"meteor":
+			var scene = load("res://scenes/spells/meteor.tscn")
+			if scene:
+				spell_instance = scene.instantiate()
+				spell_instance.position = pos
+				spell_instance.target_y = extra_y
+		"emp_blast":
+			var scene = load("res://scenes/spells/vortex.tscn")
+			if scene:
+				spell_instance = scene.instantiate()
+				spell_instance.position = pos
+		"frost_storm":
+			var scene = load("res://scenes/spells/frost_nova.tscn")
+			if scene:
+				spell_instance = scene.instantiate()
+				spell_instance.position = pos
+	
+	if spell_instance:
+		add_child(spell_instance, false)

@@ -13,6 +13,8 @@ var attack_timer: float = 0.0
 var target_player: CharacterBody3D = null
 var is_frozen: bool = false
 var is_dead: bool = false
+var slow_factor: float = 1.0
+var slow_timer: float = 0.0
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 const GIBS_SCENE_PATH = "res://scenes/effects/cube_gibs.tscn"
@@ -40,6 +42,10 @@ func _physics_process(delta: float) -> void:
 		return
 
 	attack_timer -= delta
+	if slow_timer > 0:
+		slow_timer -= delta
+		if slow_timer <= 0:
+			slow_factor = 1.0
 
 	# En yakın oyuncuyu hedef seç
 	_find_closest_player()
@@ -58,12 +64,15 @@ func _physics_process(delta: float) -> void:
 			rotation.z = 0
 
 		# Mesafe kontrolü: Kovalama mı, Saldırı mı?
-		if distance > 1.3:
+		var vert_diff = abs(global_position.y - target_player.global_position.y)
+		var move_speed = speed * slow_factor
+		if distance > 1.3 or vert_diff > 1.6:
+			# Zombi havadaysa veya oyuncudan çok uzaktaysa yaklaşmalı
 			var direction = diff.normalized()
-			velocity.x = direction.x * speed
-			velocity.z = direction.z * speed
+			velocity.x = direction.x * move_speed
+			velocity.z = direction.z * move_speed
 		else:
-			# Saldırı menzilinde
+			# Saldırı menzilinde ve aynı seviyede
 			velocity.x = 0
 			velocity.z = 0
 			if attack_timer <= 0:
@@ -122,22 +131,22 @@ func _flash_hurt() -> void:
 			h_mesh.material_override = null
 
 ## Hasar Alma Metodu (Mermi isabet ettiğinde çağrılır)
-func take_damage(amount: float, is_headshot: bool = false, hit_point: Vector3 = Vector3.ZERO) -> void:
+func take_damage(amount: float, is_headshot: bool = false, hit_point: Vector3 = Vector3.ZERO, attacker_id: int = 1) -> void:
 	if is_dead:
 		return
 	# Hasar hesaplaması sunucuda yetkilidir
 	if not multiplayer.is_server():
-		_request_damage.rpc_id(1, amount, is_headshot, hit_point)
+		_request_damage.rpc_id(1, amount, is_headshot, hit_point, attacker_id)
 		return
 
-	_apply_damage(amount, is_headshot, hit_point)
+	_apply_damage(amount, is_headshot, hit_point, attacker_id)
 
 @rpc("any_peer", "reliable")
-func _request_damage(amount: float, is_headshot: bool, hit_point: Vector3) -> void:
+func _request_damage(amount: float, is_headshot: bool, hit_point: Vector3, attacker_id: int = 1) -> void:
 	if multiplayer.is_server():
-		take_damage(amount, is_headshot, hit_point)
+		take_damage(amount, is_headshot, hit_point, attacker_id)
 
-func _apply_damage(amount: float, is_headshot: bool, hit_point: Vector3) -> void:
+func _apply_damage(amount: float, is_headshot: bool, hit_point: Vector3, attacker_id: int = 1) -> void:
 	if is_dead:
 		return
 	var final_damage = amount * 2.5 if is_headshot else amount
@@ -145,24 +154,29 @@ func _apply_damage(amount: float, is_headshot: bool, hit_point: Vector3) -> void
 	
 	_flash_hurt.rpc()
 	
-	# Hafif geriye savrulma (knockback)
-	if hit_point != Vector3.ZERO:
+	# Hafif geriye savrulma (knockback) - Sadece belirgin hasarlarda ve neredeyse tamamen yatay
+	if amount >= 12.0 and hit_point != Vector3.ZERO:
 		var push_dir = (global_position - hit_point).normalized()
-		push_dir.y = 0.2
-		velocity += push_dir * 3.0
+		push_dir.y = 0.04
+		velocity += push_dir * min(amount * 0.08, 2.8)
 
 	if current_health <= 0:
 		is_dead = true
-		_die.rpc(is_headshot)
+		_die.rpc(is_headshot, attacker_id)
 
 const PICKUP_SCENE_PATH = "res://scenes/interactables/pickup.tscn"
 
 @rpc("call_local", "reliable")
-func _die(is_headshot: bool) -> void:
+func _die(is_headshot: bool, attacker_id: int = 1) -> void:
 	if is_dead and not multiplayer.is_server() and not visible:
 		return
 	is_dead = true
 	died.emit(self)
+	
+	# Skoru vuran oyuncuya yaz
+	var killer = get_tree().current_scene.find_child(str(attacker_id), true, false)
+	if killer and killer.has_method("record_kill"):
+		killer.record_kill(is_headshot)
 	
 	# Küp parçalanma efektini doğur
 	var gibs_scene = load(GIBS_SCENE_PATH)
@@ -173,22 +187,31 @@ func _die(is_headshot: bool) -> void:
 
 	# Eşya Düşürme (Sadece Sunucu)
 	if multiplayer.is_server():
-		# 100% Altın Düşer
-		_spawn_pickup("gold", randi_range(8, 18), global_position)
+		# Altın Düşüşü
+		_spawn_pickup("gold", randi_range(6, 14), global_position)
 		
-		# Şanslı Ek Düşüşler
+		# Takımın en yüksek ganimet şansını hesapla
+		var luck_bonus = 0.0
+		var players = get_tree().get_nodes_in_group("players")
+		for p in players:
+			luck_bonus = max(luck_bonus, p.get("stat_drop_luck", 0.0))
+		
+		# Dengeli Düşüş Oranları (Taban ~%15, Şans Kartı ile artar)
+		var base_chance = 0.15 * (1.0 + luck_bonus)
 		var roll = randf()
-		if roll < 0.28:
+		if roll < base_chance:
 			var w_roll = randf()
-			if w_roll < 0.50:
-				_spawn_pickup("shotgun", 16, global_position + Vector3(0.4, 0, 0.4))
-			elif w_roll < 0.85:
-				_spawn_pickup("uzi", 90, global_position + Vector3(0.4, 0, 0.4))
+			if w_roll < 0.35:
+				_spawn_pickup("shotgun", 12, global_position + Vector3(0.4, 0, 0.4))
+			elif w_roll < 0.65:
+				_spawn_pickup("uzi", 60, global_position + Vector3(0.4, 0, 0.4))
+			elif w_roll < 0.90:
+				_spawn_pickup("bixi", 80, global_position + Vector3(0.4, 0, 0.4))
 			else:
-				_spawn_pickup("rocket", 4, global_position + Vector3(0.4, 0, 0.4))
-		elif roll < 0.48:
+				_spawn_pickup("rocket", 3, global_position + Vector3(0.4, 0, 0.4))
+		elif roll < base_chance + 0.05:
 			_spawn_pickup("barrel", 1, global_position + Vector3(-0.4, 0, 0.4))
-		elif roll < 0.65:
+		elif roll < base_chance + 0.10:
 			_spawn_pickup("health", 25, global_position + Vector3(0.4, 0, -0.4))
 		
 		queue_free()
@@ -232,3 +255,8 @@ func _apply_freeze(duration: float) -> void:
 	if is_instance_valid(self):
 		if b_mesh and b_mesh.material_override == _get_freeze_mat():
 			b_mesh.material_override = null
+
+## Yavaşlatma Fonksiyonu (Buz Muhafızı Kriyojenik Zemin)
+func apply_slow(factor: float = 0.4, duration: float = 1.0) -> void:
+	slow_factor = min(slow_factor, factor)
+	slow_timer = max(slow_timer, duration)

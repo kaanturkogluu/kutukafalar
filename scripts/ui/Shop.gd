@@ -75,7 +75,9 @@ func _generate_offers() -> void:
 		{"type": "speed", "title": "🏃 Kutu Çevikliği", "desc": "Koşma Hızı +%15 Hızlanır", "cost": base_cost - 10, "bought": false},
 		{"type": "firerate", "title": "⚡ Seri Tetik", "desc": "Silah Atış Hızı +%20 Hızlanır", "cost": base_cost + 15, "bought": false},
 		{"type": "barrels", "title": "📦 Varil İkmali", "desc": "+3 Patlayıcı Varil Kapasitesi", "cost": base_cost - 15, "bought": false},
-		{"type": "cooldown", "title": "🔮 Büyü Odaklanması", "desc": "Taktiksel Büyü Bekleme Süresi -2.5 sn", "cost": base_cost + 25, "bought": false}
+		{"type": "cooldown", "title": "🔮 Büyü Odaklanması", "desc": "Taktiksel Büyü Bekleme Süresi -2.5 sn", "cost": base_cost + 25, "bought": false},
+		{"type": "droprate", "title": "🍀 Ganimet Şansı", "desc": "Zombilerden Eşya ve Silah Düşme Şansı +%50 Artar", "cost": base_cost + 10, "bought": false},
+		{"type": "bixi", "title": "🔥 Bixi (PKM) Ağır Makineli", "desc": "Yüksek Mermi Kapasiteli Tam Otomatik Ağır Makineli (+120 Mermi)", "cost": base_cost + 40, "bought": false}
 	]
 	pool.shuffle()
 	current_offers = [pool[0], pool[1], pool[2]]
@@ -109,7 +111,13 @@ func _buy_card(index: int) -> void:
 		"cooldown":
 			if local_player.spell_manager:
 				local_player.spell_manager.tactical_cooldown = max(5.0, local_player.spell_manager.tactical_cooldown - 2.5)
+		"droprate":
+			local_player.stat_drop_luck += 0.50
+		"bixi":
+			local_player.apply_pickup("bixi", 120)
 
+	if local_player.has_method("sync_player_stats"):
+		local_player.sync_player_stats.rpc(local_player.gold)
 	local_player._update_hud()
 	_update_ui()
 	print("[Mağaza] Satın alındı: ", offer.title)

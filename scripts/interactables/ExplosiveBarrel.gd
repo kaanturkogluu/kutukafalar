@@ -86,8 +86,5 @@ func _detonate() -> void:
 			# Zincirleme Varil Patlaması!
 			elif collider.is_in_group("barrels") and collider.has_method("take_damage"):
 				collider.take_damage(damage_to_deal, false, global_position)
-			# Oyuncuya itme/hafif hasar
-			elif collider.is_in_group("players") and collider.has_method("take_damage"):
-				collider.take_damage(damage_to_deal * 0.25) # Dost ateşi hafif
 
 	queue_free()

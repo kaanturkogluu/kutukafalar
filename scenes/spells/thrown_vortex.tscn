@@ -58,7 +58,8 @@ func _pull_enemies(delta: float) -> void:
 		if dist > 0.5:
 			var pull_dir = diff.normalized()
 			if body.is_in_group(\"enemies\"):
-				body.velocity = body.velocity.lerp(pull_dir * 12.0, 10.0 * delta)
+				body.velocity.x = lerp(body.velocity.x, pull_dir.x * 12.0, 8.0 * delta)
+				body.velocity.z = lerp(body.velocity.z, pull_dir.z * 12.0, 8.0 * delta)
 			elif body is RigidBody3D:
 				body.apply_central_impulse(pull_dir * 18.0 * delta)
 "

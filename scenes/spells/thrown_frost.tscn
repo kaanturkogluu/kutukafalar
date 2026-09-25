@@ -10,43 +10,53 @@ var freeze_radius: float = 8.5
 var freeze_duration: float = 4.5
 var damage: float = 45.0
 
+var has_deployed: bool = false
+var duration: float = 5.5
+
 func setup(dir: Vector3) -> void:
 	velocity_vector = dir * speed + Vector3.UP * 3.5
 
 func _physics_process(delta: float) -> void:
-	velocity_vector.y -= gravity * delta
-	$MeshInstance3D.rotate_x(10.0 * delta)
-	$MeshInstance3D.rotate_z(8.0 * delta)
-	
-	var collision = move_and_collide(velocity_vector * delta)
-	if collision:
-		explode_frost()
+	if not has_deployed:
+		velocity_vector.y -= gravity * delta
+		$MeshInstance3D.rotate_x(10.0 * delta)
+		$MeshInstance3D.rotate_z(8.0 * delta)
+		var collision = move_and_collide(velocity_vector * delta)
+		if collision:
+			deploy_frost_zone()
+	else:
+		if multiplayer.is_server():
+			_frost_zone_tick(delta)
 
-func explode_frost() -> void:
+func deploy_frost_zone() -> void:
+	if has_deployed:
+		return
+	has_deployed = true
+	velocity_vector = Vector3.ZERO
 	$MeshInstance3D.visible = false
 	$IceParticles.emitting = true
-	$OmniLight3D.light_energy = 6.0
+	$OmniLight3D.light_energy = 5.0
 	
-	if multiplayer.is_server():
-		var space = get_world_3d().direct_space_state
-		var query = PhysicsShapeQueryParameters3D.new()
-		var sphere = SphereShape3D.new()
-		sphere.radius = freeze_radius
-		query.shape = sphere
-		query.transform = global_transform
-		query.collision_mask = 7
-
-		var hits = space.intersect_shape(query, 64)
-		for h in hits:
-			var body = h.collider
-			if body.is_in_group(\"enemies\"):
-				if body.has_method(\"freeze\"):
-					body.freeze(freeze_duration)
-				if body.has_method(\"take_damage\"):
-					body.take_damage(damage, false, global_position)
-	
-	await get_tree().create_timer(1.2).timeout
+	await get_tree().create_timer(duration).timeout
 	queue_free()
+
+func _frost_zone_tick(delta: float) -> void:
+	var space = get_world_3d().direct_space_state
+	var query = PhysicsShapeQueryParameters3D.new()
+	var sphere = SphereShape3D.new()
+	sphere.radius = freeze_radius
+	query.shape = sphere
+	query.transform = global_transform
+	query.collision_mask = 7
+
+	var hits = space.intersect_shape(query, 64)
+	for h in hits:
+		var body = h.collider
+		if body.is_in_group(\"enemies\"):
+			if body.has_method(\"apply_slow\"):
+				body.apply_slow(0.35, 0.4)
+			if body.has_method(\"take_damage\"):
+				body.take_damage(16.0 * delta, false, global_position)
 "
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_tf"]
