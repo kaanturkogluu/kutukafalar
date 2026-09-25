@@ -1,0 +1,160 @@
+[gd_scene load_steps=2 format=3 uid="uid://shop_scene_01"]
+
+[ext_resource type="Script" path="res://scripts/ui/Shop.gd" id="1_shop"]
+
+[node name="ShopUI" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_shop")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.65)
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -380.0
+offset_top = -220.0
+offset_right = 380.0
+offset_bottom = 220.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 14
+
+[node name="TitleLabel" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 24
+text = "🛗 KAT TAMAMLANDI! ASANSÖR MAĞAZASI"
+horizontal_alignment = 1
+
+[node name="GoldLabel" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.4, 1)
+theme_override_font_sizes/font_size = 18
+text = "🪙 MEVCUT ALTININIZ: 0"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxCards" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Card1" type="PanelContainer" parent="Panel/VBoxContainer/HBoxCards"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBox" type="VBoxContainer" parent="Panel/VBoxContainer/HBoxCards/Card1"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Title" type="Label" parent="Panel/VBoxContainer/HBoxCards/Card1/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "🛡️ Zırh Takviyesi"
+horizontal_alignment = 1
+
+[node name="Desc" type="Label" parent="Panel/VBoxContainer/HBoxCards/Card1/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.75, 0.8, 0.85, 1)
+theme_override_font_sizes/font_size = 12
+text = "+35 Maksimum Can ve Tam Şifa"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="BuyButton" type="Button" parent="Panel/VBoxContainer/HBoxCards/Card1/VBox"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+text = "SATIN AL (50 🪙)"
+
+[node name="Card2" type="PanelContainer" parent="Panel/VBoxContainer/HBoxCards"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBox" type="VBoxContainer" parent="Panel/VBoxContainer/HBoxCards/Card2"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Title" type="Label" parent="Panel/VBoxContainer/HBoxCards/Card2/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "💥 Ağır Mühimmat"
+horizontal_alignment = 1
+
+[node name="Desc" type="Label" parent="Panel/VBoxContainer/HBoxCards/Card2/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.75, 0.8, 0.85, 1)
+theme_override_font_sizes/font_size = 12
+text = "Tüm Silah Hasarı +%25 Artar"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="BuyButton" type="Button" parent="Panel/VBoxContainer/HBoxCards/Card2/VBox"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+text = "SATIN AL (70 🪙)"
+
+[node name="Card3" type="PanelContainer" parent="Panel/VBoxContainer/HBoxCards"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBox" type="VBoxContainer" parent="Panel/VBoxContainer/HBoxCards/Card3"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Title" type="Label" parent="Panel/VBoxContainer/HBoxCards/Card3/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "🏃 Kutu Çevikliği"
+horizontal_alignment = 1
+
+[node name="Desc" type="Label" parent="Panel/VBoxContainer/HBoxCards/Card3/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.75, 0.8, 0.85, 1)
+theme_override_font_sizes/font_size = 12
+text = "Koşma Hızı +%15 Hızlanır"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="BuyButton" type="Button" parent="Panel/VBoxContainer/HBoxCards/Card3/VBox"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+text = "SATIN AL (45 🪙)"
+
+[node name="NextFloorButton" type="Button" parent="Panel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "⬇️ SONRAKİ KATA İN (ASANSÖRÜ ÇALIŞTIR)"

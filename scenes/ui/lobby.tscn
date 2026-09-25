@@ -1,0 +1,220 @@
+[gd_scene load_steps=2 format=3 uid="uid://c51wup2e3a1k8"]
+
+[ext_resource type="Script" path="res://scripts/ui/Lobby.gd" id="1_lobby"]
+
+[node name="Lobby" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_lobby")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.09, 0.12, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(400, 360)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "📦 KUTU KAFALAR"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "1. ŞAHIS CO-OP HORDE SHOOTER"
+horizontal_alignment = 1
+
+[node name="HSeparator1" type="HSeparator" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="NameInput" type="LineEdit" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+placeholder_text = "Oyuncu Adınız..."
+text = "Kutu Asker"
+alignment = 1
+
+[node name="ClassOption" type="OptionButton" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+alignment = 1
+
+[node name="HostButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "🎮 ODA KUR (HOST)"
+
+[node name="HSeparator2" type="HSeparator" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="IpInput" type="LineEdit" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+placeholder_text = "Sunucu IP Adresi"
+text = "127.0.0.1"
+alignment = 1
+
+[node name="JoinButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "🔗 ODAYA KATIL (JOIN)"
+
+[node name="StatusLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.5, 1)
+theme_override_font_sizes/font_size = 12
+text = "Durum bekleniyor..."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="FooterBox" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="VersionLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/FooterBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.5, 0.6, 1)
+theme_override_font_sizes/font_size = 11
+text = "v1.0.0"
+
+[node name="CheckUpdateBtn" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/FooterBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.75, 1, 1)
+theme_override_font_sizes/font_size = 11
+flat = true
+text = "🔄 Güncelleme Denetle"
+
+[node name="UpdateOverlay" type="ColorRect" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.78)
+
+[node name="Center" type="CenterContainer" parent="UpdateOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="UpdatePanel" type="PanelContainer" parent="UpdateOverlay/Center"]
+custom_minimum_size = Vector2(440, 280)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="UpdateOverlay/Center/UpdatePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="UpdateOverlay/Center/UpdatePanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="UpdateTitle" type="Label" parent="UpdateOverlay/Center/UpdatePanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 0.4, 1)
+theme_override_font_sizes/font_size = 20
+text = "🚀 YENİ GÜNCELLEME MEVCUT!"
+horizontal_alignment = 1
+
+[node name="UpdateInfoLabel" type="Label" parent="UpdateOverlay/Center/UpdatePanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 14
+text = "Yeni Sürüm: v1.0.1 (Boyut: ~250 KB)"
+horizontal_alignment = 1
+
+[node name="UpdateNotesLabel" type="Label" parent="UpdateOverlay/Center/UpdatePanel/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 12
+text = "Yama notları yükleniyor..."
+autowrap_mode = 2
+
+[node name="UpdateProgressBar" type="ProgressBar" parent="UpdateOverlay/Center/UpdatePanel/Margin/VBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+show_percentage = true
+
+[node name="UpdateProgressText" type="Label" parent="UpdateOverlay/Center/UpdatePanel/Margin/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "İndiriliyor..."
+horizontal_alignment = 1
+
+[node name="ButtonBox" type="HBoxContainer" parent="UpdateOverlay/Center/UpdatePanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="StartUpdateBtn" type="Button" parent="UpdateOverlay/Center/UpdatePanel/Margin/VBox/ButtonBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 40)
+layout_mode = 2
+text = "📥 ŞİMDİ GÜNCELLE"
+
+[node name="DismissUpdateBtn" type="Button" parent="UpdateOverlay/Center/UpdatePanel/Margin/VBox/ButtonBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+text = "Daha Sonra"
+

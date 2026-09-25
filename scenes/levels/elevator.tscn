@@ -1,0 +1,72 @@
+[gd_scene load_steps=8 format=3 uid="uid://elevator_scene_01"]
+
+[ext_resource type="Script" path="res://scripts/world/Elevator.gd" id="1_elev"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
+albedo_color = Color(0.2, 0.22, 0.25, 1)
+metallic = 0.5
+roughness = 0.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor"]
+material = SubResource("StandardMaterial3D_floor")
+size = Vector3(4.2, 0.4, 4.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(4.2, 0.4, 4.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_door"]
+albedo_color = Color(0.3, 0.35, 0.4, 1)
+metallic = 0.7
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_door"]
+material = SubResource("StandardMaterial3D_door")
+size = Vector3(1.4, 3.2, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_trig"]
+size = Vector3(3.6, 3.0, 3.6)
+
+[node name="Elevator" type="Node3D"]
+script = ExtResource("1_elev")
+
+[node name="Floor" type="StaticBody3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("BoxMesh_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("BoxShape3D_floor")
+
+[node name="BeaconLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+light_color = Color(1, 0.2, 0.1, 1)
+light_energy = 4.0
+omni_range = 8.0
+
+[node name="SignLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 2.0)
+billboard = 1
+no_depth_test = true
+text = "ASANSÖR"
+font_size = 28
+outline_size = 8
+
+[node name="LeftDoor" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 1.6, 2.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="LeftDoor"]
+mesh = SubResource("BoxMesh_door")
+
+[node name="RightDoor" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 1.6, 2.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RightDoor"]
+mesh = SubResource("BoxMesh_door")
+
+[node name="TriggerArea" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TriggerArea"]
+shape = SubResource("BoxShape3D_trig")

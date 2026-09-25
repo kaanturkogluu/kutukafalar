@@ -1,0 +1,99 @@
+[gd_scene load_steps=7 format=3 uid="uid://meteor_spell_01"]
+
+[sub_resource type="GDScript" id="GDScript_meteor"]
+script/source = "extends Node3D
+
+@export var fall_speed: float = 38.0
+@export var damage: float = 500.0
+@export var explosion_radius: float = 8.5
+var target_y: float = 0.0
+var has_exploded: bool = false
+
+const EXPLOSION_EFFECT_PATH = \"res://scenes/effects/barrel_explosion.tscn\"
+
+func _ready() -> void:
+	$MeteorParticles.emitting = true
+
+func _physics_process(delta: float) -> void:
+	if has_exploded:
+		return
+	
+	global_position.y -= fall_speed * delta
+	if global_position.y <= target_y + 0.5:
+		explode()
+
+func explode() -> void:
+	if has_exploded:
+		return
+	has_exploded = true
+	
+	var exp_scene = load(EXPLOSION_EFFECT_PATH)
+	if exp_scene:
+		var exp_node = exp_scene.instantiate()
+		get_parent().add_child(exp_node)
+		exp_node.global_position = global_position
+		exp_node.scale = Vector3(1.8, 1.8, 1.8)
+
+	if multiplayer.is_server():
+		var space = get_world_3d().direct_space_state
+		var query = PhysicsShapeQueryParameters3D.new()
+		var sphere = SphereShape3D.new()
+		sphere.radius = explosion_radius
+		query.shape = sphere
+		query.transform = global_transform
+		query.collision_mask = 7
+		
+		var hits = space.intersect_shape(query, 64)
+		for h in hits:
+			var collider = h.collider
+			if collider.is_in_group(\"enemies\") and collider.has_method(\"take_damage\"):
+				collider.take_damage(damage, false, global_position)
+			elif collider.is_in_group(\"barrels\") and collider.has_method(\"take_damage\"):
+				collider.take_damage(damage, false, global_position)
+	
+	queue_free()
+"
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_meteor"]
+albedo_color = Color(0.95, 0.25, 0.05, 1)
+emission_enabled = true
+emission = Color(1, 0.2, 0.05, 1)
+emission_energy_multiplier = 4.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_meteor"]
+material = SubResource("StandardMaterial3D_meteor")
+size = Vector3(2.2, 2.2, 2.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_trail"]
+albedo_color = Color(1, 0.45, 0.1, 1)
+emission_enabled = true
+emission = Color(1, 0.35, 0.1, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_trail"]
+material = SubResource("StandardMaterial3D_trail")
+size = Vector3(0.4, 0.4, 0.4)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_trail"]
+direction = Vector3(0, 1, 0)
+spread = 20.0
+initial_velocity_min = 4.0
+initial_velocity_max = 8.0
+
+[node name="Meteor" type="Node3D"]
+script = SubResource("GDScript_meteor")
+
+[node name="MeteorMesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_meteor")
+
+[node name="MeteorParticles" type="GPUParticles3D" parent="."]
+emitting = false
+amount = 24
+lifetime = 0.4
+process_material = SubResource("ParticleProcessMaterial_trail")
+draw_pass_1 = SubResource("BoxMesh_trail")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+light_color = Color(1, 0.4, 0.1, 1)
+light_energy = 8.0
+omni_range = 15.0

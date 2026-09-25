@@ -1,0 +1,426 @@
+[gd_scene load_steps=12 format=3 uid="uid://bvyq107p8k511"]
+
+[ext_resource type="Script" path="res://scripts/player/FPSController.gd" id="1_fps"]
+[ext_resource type="Script" path="res://scripts/player/SpellManager.gd" id="2_spell"]
+
+[sub_resource type="Gradient" id="Gradient_vignette"]
+offsets = PackedFloat32Array(0.35, 1)
+colors = PackedColorArray(0.85, 0.02, 0.02, 0, 0.9, 0.03, 0.03, 0.92)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_vignette"]
+gradient = SubResource("Gradient_vignette")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.9, 0.9)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_body"]
+size = Vector3(0.8, 1.8, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
+albedo_color = Color(0.18, 0.35, 0.65, 1)
+roughness = 0.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_body"]
+material = SubResource("StandardMaterial3D_body")
+size = Vector3(0.7, 0.9, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_head"]
+albedo_color = Color(0.92, 0.75, 0.55, 1)
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_head"]
+material = SubResource("StandardMaterial3D_head")
+size = Vector3(0.5, 0.5, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gun"]
+albedo_color = Color(0.2, 0.22, 0.25, 1)
+metallic = 0.6
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_gun"]
+material = SubResource("StandardMaterial3D_gun")
+size = Vector3(0.12, 0.14, 0.45)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_player"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath("Head:rotation")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+properties/3/path = NodePath(".:velocity")
+properties/3/spawn = true
+properties/3/replication_mode = 1
+
+[node name="Player" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 7
+script = ExtResource("1_fps")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("BoxShape3D_body")
+
+[node name="BodyMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+mesh = SubResource("BoxMesh_body")
+
+[node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Head"]
+fov = 85.0
+
+[node name="HeadMesh" type="MeshInstance3D" parent="Head"]
+mesh = SubResource("BoxMesh_head")
+
+[node name="ShootRay" type="RayCast3D" parent="Head/Camera3D"]
+target_position = Vector3(0, 0, -60)
+collision_mask = 7
+collide_with_areas = true
+
+[node name="KickRay" type="RayCast3D" parent="Head/Camera3D"]
+target_position = Vector3(0, 0, -2.4)
+collision_mask = 7
+collide_with_areas = true
+
+[node name="Gun" type="Node3D" parent="Head/Camera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, -0.22, -0.45)
+
+[node name="GunMesh" type="MeshInstance3D" parent="Head/Camera3D/Gun"]
+mesh = SubResource("BoxMesh_gun")
+
+[node name="MuzzleFlash" type="OmniLight3D" parent="Head/Camera3D/Gun"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.25)
+light_color = Color(1, 0.85, 0.35, 1)
+light_energy = 3.0
+omni_range = 3.0
+
+[node name="NameLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.05, 0)
+billboard = 1
+no_depth_test = true
+text = "Kutu Kafa"
+font_size = 28
+outline_size = 8
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_player")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Crosshair" type="Control" parent="HUD"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CrosshairH" type="ColorRect" parent="HUD/Crosshair"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -8.0
+offset_top = -1.0
+offset_right = 8.0
+offset_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 0.12, 0.12, 0.95)
+
+[node name="CrosshairV" type="ColorRect" parent="HUD/Crosshair"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -1.0
+offset_top = -8.0
+offset_right = 1.0
+offset_bottom = 8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 0.12, 0.12, 0.95)
+
+[node name="HealthContainer" type="VBoxContainer" parent="HUD"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -65.0
+offset_right = 260.0
+offset_bottom = -20.0
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="HealthLabel" type="Label" parent="HUD/HealthContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "CAN: 100 / 100"
+
+[node name="HealthBar" type="ProgressBar" parent="HUD/HealthContainer"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+mouse_filter = 2
+value = 100.0
+show_percentage = false
+
+[node name="ComboContainer" type="VBoxContainer" parent="HUD"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -200.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 75.0
+grow_horizontal = 0
+mouse_filter = 2
+
+[node name="MultiplierLabel" type="Label" parent="HUD/ComboContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 20
+text = "KOMBO: x1"
+horizontal_alignment = 2
+
+[node name="ComboBar" type="ProgressBar" parent="HUD/ComboContainer"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+mouse_filter = 2
+value = 0.0
+show_percentage = false
+
+[node name="GoldContainer" type="VBoxContainer" parent="HUD"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 220.0
+offset_bottom = 60.0
+mouse_filter = 2
+
+[node name="GoldLabel" type="Label" parent="HUD/GoldContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 18
+text = "🪙 ALTIN: 0"
+
+[node name="WeaponContainer" type="VBoxContainer" parent="HUD"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -350.0
+offset_top = -118.0
+offset_right = -20.0
+offset_bottom = -50.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="WeaponNoticeLabel" type="Label" parent="HUD/WeaponContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 2
+
+[node name="WeaponLabel" type="Label" parent="HUD/WeaponContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 16
+text = "🔫 TABANCA (∞)"
+horizontal_alignment = 2
+
+[node name="WeaponSlotsLabel" type="Label" parent="HUD/WeaponContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+text = "▶ [1: Tabanca (∞)]"
+horizontal_alignment = 2
+
+[node name="BarrelContainer" type="VBoxContainer" parent="HUD"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -180.0
+offset_top = -48.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="BarrelLabel" type="Label" parent="HUD/BarrelContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.3, 1)
+theme_override_font_sizes/font_size = 15
+text = "VARİL (G): 3"
+horizontal_alignment = 2
+
+[node name="SpellContainer" type="HBoxContainer" parent="HUD"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -65.0
+offset_right = 150.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="TacticalBox" type="VBoxContainer" parent="HUD/SpellContainer"]
+layout_mode = 2
+
+[node name="TacticalLabel" type="Label" parent="HUD/SpellContainer/TacticalBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "[E] TAKTİK"
+horizontal_alignment = 1
+
+[node name="TacticalBar" type="ProgressBar" parent="HUD/SpellContainer/TacticalBox"]
+custom_minimum_size = Vector2(120, 12)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="UltBox" type="VBoxContainer" parent="HUD/SpellContainer"]
+layout_mode = 2
+
+[node name="UltLabel" type="Label" parent="HUD/SpellContainer/UltBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.75, 0.2, 1)
+theme_override_font_sizes/font_size = 13
+text = "[Q] ULTİ: %0"
+horizontal_alignment = 1
+
+[node name="UltBar" type="ProgressBar" parent="HUD/SpellContainer/UltBox"]
+custom_minimum_size = Vector2(130, 12)
+layout_mode = 2
+value = 0.0
+show_percentage = false
+
+[node name="DamageOverlay" type="Control" parent="HUD"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="DamageVignette" type="TextureRect" parent="HUD/DamageOverlay"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_vignette")
+expand_mode = 1
+
+[node name="DamageFlash" type="ColorRect" parent="HUD/DamageOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.9, 0.08, 0.08, 0)
+
+[node name="DeathScreen" type="Control" parent="HUD"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Backdrop" type="ColorRect" parent="HUD/DeathScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.01, 0.01, 0.88)
+
+[node name="CenterContainer" type="CenterContainer" parent="HUD/DeathScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="HUD/DeathScreen/CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="DeathTitleLabel" type="Label" parent="HUD/DeathScreen/CenterContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.15, 0.15, 1)
+theme_override_colors/font_shadow_color = Color(0.4, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 46
+text = "💀 ÖLDÜNÜZ! 💀"
+horizontal_alignment = 1
+
+[node name="DeathReasonLabel" type="Label" parent="HUD/DeathScreen/CenterContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "Kutun parçalandı..."
+horizontal_alignment = 1
+
+[node name="DeathInfoLabel" type="Label" parent="HUD/DeathScreen/CenterContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.75, 0.8, 1)
+theme_override_font_sizes/font_size = 15
+text = "Takım arkadaşının asansöre ulaşmasını bekle veya yeniden başla."
+horizontal_alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="HUD/DeathScreen/CenterContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="RestartBtn" type="Button" parent="HUD/DeathScreen/CenterContainer/VBox/Buttons"]
+custom_minimum_size = Vector2(180, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "🔄 YENİDEN BAŞLAT [R]"
+
+[node name="LobbyBtn" type="Button" parent="HUD/DeathScreen/CenterContainer/VBox/Buttons"]
+custom_minimum_size = Vector2(150, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "🚪 LOBİYE DÖN"
+
+[node name="SpellManager" type="Node" parent="."]
+script = ExtResource("2_spell")

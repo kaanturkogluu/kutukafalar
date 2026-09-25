@@ -1,0 +1,60 @@
+[gd_scene load_steps=8 format=3 uid="uid://zombie_scene_01"]
+
+[ext_resource type="Script" path="res://scripts/enemies/ZombieAI.gd" id="1_zombie"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_zombie"]
+size = Vector3(0.7, 1.8, 0.7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_zbody"]
+albedo_color = Color(0.9, 0.9, 0.92, 1)
+roughness = 0.6
+
+[sub_resource type="BoxMesh" id="BoxMesh_zbody"]
+material = SubResource("StandardMaterial3D_zbody")
+size = Vector3(0.7, 0.9, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_zhead"]
+material = SubResource("StandardMaterial3D_zbody")
+size = Vector3(0.5, 0.5, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_headshot"]
+size = Vector3(0.55, 0.55, 0.55)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_zombie"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+
+[node name="Zombie" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 7
+script = ExtResource("1_zombie")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("BoxShape3D_zombie")
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="BodyMesh" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+mesh = SubResource("BoxMesh_zbody")
+
+[node name="HeadMesh" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0)
+mesh = SubResource("BoxMesh_zhead")
+
+[node name="HeadshotArea" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0)
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HeadshotArea"]
+shape = SubResource("BoxShape3D_headshot")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_zombie")

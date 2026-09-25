@@ -1,0 +1,102 @@
+[gd_scene load_steps=7 format=3 uid="uid://vortex_spell_01"]
+
+[sub_resource type="GDScript" id="GDScript_vortex"]
+script/source = "extends Node3D
+
+@export var duration: float = 3.5
+@export var pull_radius: float = 8.5
+@export var pull_force: float = 14.0
+
+func _ready() -> void:
+	$Particles.emitting = true
+	await get_tree().create_timer(duration).timeout
+	# Bitiş patlaması
+	if multiplayer.is_server():
+		var space = get_world_3d().direct_space_state
+		var query = PhysicsShapeQueryParameters3D.new()
+		var sphere = SphereShape3D.new()
+		sphere.radius = pull_radius * 0.6
+		query.shape = sphere
+		query.transform = global_transform
+		query.collision_mask = 7
+		for hit in space.intersect_shape(query, 32):
+			if hit.collider.is_in_group(\"enemies\") and hit.collider.has_method(\"take_damage\"):
+				hit.collider.take_damage(40.0, false, global_position)
+	queue_free()
+
+func _physics_process(delta: float) -> void:
+	$CoreMesh.rotate_y(8.0 * delta)
+	$CoreMesh.rotate_x(4.0 * delta)
+
+	if not multiplayer.is_server():
+		return
+
+	var space = get_world_3d().direct_space_state
+	var query = PhysicsShapeQueryParameters3D.new()
+	var sphere = SphereShape3D.new()
+	sphere.radius = pull_radius
+	query.shape = sphere
+	query.transform = global_transform
+	query.collision_mask = 7
+
+	var hits = space.intersect_shape(query, 64)
+	for h in hits:
+		var body = h.collider
+		var diff = global_position - body.global_position
+		diff.y = 0
+		var dist = diff.length()
+		if dist > 0.6:
+			var pull_dir = diff.normalized()
+			if body.is_in_group(\"enemies\"):
+				body.velocity += pull_dir * pull_force * delta * 10.0
+			elif body is RigidBody3D:
+				body.apply_central_impulse(pull_dir * pull_force * delta * 5.0)
+"
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vortex"]
+albedo_color = Color(0.6, 0.1, 0.9, 1)
+emission_enabled = true
+emission = Color(0.5, 0.05, 0.85, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_vortex"]
+material = SubResource("StandardMaterial3D_vortex")
+size = Vector3(0.6, 0.6, 0.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_p"]
+albedo_color = Color(0.8, 0.3, 1, 1)
+emission_enabled = true
+emission = Color(0.7, 0.2, 0.9, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_part"]
+material = SubResource("StandardMaterial3D_p")
+size = Vector3(0.12, 0.12, 0.12)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_v"]
+emission_shape = 1
+emission_sphere_radius = 4.0
+direction = Vector3(0, 0, 0)
+gravity = Vector3(0, 0, 0)
+radial_accel_min = -15.0
+radial_accel_max = -8.0
+
+[node name="Vortex" type="Node3D"]
+script = SubResource("GDScript_vortex")
+
+[node name="CoreMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("BoxMesh_vortex")
+
+[node name="Particles" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+emitting = false
+amount = 40
+lifetime = 1.0
+process_material = SubResource("ParticleProcessMaterial_v")
+draw_pass_1 = SubResource("BoxMesh_part")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+light_color = Color(0.75, 0.2, 1, 1)
+light_energy = 5.0
+omni_range = 8.0

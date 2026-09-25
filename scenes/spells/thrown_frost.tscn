@@ -1,0 +1,99 @@
+[gd_scene load_steps=7 format=3 uid="uid://thrown_frost_01"]
+
+[sub_resource type="GDScript" id="GDScript_tf"]
+script/source = "extends CharacterBody3D
+
+@export var speed: float = 18.0
+var velocity_vector: Vector3 = Vector3.ZERO
+var gravity: float = 20.0
+var freeze_radius: float = 8.5
+var freeze_duration: float = 4.5
+var damage: float = 45.0
+
+func setup(dir: Vector3) -> void:
+	velocity_vector = dir * speed + Vector3.UP * 3.5
+
+func _physics_process(delta: float) -> void:
+	velocity_vector.y -= gravity * delta
+	$MeshInstance3D.rotate_x(10.0 * delta)
+	$MeshInstance3D.rotate_z(8.0 * delta)
+	
+	var collision = move_and_collide(velocity_vector * delta)
+	if collision:
+		explode_frost()
+
+func explode_frost() -> void:
+	$MeshInstance3D.visible = false
+	$IceParticles.emitting = true
+	$OmniLight3D.light_energy = 6.0
+	
+	if multiplayer.is_server():
+		var space = get_world_3d().direct_space_state
+		var query = PhysicsShapeQueryParameters3D.new()
+		var sphere = SphereShape3D.new()
+		sphere.radius = freeze_radius
+		query.shape = sphere
+		query.transform = global_transform
+		query.collision_mask = 7
+
+		var hits = space.intersect_shape(query, 64)
+		for h in hits:
+			var body = h.collider
+			if body.is_in_group(\"enemies\"):
+				if body.has_method(\"freeze\"):
+					body.freeze(freeze_duration)
+				if body.has_method(\"take_damage\"):
+					body.take_damage(damage, false, global_position)
+	
+	await get_tree().create_timer(1.2).timeout
+	queue_free()
+"
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_tf"]
+radius = 0.3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ice"]
+albedo_color = Color(0.3, 0.8, 1, 0.9)
+roughness = 0.1
+emission_enabled = true
+emission = Color(0.2, 0.7, 1, 1)
+emission_energy_multiplier = 2.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_tf"]
+material = SubResource("StandardMaterial3D_ice")
+size = Vector3(0.45, 0.45, 0.45)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ice_p"]
+material = SubResource("StandardMaterial3D_ice")
+size = Vector3(0.18, 0.18, 0.18)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_ice"]
+direction = Vector3(0, 0.4, 0)
+spread = 180.0
+initial_velocity_min = 8.0
+initial_velocity_max = 14.0
+
+[node name="ThrownFrost" type="CharacterBody3D"]
+collision_layer = 0
+collision_mask = 1
+script = SubResource("GDScript_tf")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_tf")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_tf")
+
+[node name="IceParticles" type="GPUParticles3D" parent="."]
+emitting = false
+amount = 40
+lifetime = 0.6
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_ice")
+draw_pass_1 = SubResource("BoxMesh_ice_p")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+light_color = Color(0.3, 0.8, 1, 1)
+light_energy = 2.0
+omni_range = 9.0

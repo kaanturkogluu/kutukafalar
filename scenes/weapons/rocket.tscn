@@ -1,0 +1,102 @@
+[gd_scene load_steps=7 format=3 uid="uid://rocket_scene_01"]
+
+[sub_resource type="GDScript" id="GDScript_rocket"]
+script/source = "extends Area3D
+
+@export var speed: float = 26.0
+@export var damage: float = 350.0
+@export var explosion_radius: float = 6.0
+var direction: Vector3 = Vector3.FORWARD
+var has_exploded: bool = false
+
+const EXPLOSION_EFFECT_PATH = \"res://scenes/effects/barrel_explosion.tscn\"
+
+func _ready() -> void:
+	$TrailParticles.emitting = true
+	await get_tree().create_timer(4.0).timeout
+	explode()
+
+func _physics_process(delta: float) -> void:
+	if not has_exploded:
+		global_position += direction * speed * delta
+
+func _on_body_entered(body: Node3D) -> void:
+	explode()
+
+func explode() -> void:
+	if has_exploded:
+		return
+	has_exploded = true
+	
+	var exp_scene = load(EXPLOSION_EFFECT_PATH)
+	if exp_scene:
+		var exp_node = exp_scene.instantiate()
+		get_parent().add_child(exp_node)
+		exp_node.global_position = global_position
+		
+	if multiplayer.is_server():
+		var space = get_world_3d().direct_space_state
+		var query = PhysicsShapeQueryParameters3D.new()
+		var sphere = SphereShape3D.new()
+		sphere.radius = explosion_radius
+		query.shape = sphere
+		query.transform = global_transform
+		query.collision_mask = 7
+		
+		for hit in space.intersect_shape(query, 64):
+			var b = hit.collider
+			if b.is_in_group(\"enemies\") and b.has_method(\"take_damage\"):
+				b.take_damage(damage, false, global_position)
+			elif b.is_in_group(\"barrels\") and b.has_method(\"take_damage\"):
+				b.take_damage(damage, false, global_position)
+	
+	queue_free()
+"
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_r"]
+radius = 0.3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rmat"]
+albedo_color = Color(0.2, 0.22, 0.25, 1)
+metallic = 0.8
+roughness = 0.2
+
+[sub_resource type="BoxMesh" id="BoxMesh_rocket"]
+material = SubResource("StandardMaterial3D_rmat")
+size = Vector3(0.18, 0.18, 0.7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fire"]
+albedo_color = Color(1, 0.5, 0.1, 1)
+emission_enabled = true
+emission = Color(1, 0.4, 0.05, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_smoke"]
+material = SubResource("StandardMaterial3D_fire")
+size = Vector3(0.12, 0.12, 0.12)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_r"]
+direction = Vector3(0, 0, 1)
+spread = 20.0
+initial_velocity_min = 2.0
+initial_velocity_max = 5.0
+
+[node name="Rocket" type="Area3D"]
+collision_layer = 0
+collision_mask = 5
+script = SubResource("GDScript_rocket")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_r")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_rocket")
+
+[node name="TrailParticles" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.35)
+emitting = false
+amount = 16
+lifetime = 0.3
+process_material = SubResource("ParticleProcessMaterial_r")
+draw_pass_1 = SubResource("BoxMesh_smoke")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

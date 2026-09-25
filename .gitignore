@@ -1,0 +1,19 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Export builds
+builds/
+dist/
+*.exe
+*.pck
+*.apk
+*.aab
+
+# Temporary logs & test artifacts
+*.log
+*.tmp
+test_output.txt
+test_runner.gd
+godot_help.txt
+godot_run_log.txt
