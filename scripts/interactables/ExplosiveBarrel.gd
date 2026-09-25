@@ -18,7 +18,7 @@ func _ready() -> void:
 		freeze = true
 
 ## Hasar alma (Mermi vurunca veya başka patlamayla)
-func take_damage(amount: float, _is_headshot: bool = false, hit_point: Vector3 = Vector3.ZERO) -> void:
+func take_damage(amount: float, _is_headshot: bool = false, hit_point: Vector3 = Vector3.ZERO, _attacker_id: int = 1) -> void:
 	if is_exploded:
 		return
 	

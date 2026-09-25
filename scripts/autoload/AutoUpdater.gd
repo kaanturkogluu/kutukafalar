@@ -26,6 +26,14 @@ var target_pck_path: String = ""
 var temp_pck_path: String = ""
 
 func _ready() -> void:
+	_determine_paths()
+	
+	# Oyun başlarken: user:// içinde indirilmiş güncel bir PCK paketi varsa yükle
+	var user_pck = ProjectSettings.globalize_path("user://KutuKafalar.pck")
+	if FileAccess.file_exists(user_pck) and not OS.has_feature("editor"):
+		print("[AutoUpdater] user:// konumundaki güncel yama yükleniyor: ", user_pck)
+		ProjectSettings.load_resource_pack(user_pck, true)
+	
 	check_http = HTTPRequest.new()
 	add_child(check_http)
 	check_http.request_completed.connect(_on_check_request_completed)
@@ -33,8 +41,6 @@ func _ready() -> void:
 	download_http = HTTPRequest.new()
 	add_child(download_http)
 	download_http.request_completed.connect(_on_download_request_completed)
-	
-	_determine_paths()
 
 func _determine_paths() -> void:
 	var base_dir: String
@@ -44,7 +50,8 @@ func _determine_paths() -> void:
 		base_dir = OS.get_executable_path().get_base_dir()
 	
 	target_pck_path = base_dir.path_join("KutuKafalar.pck")
-	temp_pck_path = base_dir.path_join("KutuKafalar.pck.new")
+	# user:// her Windows bilgisayarda tam okuma/yazma yetkisine sahip garantili yoldur
+	temp_pck_path = ProjectSettings.globalize_path("user://KutuKafalar.pck.new")
 
 func _process(_delta: float) -> void:
 	if is_downloading and download_http:
@@ -149,6 +156,10 @@ func start_download(pck_url: String = "") -> void:
 		update_failed.emit("İndirilecek dosya bağlantısı bulunamadı.")
 		return
 	
+	# Eski indirme artığı varsa temizle
+	if FileAccess.file_exists(temp_pck_path):
+		DirAccess.remove_absolute(temp_pck_path)
+	
 	is_downloading = true
 	download_http.download_file = temp_pck_path
 	
@@ -162,15 +173,29 @@ func start_download(pck_url: String = "") -> void:
 		is_downloading = false
 		update_failed.emit("İndirme isteği başlatılamadı: " + str(err))
 
-func _on_download_request_completed(_result: int, response_code: int, _headers: PackedStringArray, _body: PackedByteArray) -> void:
+func _on_download_request_completed(result: int, response_code: int, _headers: PackedStringArray, _body: PackedByteArray) -> void:
 	is_downloading = false
+	download_http.download_file = "" # Dosya kilidini serbest bırak
+	
+	if result != HTTPRequest.RESULT_SUCCESS:
+		var err_str = "İndirme ağ hatası (Kod: " + str(result) + ")"
+		if result == HTTPRequest.RESULT_DOWNLOAD_FILE_CANT_OPEN:
+			err_str = "Hedef klasöre yazma izni yok veya disk dolu!"
+		elif result == HTTPRequest.RESULT_DOWNLOAD_FILE_WRITE_ERROR:
+			err_str = "Dosya diske yazılamadı!"
+		update_failed.emit(err_str)
+		return
 	
 	if response_code != 200:
 		print("[AutoUpdater] İndirme başarısız oldu! Kod: ", response_code)
 		update_failed.emit("Dosya indirilemedi (Kod: " + str(response_code) + ")")
 		return
 	
-	print("[AutoUpdater] İndirme tamamlandı!")
+	if not FileAccess.file_exists(temp_pck_path):
+		update_failed.emit("İndirilen yama dosyası oluşturulamadı!")
+		return
+	
+	print("[AutoUpdater] İndirme tamamlandı! Dosya boyutu: ", FileAccess.get_file_as_bytes(temp_pck_path).size())
 	download_completed.emit()
 
 ## Güncellemeyi uygula ve oyunu 1 saniyede yeniden başlat
@@ -182,16 +207,28 @@ func apply_update_and_restart() -> void:
 	var base_dir = OS.get_executable_path().get_base_dir()
 	var exe_name = OS.get_executable_path().get_file()
 	
+	# Ayrıca user:// içine de kalıcı olarak KutuKafalar.pck olarak kopyala
+	var user_permanent_pck = ProjectSettings.globalize_path("user://KutuKafalar.pck")
+	DirAccess.copy_absolute(temp_pck_path, user_permanent_pck)
+	
+	# Eğer editördeysek, doğrudan çalışma zamanında paketi yükle
+	if OS.has_feature("editor"):
+		print("[AutoUpdater] Editör modunda runtime pack yükleniyor...")
+		ProjectSettings.load_resource_pack(temp_pck_path, true)
+		get_tree().reload_current_scene()
+		return
+	
 	# Windows için otomatik değiştirici ve yeniden başlatıcı bat dosyası
 	var bat_path = base_dir.path_join("apply_update.bat")
 	var bat_content = """@echo off
 timeout /t 1 /nobreak >nul
-if exist "%~dp0KutuKafalar.pck.new" (
-    move /y "%~dp0KutuKafalar.pck.new" "%~dp0KutuKafalar.pck" >nul
+if exist "{TEMP_PCK}" (
+    copy /y "{TEMP_PCK}" "%~dp0KutuKafalar.pck" >nul
+    del "{TEMP_PCK}" >nul
 )
 start "" "%~dp0{EXE_NAME}"
 del "%~f0"
-""".replace("{EXE_NAME}", exe_name)
+""".replace("{TEMP_PCK}", temp_pck_path.replace("/", "\\")).replace("{EXE_NAME}", exe_name)
 	
 	var bat_file = FileAccess.open(bat_path, FileAccess.WRITE)
 	if bat_file:
@@ -201,7 +238,7 @@ del "%~f0"
 		OS.create_process("cmd.exe", ["/c", bat_path])
 		get_tree().quit(0)
 	else:
-		# Eğer bat yazılamazsa (örn. editördeyken), dinamik olarak paketi hafızaya yükle
+		# Eğer exe klasörüne bat yazılamazsa, runtime pack yükle
 		print("[AutoUpdater] Bat yazılamadı, runtime pack yükleniyor...")
 		ProjectSettings.load_resource_pack(temp_pck_path, true)
 		get_tree().reload_current_scene()

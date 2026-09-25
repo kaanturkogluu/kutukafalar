@@ -427,7 +427,7 @@ func sync_spawn_spell(spell_type: String, pos: Vector3, dir: Vector3, extra_y: f
 				spell_instance = scene.instantiate()
 				spell_instance.position = pos
 				spell_instance.direction = dir
-				spell_instance.look_at(pos + dir, Vector3.UP)
+				spell_instance.look_at_from_position(pos, pos + dir, Vector3.UP)
 		"thrown_vortex":
 			var scene = load("res://scenes/spells/thrown_vortex.tscn")
 			if scene:
