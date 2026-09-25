@@ -1,14 +1,25 @@
 extends Control
 
-# --- Ana Menü ve Çok Oyunculu Lobi Ekranı ---
+# --- Ana Menü, Çok Oyunculu Bekleme Odası ve Otomatik Güncelleyici ---
 const GAME_SCENE_PATH: String = "res://scenes/levels/main_level.tscn"
 
+# 1. Aşama: Bağlantı Paneli
+@onready var connect_panel: PanelContainer = %ConnectPanel
 @onready var name_input: LineEdit = %NameInput
 @onready var class_option: OptionButton = %ClassOption
 @onready var ip_input: LineEdit = %IpInput
 @onready var host_button: Button = %HostButton
 @onready var join_button: Button = %JoinButton
 @onready var status_label: Label = %StatusLabel
+
+# 2. Aşama: Bekleme Odası (Room Panel)
+@onready var room_panel: PanelContainer = %RoomPanel
+@onready var room_info_label: Label = %RoomInfoLabel
+@onready var player_list_box: VBoxContainer = %PlayerListBox
+@onready var room_status_label: Label = %RoomStatusLabel
+@onready var ready_btn: Button = %ReadyBtn
+@onready var start_game_btn: Button = %StartGameBtn
+@onready var leave_room_btn: Button = %LeaveRoomBtn
 
 # Güncelleyici Arayüz Elemanları
 @onready var version_label: Label = %VersionLabel
@@ -21,8 +32,11 @@ const GAME_SCENE_PATH: String = "res://scenes/levels/main_level.tscn"
 @onready var start_update_btn: Button = %StartUpdateBtn
 @onready var dismiss_update_btn: Button = %DismissUpdateBtn
 
+var is_local_ready: bool = false
+
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	_show_connect_panel()
 	
 	if version_label:
 		version_label.text = AutoUpdater.CURRENT_VERSION
@@ -36,8 +50,15 @@ func _ready() -> void:
 	host_button.pressed.connect(_on_host_pressed)
 	join_button.pressed.connect(_on_join_pressed)
 	
+	ready_btn.pressed.connect(_on_ready_pressed)
+	start_game_btn.pressed.connect(_on_start_game_pressed)
+	leave_room_btn.pressed.connect(_on_leave_room_pressed)
+	
 	NetworkManager.connection_succeeded.connect(_on_connection_succeeded)
 	NetworkManager.connection_failed.connect(_on_connection_failed)
+	NetworkManager.server_disconnected.connect(_on_server_disconnected)
+	NetworkManager.lobby_updated.connect(_on_lobby_updated)
+	NetworkManager.game_rejected.connect(_on_game_rejected)
 	
 	# AutoUpdater bağlantıları
 	if check_update_btn:
@@ -57,6 +78,200 @@ func _ready() -> void:
 	
 	# Açılışta sessizce güncelleme denetle
 	get_tree().create_timer(0.5).timeout.connect(func(): AutoUpdater.check_for_updates())
+
+func _show_connect_panel() -> void:
+	connect_panel.visible = true
+	room_panel.visible = false
+	host_button.disabled = false
+	join_button.disabled = false
+
+func _show_room_panel() -> void:
+	connect_panel.visible = false
+	room_panel.visible = true
+	is_local_ready = false
+	_update_room_buttons()
+
+func _get_player_name() -> String:
+	var player_name = name_input.text.strip_edges()
+	if player_name.is_empty():
+		return "Kutu Kafa " + str(randi_range(10, 99))
+	return player_name
+
+func _apply_selected_class() -> void:
+	var selected_class = "Pyromancer"
+	match class_option.selected:
+		0: selected_class = "Pyromancer"
+		1: selected_class = "Engineer"
+		2: selected_class = "Cryomancer"
+		3: selected_class = "Medic"
+	NetworkManager.local_player_info["class"] = selected_class
+	print("[Lobi] Seçilen Sınıf: ", selected_class)
+
+func _get_class_display_title(class_code: String) -> String:
+	match class_code:
+		"Pyromancer": return "🔥 Büyücü"
+		"Engineer": return "⚙️ Mühendis"
+		"Cryomancer": return "❄️ Buz Muhafızı"
+		"Medic": return "💚 Sıhhiye"
+		_: return class_code
+
+# --- Buton Aksiyonları ---
+
+func _on_host_pressed() -> void:
+	_apply_selected_class()
+	var player_name = _get_player_name()
+	var error = NetworkManager.create_game(player_name)
+	if error == OK:
+		_show_room_panel()
+		room_info_label.text = "👑 Oda Kuruldu (Host: " + player_name + ") | Port: 7000"
+		_refresh_player_list()
+	else:
+		status_label.text = "Hata: Oda kurulamadı! (Port meşgul olabilir)"
+
+func _on_join_pressed() -> void:
+	_apply_selected_class()
+	var ip = ip_input.text.strip_edges()
+	if ip.is_empty():
+		ip = "127.0.0.1"
+	
+	var player_name = _get_player_name()
+	status_label.text = "Sunucuya bağlanılıyor: " + ip + "..."
+	host_button.disabled = true
+	join_button.disabled = true
+	
+	var error = NetworkManager.join_game(ip, player_name)
+	if error != OK:
+		status_label.text = "Hata: Bağlantı başlatılamadı!"
+		host_button.disabled = false
+		join_button.disabled = false
+
+func _on_ready_pressed() -> void:
+	is_local_ready = not is_local_ready
+	NetworkManager.set_local_ready(is_local_ready)
+	_update_room_buttons()
+
+func _on_start_game_pressed() -> void:
+	if multiplayer.is_server():
+		start_game_btn.disabled = true
+		room_status_label.text = "🚀 Oyun başlatılıyor! Sahne yükleniyor..."
+		NetworkManager.start_game()
+
+func _on_leave_room_pressed() -> void:
+	NetworkManager.disconnect_game()
+	_show_connect_panel()
+	status_label.text = "Odadan ayrıldınız."
+
+# --- Ağ Geri Bildirimleri ---
+
+func _on_connection_succeeded() -> void:
+	_show_room_panel()
+	room_info_label.text = "🔗 Odaya Katılınıldı! Sunucu: " + ip_input.text.strip_edges()
+	_update_room_buttons()
+
+func _on_connection_failed() -> void:
+	_show_connect_panel()
+	status_label.text = "Bağlantı başarısız! IP adresini ve sunucunun açık olduğunu kontrol edin."
+
+func _on_server_disconnected() -> void:
+	_show_connect_panel()
+	status_label.text = "Sunucu bağlantısı koptu veya oda kapatıldı."
+
+func _on_game_rejected(reason: String) -> void:
+	_show_connect_panel()
+	status_label.text = "Bağlantı Reddedildi: " + reason
+
+func _on_lobby_updated(_players_dict: Dictionary) -> void:
+	_refresh_player_list()
+	_update_room_buttons()
+
+func _refresh_player_list() -> void:
+	for child in player_list_box.get_children():
+		child.queue_free()
+	
+	var all_ready = true
+	var player_count = NetworkManager.players.size()
+	
+	for id in NetworkManager.players.keys():
+		var p_info = NetworkManager.players[id]
+		var p_name = p_info.get("name", "Bilinmeyen")
+		var p_class = p_info.get("class", "Pyromancer")
+		var is_ready = p_info.get("is_ready", false)
+		var is_host = (id == 1)
+		
+		if not is_ready and not is_host:
+			all_ready = false
+		
+		# Oyuncu kartı satırı
+		var row = PanelContainer.new()
+		var margin = MarginContainer.new()
+		margin.add_theme_constant_override("margin_left", 12)
+		margin.add_theme_constant_override("margin_top", 8)
+		margin.add_theme_constant_override("margin_right", 12)
+		margin.add_theme_constant_override("margin_bottom", 8)
+		
+		var hbox = HBoxContainer.new()
+		hbox.add_theme_constant_override("separation", 12)
+		
+		# İsim ve rol
+		var name_lbl = Label.new()
+		name_lbl.text = ("👑 " if is_host else "👤 ") + p_name
+		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		name_lbl.add_theme_color_override("font_color", Color(1.0, 0.9, 0.3) if is_host else Color.WHITE)
+		hbox.add_child(name_lbl)
+		
+		# Sınıf
+		var class_lbl = Label.new()
+		class_lbl.text = _get_class_display_title(p_class)
+		class_lbl.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+		hbox.add_child(class_lbl)
+		
+		# Hazır Durumu
+		var status_badge = Label.new()
+		if is_host:
+			status_badge.text = "[ODA SAHİBİ]"
+			status_badge.add_theme_color_override("font_color", Color(1.0, 0.8, 0.2))
+		elif is_ready:
+			status_badge.text = "✅ HAZIR"
+			status_badge.add_theme_color_override("font_color", Color(0.2, 1.0, 0.4))
+		else:
+			status_badge.text = "⏳ BEKLİYOR"
+			status_badge.add_theme_color_override("font_color", Color(0.9, 0.4, 0.3))
+		hbox.add_child(status_badge)
+		
+		margin.add_child(hbox)
+		row.add_child(margin)
+		player_list_box.add_child(row)
+	
+	room_info_label.text = "Katılımcılar: (" + str(player_count) + "/4)"
+	
+	if multiplayer.is_server():
+		if player_count <= 1:
+			room_status_label.text = "Arkadaşınızın odaya katılması bekleniyor..."
+			start_game_btn.disabled = false # Tek başına test edebilsin
+		elif all_ready:
+			room_status_label.text = "🎉 Tüm oyuncular hazır! Oyunu başlatabilirsiniz."
+			room_status_label.add_theme_color_override("font_color", Color(0.2, 1.0, 0.4))
+			start_game_btn.disabled = false
+		else:
+			room_status_label.text = "Diğer oyuncuların hazır olması bekleniyor..."
+			room_status_label.add_theme_color_override("font_color", Color(0.9, 0.8, 0.3))
+			start_game_btn.disabled = false # Host dilerse yine de başlatabilir
+
+func _update_room_buttons() -> void:
+	if multiplayer.is_server():
+		ready_btn.visible = false
+		start_game_btn.visible = true
+	else:
+		ready_btn.visible = true
+		start_game_btn.visible = false
+		if is_local_ready:
+			ready_btn.text = "❌ HAZIR DEĞİLİM"
+			ready_btn.modulate = Color(1.0, 0.5, 0.5)
+		else:
+			ready_btn.text = "✅ HAZIR OL"
+			ready_btn.modulate = Color(0.5, 1.0, 0.5)
+
+# --- AutoUpdater Geri Bildirimleri ---
 
 func _on_check_update_pressed() -> void:
 	status_label.text = "Güncellemeler denetleniyor..."
@@ -99,55 +314,3 @@ func _on_update_failed(reason: String) -> void:
 		update_progress_text.text = "Hata: " + reason
 		start_update_btn.disabled = false
 		dismiss_update_btn.disabled = false
-
-func _get_player_name() -> String:
-	var player_name = name_input.text.strip_edges()
-	if player_name.is_empty():
-		return "Kutu Kafa " + str(randi_range(10, 99))
-	return player_name
-
-func _apply_selected_class() -> void:
-	var selected_class = "Pyromancer"
-	match class_option.selected:
-		0: selected_class = "Pyromancer"
-		1: selected_class = "Engineer"
-		2: selected_class = "Cryomancer"
-		3: selected_class = "Medic"
-	NetworkManager.local_player_info["class"] = selected_class
-	print("[Lobi] Seçilen Sınıf: ", selected_class)
-
-func _on_host_pressed() -> void:
-	_apply_selected_class()
-	var player_name = _get_player_name()
-	var error = NetworkManager.create_game(player_name)
-	if error == OK:
-		status_label.text = "Oda kuruldu! Oyun başlatılıyor..."
-		get_tree().change_scene_to_file(GAME_SCENE_PATH)
-	else:
-		status_label.text = "Hata: Oda kurulamadı! (Port meşgul olabilir)"
-
-func _on_join_pressed() -> void:
-	_apply_selected_class()
-	var ip = ip_input.text.strip_edges()
-	if ip.is_empty():
-		ip = "127.0.0.1"
-	
-	var player_name = _get_player_name()
-	status_label.text = "Sunucuya bağlanılıyor: " + ip + "..."
-	host_button.disabled = true
-	join_button.disabled = true
-	
-	var error = NetworkManager.join_game(ip, player_name)
-	if error != OK:
-		status_label.text = "Hata: Bağlantı başlatılamadı!"
-		host_button.disabled = false
-		join_button.disabled = false
-
-func _on_connection_succeeded() -> void:
-	status_label.text = "Bağlantı başarılı! Haritaya giriliyor..."
-	get_tree().change_scene_to_file(GAME_SCENE_PATH)
-
-func _on_connection_failed() -> void:
-	status_label.text = "Bağlantı başarısız! IP adresini ve sunucunun açık olduğunu kontrol edin."
-	host_button.disabled = false
-	join_button.disabled = false

@@ -54,6 +54,8 @@ const GIBS_SCENE_PATH = "res://scenes/effects/cube_gibs.tscn"
 # Durum ve Efekt Değişkenleri
 var is_dead: bool = false
 var is_in_shop: bool = false
+var spectator_target: CharacterBody3D = null
+var all_players_dead: bool = false
 var camera_trauma: float = 0.0
 var hurt_tween: Tween = null
 
@@ -154,8 +156,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	
 	if is_dead:
-		if event is InputEventKey and event.pressed and (event.keycode == KEY_R or event.keycode == KEY_SPACE):
-			_on_restart_pressed()
+		if all_players_dead:
+			if event is InputEventKey and event.pressed and (event.keycode == KEY_R or event.keycode == KEY_SPACE):
+				_on_restart_pressed()
+		else:
+			if (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or (event is InputEventKey and event.pressed and event.keycode == KEY_SPACE):
+				_cycle_spectator_target(1)
 		return
 	
 	# Mağaza açıkken veya fare görünürken silah ve kamera girdilerini engelle
@@ -221,6 +227,15 @@ func _physics_process(delta: float) -> void:
 		velocity.x = move_toward(velocity.x, 0, 10.0 * delta)
 		velocity.z = move_toward(velocity.z, 0, 10.0 * delta)
 		move_and_slide()
+		
+		# İzleyici Kamera Takibi (Spectator Follow)
+		if is_multiplayer_authority() and spectator_target and is_instance_valid(spectator_target):
+			if spectator_target.get("is_dead") or spectator_target.get("current_health", 0.0) <= 0:
+				_cycle_spectator_target(1)
+			else:
+				var target_cam_pos = spectator_target.global_position + Vector3(0, 1.8, 0) - spectator_target.transform.basis.z * 2.2
+				camera.global_position = camera.global_position.lerp(target_cam_pos, 10.0 * delta)
+				camera.look_at(spectator_target.global_position + Vector3(0, 1.2, 0), Vector3.UP)
 		return
 
 	# Mağazadayken hareket ve aksiyonları durdur
@@ -708,6 +723,7 @@ func _die() -> void:
 	_update_combo_hud()
 	
 	collision_layer = 0
+	collision_mask = 0
 	gun.visible = false
 	
 	# Karakterin 3D modelini yere devir (Boxhead ragdoll/ölüm duruşu)
@@ -732,29 +748,115 @@ func _die() -> void:
 	player_died.emit()
 	
 	if is_multiplayer_authority():
-		# Kameranın yere düşmesi
-		var cam_tween = create_tween().set_parallel(true)
-		cam_tween.tween_property(camera, "position:y", -0.5, 0.4).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
-		cam_tween.tween_property(camera, "rotation_degrees:z", 40.0, 0.4)
-		
-		# Ölüm Ekranını Aç
-		if death_screen:
-			death_screen.visible = true
-			if death_reason_label:
-				death_reason_label.text = "Kutun parçalandı! Canın tükendi."
-			if death_info_label:
-				if multiplayer.get_peers().size() == 0:
-					death_info_label.text = "Tek başınasın. [R] tuşuna veya butona basarak yeniden başla!"
-				else:
-					death_info_label.text = "Takım arkadaşlarını bekle... Asansöre ulaşıldığında canlanacaksın!"
-		
+		var living_teammates = _get_living_teammates()
+		if living_teammates.is_empty():
+			all_players_dead = true
+			var cam_tween = create_tween().set_parallel(true)
+			cam_tween.tween_property(camera, "position:y", -0.5, 0.4).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+			cam_tween.tween_property(camera, "rotation_degrees:z", 40.0, 0.4)
+			_update_spectator_hud()
+		else:
+			all_players_dead = false
+			_start_spectating()
+
+func _get_living_teammates() -> Array[CharacterBody3D]:
+	var list: Array[CharacterBody3D] = []
+	var players = get_tree().get_nodes_in_group("players")
+	for p in players:
+		if is_instance_valid(p) and p != self and not p.get("is_dead") and p.get("current_health", 0.0) > 0:
+			list.append(p)
+	return list
+
+func _start_spectating() -> void:
+	if not is_multiplayer_authority():
+		return
+	var living = _get_living_teammates()
+	if living.is_empty():
+		all_players_dead = true
+		spectator_target = null
+		_update_spectator_hud()
+		return
+	
+	if spectator_target == null or not is_instance_valid(spectator_target) or spectator_target.get("is_dead"):
+		spectator_target = living[0]
+	
+	camera.top_level = true
+	_update_spectator_hud()
+
+func _cycle_spectator_target(direction: int = 1) -> void:
+	if not is_multiplayer_authority() or all_players_dead:
+		return
+	var living = _get_living_teammates()
+	if living.is_empty():
+		spectator_target = null
+		all_players_dead = true
+		_update_spectator_hud()
+		return
+	
+	var current_index = -1
+	if spectator_target and is_instance_valid(spectator_target):
+		current_index = living.find(spectator_target)
+	
+	if current_index == -1:
+		spectator_target = living[0]
+	else:
+		var next_index = (current_index + direction) % living.size()
+		if next_index < 0:
+			next_index = living.size() - 1
+		spectator_target = living[next_index]
+	
+	_update_spectator_hud()
+
+func set_all_players_dead() -> void:
+	all_players_dead = true
+	spectator_target = null
+	if is_multiplayer_authority():
+		_update_spectator_hud()
+
+func _update_spectator_hud() -> void:
+	if not is_multiplayer_authority() or not death_screen:
+		return
+	
+	death_screen.visible = true
+	var backdrop = death_screen.get_node_or_null("Backdrop")
+	
+	if all_players_dead or _get_living_teammates().is_empty():
+		if backdrop:
+			backdrop.color = Color(0.06, 0.01, 0.01, 0.88)
+		if death_title_label:
+			death_title_label.text = "💀 OYUN BİTTİ 💀"
+		if death_reason_label:
+			death_reason_label.text = "Tüm takım alt edildi!"
+		if death_info_label:
+			death_info_label.text = "[R] veya [Boşluk] tuşuna basarak yeniden başlatın."
+		if restart_btn:
+			restart_btn.visible = true
+			restart_btn.disabled = false
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	else:
+		# Takım arkadaşları hayatta: İzleyici ekranı (arkası görünür, yarı saydam)
+		if backdrop:
+			backdrop.color = Color(0.0, 0.0, 0.0, 0.25)
+		if death_title_label:
+			death_title_label.text = "👁 İZLEYİCİ MODU"
+		if death_reason_label:
+			death_reason_label.text = "Takım arkadaşların savaşıyor! Asansöre ulaşıldığında canlanacaksın."
+		if death_info_label:
+			var target_name = spectator_target.player_name if (spectator_target and is_instance_valid(spectator_target)) else "Takım Arkadaşı"
+			death_info_label.text = "İzlenen: " + target_name + "  |  [Sol Tık / Boşluk] Sonraki Oyuncu"
+		if restart_btn:
+			restart_btn.visible = false
+			restart_btn.disabled = true
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 @rpc("any_peer", "call_local", "reliable")
 func revive(health_amount: float = 50.0, spawn_pos: Vector3 = Vector3.ZERO) -> void:
 	is_dead = false
+	all_players_dead = false
+	spectator_target = null
 	current_health = health_amount
 	collision_layer = 2
+	collision_mask = 5
 	
 	if spawn_pos != Vector3.ZERO:
 		global_position = spawn_pos
@@ -773,6 +875,7 @@ func revive(health_amount: float = 50.0, spawn_pos: Vector3 = Vector3.ZERO) -> v
 	gun.visible = true
 	
 	if is_multiplayer_authority():
+		camera.top_level = false
 		camera.position = Vector3.ZERO
 		camera.rotation = Vector3.ZERO
 		camera.h_offset = 0.0
@@ -784,6 +887,9 @@ func revive(health_amount: float = 50.0, spawn_pos: Vector3 = Vector3.ZERO) -> v
 
 func _on_restart_pressed() -> void:
 	if not is_multiplayer_authority():
+		return
+	# Takım arkadaşları hayattayken tek başına oyunu sıfırlamayı engelle
+	if not all_players_dead and multiplayer.get_peers().size() > 0:
 		return
 	var main_level = get_tree().current_scene
 	if main_level and main_level.has_method("request_restart"):

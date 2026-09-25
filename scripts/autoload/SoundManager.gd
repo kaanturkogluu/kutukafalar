@@ -3,10 +3,15 @@ extends Node
 # --- Kutu Kafalar Ses Yöneticisi (SoundManager) ---
 # Saf GDScript ile oluşturulan prosedürel 16-bit retro arcade ses efektleri
 
+static var instance: SoundManager = null
+
 var sound_streams: Dictionary = {}
 var player_pool: Array[AudioStreamPlayer] = []
 var player_pool_index: int = 0
 const POOL_SIZE: int = 16
+
+func _enter_tree() -> void:
+	instance = self
 
 func _ready() -> void:
 	_generate_all_sounds()
@@ -89,8 +94,12 @@ func _generate_all_sounds() -> void:
 		sound_streams[s_name] = wav
 
 ## 2D / Stereo Doğrudan Ses Çalma (Yerel Oyuncu ve UI için)
-func play_sfx(sfx_name: String, pitch_range: float = 0.05, volume_db: float = 0.0) -> void:
-	if not sound_streams.has(sfx_name):
+static func play_sfx(sfx_name: String, pitch_range: float = 0.05, volume_db: float = 0.0) -> void:
+	if instance:
+		instance._play_sfx_internal(sfx_name, pitch_range, volume_db)
+
+func _play_sfx_internal(sfx_name: String, pitch_range: float = 0.05, volume_db: float = 0.0) -> void:
+	if not sound_streams.has(sfx_name) or player_pool.is_empty():
 		return
 	
 	var player = player_pool[player_pool_index]
@@ -102,7 +111,11 @@ func play_sfx(sfx_name: String, pitch_range: float = 0.05, volume_db: float = 0.
 	player.play()
 
 ## 3D Uzamsal Ses Çalma (Ağdaki diğer oyuncuların ateş sesleri için)
-func play_3d_sfx(sfx_name: String, pos: Vector3, pitch_range: float = 0.05, volume_db: float = 0.0) -> void:
+static func play_3d_sfx(sfx_name: String, pos: Vector3, pitch_range: float = 0.05, volume_db: float = 0.0) -> void:
+	if instance:
+		instance._play_3d_sfx_internal(sfx_name, pos, pitch_range, volume_db)
+
+func _play_3d_sfx_internal(sfx_name: String, pos: Vector3, pitch_range: float = 0.05, volume_db: float = 0.0) -> void:
 	if not sound_streams.has(sfx_name):
 		return
 	

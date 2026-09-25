@@ -96,3 +96,23 @@ res://
   - Quick cycle between all collected weapons via Mouse Wheel Up/Down or direct slot keys 1-4.
   - **Ammo Depletion Discard:** When non-pistol weapons deplete their ammo to 0, they are automatically removed from `weapon_inventory`, playing the `empty` SFX and reverting the player to the next available weapon or the infinite pistol.
 - **UI & Shop Input Isolation:** Whenever UI is active (Shop, menus, death screen) or `Input.mouse_mode != Input.MOUSE_MODE_CAPTURED`, all weapon shooting, kicking, barrel placement, spell casting, weapon cycling, and camera rotations are strictly locked. Clicks within UI panels are consumed and never trigger `_shoot()`.
+
+## 8. Two-Stage Lobby, Waiting Room, Ready System & Late Join Protection
+- **Two-Stage Architecture (`Lobby.gd` & `NetworkManager.gd`):**
+  - Stage 1 (`ConnectPanel`): Player picks class, name, IP, and clicks Host or Join.
+  - Stage 2 (`RoomPanel` Waiting Room): Displays all connected players with classes and status badges (`👑 [ODA SAHİBİ]`, `✅ HAZIR`, `⏳ BEKLİYOR`).
+  - Clients toggle ready state via `set_local_ready(bool)`.
+  - Host triggers simultaneous scene change via `start_game()` -> `_start_game_rpc.rpc()` so all peers load `main_level.tscn` at the exact same tick.
+- **Mid-Game Join Locking:**
+  - Server tracks `is_game_in_progress: bool`.
+  - Any connection after match start is rejected via `_reject_connection.rpc_id()` with user notification and clean disconnection, preventing scene desynchronization.
+
+## 9. Multiplayer Spectator Mode & Death Restart Guarding
+- **Restart Lockout:**
+  - Dead players cannot trigger restart while teammates are alive (`if not all_players_dead and multiplayer.get_peers().size() > 0: return`).
+  - `RestartBtn` is hidden and shortcut `[R]` / `Space` is disabled until `all_players_dead` is true.
+- **Spectator Camera:**
+  - Dead player camera detaches (`top_level = true`) and smoothly tracks behind living teammates in 3rd person (`camera.global_position.lerp(target_cam_pos, 10.0 * delta)`).
+  - `[Left Click]` or `[Space]` cycles between living teammates.
+  - When all teammates die, `_announce_game_over.rpc()` sets `all_players_dead = true` on all players, displaying the Game Over overlay and enabling restart.
+  - When teammates reach the elevator, dead players are revived via `revive.rpc()`, resetting camera transforms and collisions cleanly.

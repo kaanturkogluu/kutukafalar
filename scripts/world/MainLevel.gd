@@ -53,6 +53,8 @@ func _ready() -> void:
 				node.player_died.connect(_on_player_died.bind(node))
 	)
 
+	NetworkManager.server_disconnected.connect(_on_server_disconnected)
+
 	if multiplayer.is_server():
 		NetworkManager.player_connected.connect(_on_player_connected)
 		NetworkManager.player_disconnected.connect(_on_player_disconnected)
@@ -120,6 +122,12 @@ func _on_player_disconnected(id: int) -> void:
 		var player_node = players_container.get_node_or_null(str(id))
 		if player_node:
 			player_node.queue_free()
+		get_tree().create_timer(0.1).timeout.connect(_check_all_players_dead)
+
+func _on_server_disconnected() -> void:
+	print("[MainLevel] Sunucu kapandı, ana menüye dönülüyor...")
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	get_tree().change_scene_to_file("res://scenes/ui/lobby.tscn")
 
 # --- Zombi Dalga Mantığı ---
 
@@ -288,17 +296,10 @@ func _announce_game_over() -> void:
 	if enemies_label:
 		enemies_label.text = "💀 OYUN BİTTİ! TÜM TAKIM ELENDİ 💀"
 	
-	var local_id = multiplayer.get_unique_id()
-	var local_player = players_container.get_node_or_null(str(local_id))
-	if local_player and local_player.death_screen:
-		local_player.death_screen.visible = true
-		if local_player.death_title_label:
-			local_player.death_title_label.text = "💀 OYUN BİTTİ 💀"
-		if local_player.death_reason_label:
-			local_player.death_reason_label.text = "Tüm takım zombiler tarafından alt edildi!"
-		if local_player.death_info_label:
-			local_player.death_info_label.text = "[R] tuşuna veya butona basarak baştan başlayın."
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	var players = get_tree().get_nodes_in_group("players")
+	for p in players:
+		if p.has_method("set_all_players_dead"):
+			p.set_all_players_dead()
 
 func request_restart() -> void:
 	if not multiplayer.is_server():

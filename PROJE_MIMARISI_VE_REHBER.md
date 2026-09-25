@@ -101,5 +101,21 @@ Projeyi geliştirirken token tüketimini minimumda tutmak ve hızlı ilerlemek i
   * **GitHub Releases Entegrasyonu (`AutoUpdater.gd`):** Oyun açıldığında `https://api.github.com/repos/kaanturkogluu/kutukafalar/releases/latest` adresini sorgular. Yeni bir sürüm (`tag_name`) varsa lobide indirme çubuğuyla birlikte güncelleme modalı açılır.
   * **Hafif Paket Dağıtımı (`.pck`):** Tüm oyunu baştan indirmek yerine yalnızca **220 KB** boyutundaki `KutuKafalar.pck` dosyası 1 saniyede indirilir ve oyun otomatik olarak yeniden başlatılarak güncellenir.
   * **Tek Tık Derleme Aracı (`build_release.bat` / `build_release.ps1`):** Projeyi doğrudan `builds/` klasörüne bağımsız Windows `.exe`, `.pck` ve arkadaşlara gönderilecek ilk kurulum `KutuKafalar-v1.0.0-Windows.zip` olarak paketler.
+* [x] **Faz 7: İki Aşamalı Bekleme Odası (Lobi), Hazır Sistemi, İzleyici Modu ve Geç Katılım Koruması:**
+  * **İki Aşamalı Lobi & Bekleme Odası (`Lobby.gd` & `scenes/ui/lobby.tscn`):**
+    * 1. Aşama (`ConnectPanel`): İsim, Sınıf ve IP girilerek "Oda Kur" veya "Odaya Katıl" denir.
+    * 2. Aşama (`RoomPanel` - Bekleme Odası): Tüm bağlı oyuncular bir arada listelenir. Sınıfları, isimleri, `👑 [ODA SAHİBİ]`, `✅ HAZIR` veya `⏳ BEKLİYOR` durum rozetleri canlı olarak senkronize edilir.
+    * İstemciler `✅ HAZIR OL` / `❌ HAZIR DEĞİLİM` butonlarıyla hazır durumunu değiştirir.
+    * Oda Sahibi (Host), herkes hazır olduğunda veya istediği anda `🚀 OYUNU BAŞLAT` butonuna basarak tüm oyuncuları aynı anda `main_level.tscn` sahnesine taşır.
+    * Oyuncular dilediklerinde `🚪 ODADAN AYRIL` butonuyla odayı terk edip ana menüye dönebilir.
+  * **Geç Katılım ve Oyun Bozulması Koruması (`NetworkManager.gd`):**
+    * Oyun başladıktan sonra (`is_game_in_progress = true`) gelen tüm geç bağlantılar otomatik olarak reddedilir (`_reject_connection`) ve kullanıcıya "Oyun şu anda devam ediyor!" uyarısı verilerek bağlantı temiz şekilde kapatılır; böylece dalga ve kat akışı bozulmaz.
+    * Host oyunu kapattığında veya ayrıldığında tüm istemciler donup kalmak yerine güvenle lobi ekranına yönlendirilir.
+  * **Ölüm Senkronizasyonu & Çok Oyunculu İzleyici Modu (Spectator Mode - `FPSController.gd`):**
+    * Çok oyunculu modda bir oyuncu öldüğünde tek bir oyuncunun `[R]` / `Space` / `Yeniden Başlat` tuşuna basarak oyunu erken sıfırlaması engellendi (`all_players_dead` kilidi).
+    * Ölen oyuncu hemen 3. şahıs **İzleyici Moduna (Spectator)** geçer; kamera pürüzsüz biçimde hayatta kalan takım arkadaşının arkasına geçer ve onu takip eder.
+    * `[Sol Tık]` veya `[Boşluk]` tuşuna basarak hayattaki diğer takım arkadaşları arasında geçiş yapılabilir.
+    * Takım arkadaşları katı temizleyip asansöre ulaştığında ölen oyuncular asansörde otomatik olarak canlanır.
+    * Ancak **tüm takım elendiğinde** Oyun Bitti (Game Over) ekranı gelir ve `[R]` tuşuyla 1. Kattan baştan başlatmaya izin verilir.
 
 

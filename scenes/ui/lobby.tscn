@@ -28,38 +28,39 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
-custom_minimum_size = Vector2(400, 360)
+[node name="ConnectPanel" type="PanelContainer" parent="CenterContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(420, 400)
 layout_mode = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/ConnectPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 24
 theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 24
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/ConnectPanel/MarginContainer"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="TitleLabel" type="Label" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "📦 KUTU KAFALAR"
 horizontal_alignment = 1
 
-[node name="SubtitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="SubtitleLabel" type="Label" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.65, 0.7, 0.8, 1)
 theme_override_font_sizes/font_size = 14
 text = "1. ŞAHIS CO-OP HORDE SHOOTER"
 horizontal_alignment = 1
 
-[node name="HSeparator1" type="HSeparator" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="HSeparator1" type="HSeparator" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="NameInput" type="LineEdit" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="NameInput" type="LineEdit" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
@@ -67,63 +68,144 @@ placeholder_text = "Oyuncu Adınız..."
 text = "Kutu Asker"
 alignment = 1
 
-[node name="ClassOption" type="OptionButton" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="ClassOption" type="OptionButton" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 alignment = 1
 
-[node name="HostButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="HostButton" type="Button" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 text = "🎮 ODA KUR (HOST)"
 
-[node name="HSeparator2" type="HSeparator" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="HSeparator2" type="HSeparator" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="IpInput" type="LineEdit" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="IpInput" type="LineEdit" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-placeholder_text = "Sunucu IP Adresi"
+placeholder_text = "Sunucu IP Adresi (Hamachi veya 127.0.0.1)"
 text = "127.0.0.1"
 alignment = 1
 
-[node name="JoinButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="JoinButton" type="Button" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 text = "🔗 ODAYA KATIL (JOIN)"
 
-[node name="StatusLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="StatusLabel" type="Label" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.85, 0.5, 1)
 theme_override_font_sizes/font_size = 12
-text = "Durum bekleniyor..."
+text = "Sınıfınızı seçin, oda kurun veya arkadaşınıza bağlanın."
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="FooterBox" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="FooterBox" type="HBoxContainer" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 alignment = 1
 
-[node name="VersionLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/FooterBox"]
+[node name="VersionLabel" type="Label" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer/FooterBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.5, 0.6, 1)
 theme_override_font_sizes/font_size = 11
 text = "v1.0.0"
 
-[node name="CheckUpdateBtn" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/FooterBox"]
+[node name="CheckUpdateBtn" type="Button" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer/FooterBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.75, 1, 1)
 theme_override_font_sizes/font_size = 11
 flat = true
 text = "🔄 Güncelleme Denetle"
+
+[node name="RoomPanel" type="PanelContainer" parent="CenterContainer"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(460, 440)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="CenterContainer/RoomPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/RoomPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="RoomTitle" type="Label" parent="CenterContainer/RoomPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "🎮 BEKLEME ODASI"
+horizontal_alignment = 1
+
+[node name="RoomInfoLabel" type="Label" parent="CenterContainer/RoomPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 1)
+theme_override_font_sizes/font_size = 13
+text = "Oda Bilgisi Yükleniyor..."
+horizontal_alignment = 1
+
+[node name="HSeparator3" type="HSeparator" parent="CenterContainer/RoomPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/RoomPanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PlayerListBox" type="VBoxContainer" parent="CenterContainer/RoomPanel/Margin/VBox/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="HSeparator4" type="HSeparator" parent="CenterContainer/RoomPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="RoomStatusLabel" type="Label" parent="CenterContainer/RoomPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.85, 0.4, 1)
+theme_override_font_sizes/font_size = 12
+text = "Tüm oyuncuların hazır olması bekleniyor..."
+horizontal_alignment = 1
+
+[node name="RoomButtons" type="HBoxContainer" parent="CenterContainer/RoomPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="ReadyBtn" type="Button" parent="CenterContainer/RoomPanel/Margin/VBox/RoomButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(140, 42)
+layout_mode = 2
+text = "✅ HAZIR OL"
+
+[node name="StartGameBtn" type="Button" parent="CenterContainer/RoomPanel/Margin/VBox/RoomButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(170, 42)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 1, 0.4, 1)
+text = "🚀 OYUNU BAŞLAT"
+
+[node name="LeaveRoomBtn" type="Button" parent="CenterContainer/RoomPanel/Margin/VBox/RoomButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 42)
+layout_mode = 2
+text = "🚪 AYRIL"
 
 [node name="UpdateOverlay" type="ColorRect" parent="."]
 unique_name_in_owner = true
@@ -217,4 +299,3 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 text = "Daha Sonra"
-
