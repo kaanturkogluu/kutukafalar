@@ -210,7 +210,7 @@ func sync_spawn_zombie(z_name: String, pos: Vector3, speed_val: float, hp_val: f
 		zombie.speed = speed_val
 		zombie.max_health = hp_val
 		zombie.current_health = hp_val
-		zombie.died.connect(_on_zombie_died.bind(zombie))
+		zombie.died.connect(_on_zombie_died)
 		enemies_container.add_child(zombie, true)
 
 func _spawn_single_zombie() -> void:
@@ -233,7 +233,7 @@ func sync_despawn_node(container_name: String, node_name: String) -> void:
 		if n and is_instance_valid(n):
 			n.queue_free()
 
-func _on_zombie_died(zombie_ref = null) -> void:
+func _on_zombie_died(zombie_ref = null, _extra = null) -> void:
 	if not multiplayer.is_server():
 		return
 
@@ -243,13 +243,14 @@ func _on_zombie_died(zombie_ref = null) -> void:
 	active_zombie_count = max(0, active_zombie_count - 1)
 	_sync_floor_ui.rpc(current_floor, current_wave, active_zombie_count + zombies_remaining_to_spawn)
 
-	if zombies_remaining_to_spawn == 0 and active_zombie_count == 0:
+	if zombies_remaining_to_spawn <= 0 and active_zombie_count <= 0:
+		is_wave_in_progress = false
 		var token = wave_loop_token
 		if current_wave < WAVES_PER_FLOOR:
 			# Kat içindeki bir sonraki dalga
 			current_wave += 1
 			_announce_wave_cleared.rpc()
-			await get_tree().create_timer(3.5).timeout
+			await get_tree().create_timer(3.0).timeout
 			if token == wave_loop_token:
 				_start_next_wave()
 		else:
