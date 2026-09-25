@@ -71,6 +71,15 @@ var all_players_dead: bool = false
 var camera_trauma: float = 0.0
 var hurt_tween: Tween = null
 
+# Canlandırma (Revive) Sistemi (E Tuşuna 10 saniye basılı tutarak)
+const REVIVE_REQUIRED_TIME: float = 10.0
+const REVIVE_MAX_DISTANCE: float = 3.2
+var current_reviving_target: CharacterBody3D = null
+var revive_progress_timer: float = 0.0
+var revive_box: VBoxContainer = null
+var revive_label: Label = null
+var revive_bar: ProgressBar = null
+
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 @onready var head: Node3D = $Head
@@ -171,6 +180,32 @@ func _ready() -> void:
 		hud.visible = true
 		head_mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
 		_update_hud()
+		
+		# Canlandırma (Revive) Arayüzünü Oluştur
+		revive_box = VBoxContainer.new()
+		revive_box.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+		revive_box.offset_bottom = -160.0
+		revive_box.offset_left = -200.0
+		revive_box.offset_right = 200.0
+		revive_box.grow_horizontal = Control.GROW_DIRECTION_BOTH
+		revive_box.grow_vertical = Control.GROW_DIRECTION_BEGIN
+		revive_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		revive_box.visible = false
+		
+		revive_label = Label.new()
+		revive_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		revive_label.add_theme_font_size_override("font_size", 16)
+		revive_label.add_theme_color_override("font_color", Color(0.2, 1.0, 0.4))
+		revive_label.text = "❤️ [E'YE BASILI TUT] Canlandırılıyor..."
+		revive_box.add_child(revive_label)
+		
+		revive_bar = ProgressBar.new()
+		revive_bar.custom_minimum_size = Vector2(340, 16)
+		revive_bar.show_percentage = true
+		revive_bar.max_value = 100.0
+		revive_box.add_child(revive_bar)
+		
+		hud.add_child(revive_box)
 	else:
 		camera.current = false
 		hud.visible = false
@@ -311,18 +346,23 @@ func _physics_process(delta: float) -> void:
 
 	# YALNIZCA fare kilitliyken ateş et, tekme at ve varil koy (Arayüzde tıklarken ateş etmeyi engeller)
 	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		# Ateş Etme (Sol Tık)
-		if Input.is_action_pressed("shoot") and fire_timer <= 0:
+		if is_multiplayer_authority():
+			_handle_revive_interaction(delta)
+
+		# Ateş Etme (Sol Tık) - Canlandırırken ateş etmeyi engelle
+		if Input.is_action_pressed("shoot") and fire_timer <= 0 and revive_progress_timer <= 0:
 			_shoot()
 
 		# Tekme (F Tuşu)
-		if Input.is_action_just_pressed("kick") and kick_timer <= 0:
+		if Input.is_action_just_pressed("kick") and kick_timer <= 0 and revive_progress_timer <= 0:
 			_kick()
 			kick_timer = kick_cooldown
 
 		# Varil Bırakma (G / Interact Tuşu)
-		if Input.is_action_just_pressed("interact") and barrel_count > 0:
+		if Input.is_action_just_pressed("interact") and barrel_count > 0 and revive_progress_timer <= 0:
 			_place_barrel()
+	else:
+		_reset_revive_state()
 
 	# Geri tepme yumuşatma
 	if gun:
@@ -806,11 +846,12 @@ func _die() -> void:
 	combo_timer = 0.0
 	_update_combo_hud()
 	
-	collision_layer = 0
-	collision_mask = 0
+	# Cesedin yerde durması ve takım arkadaşının yanına gelip etkileşime girebilmesi için
+	collision_layer = 2
+	collision_mask = 1
 	gun.visible = false
 	
-	# Karakterin 3D modelini yere devir (Boxhead ragdoll/ölüm duruşu)
+	# Karakterin 3D modelini yere devir (Boxhead ceset yerde kalır)
 	if body_mesh:
 		body_mesh.position = Vector3(0, 0.2, 0)
 		body_mesh.rotation_degrees = Vector3(0, 0, 85)
@@ -819,8 +860,8 @@ func _die() -> void:
 		head.rotation_degrees = Vector3(0, 0, 85)
 	
 	if name_label:
-		name_label.text = "[ÖLDÜ] " + player_name
-		name_label.modulate = Color(1.0, 0.25, 0.25)
+		name_label.text = "💀 " + player_name + "\n[E] Canlandır (10 sn)"
+		name_label.modulate = Color(1.0, 0.35, 0.35)
 	
 	# Küp parçalanma efekti doğur
 	var gibs_scene = load(GIBS_SCENE_PATH)
@@ -930,11 +971,92 @@ func _update_spectator_hud() -> void:
 			death_reason_label.text = "Takım arkadaşların savaşıyor! Asansöre ulaşıldığında canlanacaksın."
 		if death_info_label:
 			var target_name = spectator_target.player_name if (spectator_target and is_instance_valid(spectator_target)) else "Takım Arkadaşı"
-			death_info_label.text = "İzlenen: " + target_name + "  |  [Sol Tık / Boşluk] Sonraki Oyuncu"
+			death_info_label.text = "İzlenen: " + target_name + "  |  [Sol Tık / Boşluk] Oyuncu Değiştir\n(Arkadaşın cesedinin yanına gelip 10 sn [E] basılı tutarak seni kaldırabilir)"
 		if restart_btn:
 			restart_btn.visible = false
 			restart_btn.disabled = true
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+# --- Canlandırma (Revive) Etkileşimi ---
+
+func is_targeting_downed_teammate() -> bool:
+	return current_reviving_target != null
+
+func _handle_revive_interaction(delta: float) -> void:
+	if not is_multiplayer_authority() or is_dead or is_in_shop or (pause_menu and pause_menu.visible):
+		_reset_revive_state()
+		return
+	
+	# Yakındaki ölü takım arkadaşlarını tara (3.2 metre mesafe)
+	var nearest_downed: CharacterBody3D = null
+	var min_dist: float = REVIVE_MAX_DISTANCE
+	var players = get_tree().get_nodes_in_group("players")
+	for p in players:
+		if is_instance_valid(p) and p != self and p.get("is_dead"):
+			var d = global_position.distance_to(p.global_position)
+			if d < min_dist:
+				# Oyuncunun baktığı yönde mi kontrolü
+				var forward = -camera.global_transform.basis.z
+				var dir_to_p = (p.global_position - camera.global_position).normalized()
+				if forward.dot(dir_to_p) > 0.35:
+					min_dist = d
+					nearest_downed = p
+	
+	if nearest_downed:
+		current_reviving_target = nearest_downed
+		if revive_box:
+			revive_box.visible = true
+		
+		# E tuşu basılı tutuluyor mu?
+		if Input.is_key_pressed(KEY_E) or Input.is_action_pressed("spell_tactical"):
+			revive_progress_timer += delta
+			var pct = clamp((revive_progress_timer / REVIVE_REQUIRED_TIME) * 100.0, 0.0, 100.0)
+			if revive_bar:
+				revive_bar.value = pct
+			if revive_label:
+				var rem_sec = max(0.0, REVIVE_REQUIRED_TIME - revive_progress_timer)
+				revive_label.text = "❤️ " + nearest_downed.player_name + " CANLANDIRILIYOR... %" + str(int(pct)) + " (" + str(snapped(rem_sec, 0.1)) + " sn)"
+				revive_label.modulate = Color(0.2, 1.0, 0.4)
+			
+			# Canlandırılan oyuncunun ekranında göster
+			if nearest_downed.has_method("notify_being_revived"):
+				nearest_downed.notify_being_revived.rpc(player_name, pct)
+			
+			# 10 saniye dolduysa CANLANDIR!
+			if revive_progress_timer >= REVIVE_REQUIRED_TIME:
+				print("[Canlandırma] ", nearest_downed.player_name, " başarıyla canlandırıldı!")
+				_complete_revive(nearest_downed)
+				_reset_revive_state()
+		else:
+			# Tuşa basılmıyorken sadece ipucu göster
+			revive_progress_timer = 0.0
+			if revive_bar:
+				revive_bar.value = 0.0
+			if revive_label:
+				revive_label.text = "❤️ [E'YE BASILI TUT] " + nearest_downed.player_name + " Canlandır (10 sn)"
+				revive_label.modulate = Color(1.0, 0.9, 0.3)
+	else:
+		_reset_revive_state()
+
+func _reset_revive_state() -> void:
+	current_reviving_target = null
+	revive_progress_timer = 0.0
+	if revive_box:
+		revive_box.visible = false
+
+func _complete_revive(target_player: CharacterBody3D) -> void:
+	if not is_instance_valid(target_player):
+		return
+	var t_pos = target_player.global_position
+	# Sunucudan veya yetkiden revive RPC'sini çağır
+	target_player.revive.rpc(50.0, t_pos)
+	SoundManager.play_sfx("pickup")
+	_show_weapon_notice("💚 " + target_player.player_name.to_upper() + " CANLANDIRILDI!")
+
+@rpc("any_peer", "call_local", "reliable")
+func notify_being_revived(reviver_name: String, percent: float) -> void:
+	if is_multiplayer_authority() and is_dead and death_info_label:
+		death_info_label.text = "💚 " + reviver_name + " seni canlandırıyor! %" + str(int(percent))
 
 @rpc("any_peer", "call_local", "reliable")
 func revive(health_amount: float = 50.0, spawn_pos: Vector3 = Vector3.ZERO) -> void:

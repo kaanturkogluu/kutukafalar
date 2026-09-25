@@ -33,7 +33,10 @@ func _process(delta: float) -> void:
 		tactical_timer -= delta
 
 	if Input.is_action_just_pressed("spell_tactical"):
-		cast_tactical()
+		if player and player.has_method("is_targeting_downed_teammate") and player.is_targeting_downed_teammate():
+			pass
+		else:
+			cast_tactical()
 
 	if Input.is_action_just_pressed("spell_ultimate"):
 		cast_ultimate()

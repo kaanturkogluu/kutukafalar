@@ -260,7 +260,7 @@ func _on_zombie_died(zombie_ref = null, _extra = null) -> void:
 func _on_floor_cleared() -> void:
 	print("[Kat Tamamlandı] Kat ", current_floor, " temizlendi! Asansör kapıları açılıyor...")
 	_announce_floor_cleared.rpc()
-	elevator.set_elevator_state(true)
+	elevator.set_elevator_state.rpc(true)
 
 func _on_players_entered_elevator() -> void:
 	if not multiplayer.is_server():
@@ -302,7 +302,7 @@ func _request_next_floor() -> void:
 
 	current_floor += 1
 	current_wave = 1
-	elevator.set_elevator_state(false)
+	elevator.set_elevator_state.rpc(false)
 
 	# Oyuncuları asansörden doğuş noktalarına geri taşı
 	var players = get_tree().get_nodes_in_group("players")
@@ -402,7 +402,7 @@ func _restart_game() -> void:
 		elif p.has_method("revive"):
 			p.revive.rpc(p.max_health, spawn_pos)
 	
-	elevator.set_elevator_state(false)
+	elevator.set_elevator_state.rpc(false)
 	_sync_floor_ui.rpc(current_floor, current_wave, 0)
 	await get_tree().create_timer(1.8).timeout
 	_start_next_wave()

@@ -1,6 +1,6 @@
 {
-  "version": "v1.1.3",
+  "version": "v1.1.4",
   "download_url": "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-  "pck_size": 253532,
-  "changelog": "- Düşman öldükten sonra dalga ilerleme ve yeni zombi doğma (signal argument) hatası düzeltildi.\n- Kırmızı varil vurulma ve patlama hasar argümanları eşitlendi.\n- Çok oyunculu büyü oluşturma yönlendirmesi düzeltildi.\n- Güncelleyici yetki kısıtlamalarına karşı user:// depolama güvencesine alındı."
+  "pck_size": 257884,
+  "changelog": "- Asansör açılma ve kat temizlenme durumu tüm oyunculara senkronize edildi (Host ölse bile kat temizliği tamamlanır).\n- Ölen oyuncunun cesedi yerde kalır ve takım arkadaşları 10 saniye boyunca [E]'ye basılı tutarak onu kaldırabilir.\n- İzleyici ekranında canlandırma durumu ve ilerlemesi anlık gösterilir.\n- Yaşayan tüm oyuncular asansöre bindiğinde sonraki kata geçiş başlar ve ölü oyuncular yeni katta otomatik dirilir."
 }
