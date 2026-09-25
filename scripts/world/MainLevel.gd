@@ -47,7 +47,10 @@ func _ready() -> void:
 		NetworkManager.player_disconnected.connect(_on_player_disconnected)
 
 	# Seviye yüklendiğinde sunucuya hazır olduğumuzu bildir (Host ve tüm Client'lar)
-	_notify_peer_level_ready.rpc_id(1, multiplayer.get_unique_id())
+	if multiplayer.is_server():
+		_notify_peer_level_ready(1)
+	else:
+		_notify_peer_level_ready.rpc_id(1, multiplayer.get_unique_id())
 
 @rpc("any_peer", "call_local", "reliable")
 func _notify_peer_level_ready(peer_id: int) -> void:
@@ -349,7 +352,7 @@ func _check_all_players_dead() -> void:
 	
 	var all_dead = true
 	for p in players:
-		if is_instance_valid(p) and not p.get("is_dead") and p.get("current_health", 0.0) > 0:
+		if is_instance_valid(p) and not p.get("is_dead") and (p.get("current_health") == null or float(p.get("current_health")) > 0):
 			all_dead = false
 			break
 	

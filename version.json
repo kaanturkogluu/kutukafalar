@@ -1,6 +1,6 @@
 {
-  "version": "v1.1.5",
+  "version": "v1.1.6",
   "download_url": "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-  "pck_size": 261964,
-  "changelog": "- Lobi sahibi öldüğünde tüm kontroller (hareket, ateş vb.) eksiksiz durdurulup izleyici moduna geçmesi sağlandı.\n- İzleyici kamerasının hayattaki takım arkadaşını arkadan pürüzsüz takip etmesi sağlandı.\n- Öldükten sonra izleyici ekranındaki yazılar [H] tuşuna veya 'Arayüzü Gizle' butonuna basılarak gizlenebilir/gösterilebilir yapıldı.\n- İzleyici modundayken takım arkadaşları hala savaşıyorsa oyunun kazara yeniden başlatılması engellendi.\n- Oyun baştan başlatıldığında (reset_to_default_loadout) tüm oyuncuların temiz sıfırlanması ve yaşayan oyuncuların ani ölmesi sorunu düzeltildi."
+  "pck_size": 262140,
+  "changelog": "- Oyun başlarken karakterlerin doğmama ve haritanın üstten kamerada takılı kalma (GDScript parse error) hatası giderildi.\n- Sunucunun seviye başlangıcında doğrudan oyuncuyu doğurması güvenceye alındı.\n- reset_to_default_loadout değişken uyumluluğu düzeltildi."
 }

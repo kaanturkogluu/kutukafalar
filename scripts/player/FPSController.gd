@@ -1211,10 +1211,10 @@ func reset_to_default_loadout(spawn_pos: Vector3 = Vector3.ZERO) -> void:
 	
 	# Varsayılan başlangıç tabancası ve mühimmatı
 	current_weapon = "pistol"
-	weapon_slots = ["pistol"]
-	current_slot_index = 0
+	weapon_inventory = ["pistol"]
+	current_weapon_index = 0
 	weapon_ammo_dict = {
-		"pistol": 9999,
+		"pistol": -1,
 		"uzi": 0,
 		"bixi": 0,
 		"shotgun": 0,
