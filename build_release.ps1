@@ -8,7 +8,13 @@ $GodotExe = "C:\Users\Crawl\Downloads\Godot_v4.7.2-stable_win64.exe"
 $ProjectDir = $PSScriptRoot
 $BuildsRoot = Join-Path $ProjectDir "builds"
 $GameDir = Join-Path $BuildsRoot "KutuKafalar"
-$ZipOut = Join-Path $BuildsRoot "KutuKafalar-v1.0.0-Windows.zip"
+$VersionJsonPath = Join-Path $ProjectDir "version.json"
+$Version = "v1.1.6"
+if (Test-Path $VersionJsonPath) {
+    $vData = Get-Content $VersionJsonPath -Raw | ConvertFrom-Json
+    if ($vData.version) { $Version = $vData.version }
+}
+$ZipOut = Join-Path $BuildsRoot "KutuKafalar-$Version-Windows.zip"
 $PckOut = Join-Path $GameDir "KutuKafalar.pck"
 $StandalonePck = Join-Path $BuildsRoot "KutuKafalar.pck"
 

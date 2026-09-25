@@ -28,11 +28,10 @@ var temp_pck_path: String = ""
 func _ready() -> void:
 	_determine_paths()
 	
-	# Oyun başlarken: user:// içinde indirilmiş güncel bir PCK paketi varsa yükle
+	# user:// içinde eski artık bir pck kalmışsa temizle ki ana oyunu ezmesin veya kilitlemesin
 	var user_pck = ProjectSettings.globalize_path("user://KutuKafalar.pck")
-	if FileAccess.file_exists(user_pck) and not OS.has_feature("editor"):
-		print("[AutoUpdater] user:// konumundaki güncel yama yükleniyor: ", user_pck)
-		ProjectSettings.load_resource_pack(user_pck, true)
+	if FileAccess.file_exists(user_pck):
+		DirAccess.remove_absolute(user_pck)
 	
 	check_http = HTTPRequest.new()
 	add_child(check_http)
@@ -207,9 +206,7 @@ func apply_update_and_restart() -> void:
 	var base_dir = OS.get_executable_path().get_base_dir()
 	var exe_name = OS.get_executable_path().get_file()
 	
-	# Ayrıca user:// içine de kalıcı olarak KutuKafalar.pck olarak kopyala
 	var user_permanent_pck = ProjectSettings.globalize_path("user://KutuKafalar.pck")
-	DirAccess.copy_absolute(temp_pck_path, user_permanent_pck)
 	
 	# Eğer editördeysek, doğrudan çalışma zamanında paketi yükle
 	if OS.has_feature("editor"):
@@ -232,10 +229,11 @@ if not errorlevel 1 goto copy_done
 if %tries% lss 20 goto wait_loop
 
 :copy_done
-if exist "{TEMP_PCK}" del "{TEMP_PCK}" >nul 2>&1
+if exist "{USER_PCK}" del /f /q "{USER_PCK}" >nul 2>&1
+if exist "{TEMP_PCK}" del /f /q "{TEMP_PCK}" >nul 2>&1
 start "" "%~dp0{EXE_NAME}"
 del "%~f0"
-""".replace("{TEMP_PCK}", temp_pck_path.replace("/", "\\")).replace("{EXE_NAME}", exe_name)
+""".replace("{TEMP_PCK}", temp_pck_path.replace("/", "\\")).replace("{USER_PCK}", user_permanent_pck.replace("/", "\\")).replace("{EXE_NAME}", exe_name)
 	
 	var bat_file = FileAccess.open(bat_path, FileAccess.WRITE)
 	if bat_file:
