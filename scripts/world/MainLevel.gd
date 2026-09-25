@@ -349,7 +349,7 @@ func _check_all_players_dead() -> void:
 	
 	var all_dead = true
 	for p in players:
-		if not p.get("is_dead"):
+		if is_instance_valid(p) and not p.get("is_dead") and p.get("current_health", 0.0) > 0:
 			all_dead = false
 			break
 	
@@ -364,7 +364,7 @@ func _announce_game_over() -> void:
 	
 	var players = get_tree().get_nodes_in_group("players")
 	for p in players:
-		if p.has_method("set_all_players_dead"):
+		if is_instance_valid(p) and p.has_method("set_all_players_dead"):
 			p.set_all_players_dead()
 
 func request_restart() -> void:
@@ -385,9 +385,11 @@ func _restart_game() -> void:
 	current_wave = 1
 	active_zombie_count = 0
 	zombies_remaining_to_spawn = 0
+	is_wave_in_progress = false
 	
 	_close_shop_ui.rpc()
 	sync_clear_all_entities.rpc()
+	sync_reset_game_state.rpc()
 	
 	# Başlangıç varillerini yeniden doğur
 	_spawn_initial_barrels()
@@ -406,6 +408,16 @@ func _restart_game() -> void:
 	_sync_floor_ui.rpc(current_floor, current_wave, 0)
 	await get_tree().create_timer(1.8).timeout
 	_start_next_wave()
+
+@rpc("call_local", "reliable")
+func sync_reset_game_state() -> void:
+	is_wave_in_progress = false
+	if enemies_label:
+		enemies_label.text = "⚔️ YENİ OYUN BAŞLADI!"
+	if floor_label:
+		floor_label.text = "KAT 1"
+	if wave_label:
+		wave_label.text = "DALGA 1 / " + str(WAVES_PER_FLOOR)
 
 @rpc("call_local", "reliable")
 func sync_clear_all_entities() -> void:
