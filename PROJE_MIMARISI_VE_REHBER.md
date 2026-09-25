@@ -97,5 +97,9 @@ Projeyi geliştirirken token tüketimini minimumda tutmak ve hızlı ilerlemek i
   * **Mermisi Biten Silahın Kullanımdan Kalkması:** Pompalı, Uzi veya Roketatarın mermisi bittiğinde silah otomatik olarak envanterden silinir, boş mermi klik sesi (`empty`) çalar, arayüzde bildirim çıkar ve oyuncu otomatik olarak bir önceki silaha veya tabancaya geçirilir.
   * **Gelişmiş Silah HUD'ı:** Aktif silah adı, mermi sayısı, sahip olunan silahların slot listesi (`▶ [1: Tabanca (∞)] [2: Pompalı (16)]`) ve geçici bildirimler gerçek zamanlı olarak HUD'da gösterilir.
   * **Asansör Mağaza Tıklama Yalıtımı:** Mağaza açıkken veya fare görünür moddayken (`is_in_shop` / `MOUSE_MODE_VISIBLE`) tüm silah ateşleme, tekme, büyü atma ve tekerlek geçişleri kilitlendi; satın alma butonlarına tıklandığında karakterin ateş etmesi ve mermi harcaması tamamen önlendi. Kart alımlarına `pickup` ve `empty` ses efektleri eklendi.
+* [x] **Faz 6: Bağımsız EXE Derleme, Paketleme ve GitHub Otomatik Güncelleyici:**
+  * **GitHub Releases Entegrasyonu (`AutoUpdater.gd`):** Oyun açıldığında `https://api.github.com/repos/kaanturkogluu/kutukafalar/releases/latest` adresini sorgular. Yeni bir sürüm (`tag_name`) varsa lobide indirme çubuğuyla birlikte güncelleme modalı açılır.
+  * **Hafif Paket Dağıtımı (`.pck`):** Tüm oyunu baştan indirmek yerine yalnızca **220 KB** boyutundaki `KutuKafalar.pck` dosyası 1 saniyede indirilir ve oyun otomatik olarak yeniden başlatılarak güncellenir.
+  * **Tek Tık Derleme Aracı (`build_release.bat` / `build_release.ps1`):** Projeyi doğrudan `builds/` klasörüne bağımsız Windows `.exe`, `.pck` ve arkadaşlara gönderilecek ilk kurulum `KutuKafalar-v1.0.0-Windows.zip` olarak paketler.
 
 
