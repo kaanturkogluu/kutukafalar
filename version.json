@@ -1,6 +1,6 @@
 {
   "version": "v1.1.3",
   "download_url": "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-  "pck_size": 253356,
+  "pck_size": 253532,
   "changelog": "- Düşman öldükten sonra dalga ilerleme ve yeni zombi doğma (signal argument) hatası düzeltildi.\n- Kırmızı varil vurulma ve patlama hasar argümanları eşitlendi.\n- Çok oyunculu büyü oluşturma yönlendirmesi düzeltildi.\n- Güncelleyici yetki kısıtlamalarına karşı user:// depolama güvencesine alındı."
 }

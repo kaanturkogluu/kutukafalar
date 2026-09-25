@@ -221,11 +221,18 @@ func apply_update_and_restart() -> void:
 	# Windows için otomatik değiştirici ve yeniden başlatıcı bat dosyası
 	var bat_path = base_dir.path_join("apply_update.bat")
 	var bat_content = """@echo off
+chcp 65001 >nul
+echo Kutu Kafalar güncelleniyor, lütfen bekleyin...
+set /a tries=0
+:wait_loop
 timeout /t 1 /nobreak >nul
-if exist "{TEMP_PCK}" (
-    copy /y "{TEMP_PCK}" "%~dp0KutuKafalar.pck" >nul
-    del "{TEMP_PCK}" >nul
-)
+set /a tries+=1
+copy /y "{TEMP_PCK}" "%~dp0KutuKafalar.pck" >nul 2>&1
+if not errorlevel 1 goto copy_done
+if %tries% lss 20 goto wait_loop
+
+:copy_done
+if exist "{TEMP_PCK}" del "{TEMP_PCK}" >nul 2>&1
 start "" "%~dp0{EXE_NAME}"
 del "%~f0"
 """.replace("{TEMP_PCK}", temp_pck_path.replace("/", "\\")).replace("{EXE_NAME}", exe_name)
