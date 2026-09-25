@@ -86,10 +86,29 @@ func set_local_ready(ready_state: bool) -> void:
 	local_player_info["is_ready"] = ready_state
 	var my_id = multiplayer.get_unique_id()
 	if multiplayer.is_server():
-		players[my_id]["is_ready"] = ready_state
-		_sync_lobby.rpc(players)
+		if players.has(my_id):
+			players[my_id]["is_ready"] = ready_state
+			_sync_lobby.rpc(players)
 	else:
 		_request_set_ready.rpc_id(1, ready_state)
+
+## Oyuncunun Sınıfını Değiştir ve Odaya Duyur
+func set_local_class(class_name: String) -> void:
+	local_player_info["class"] = class_name
+	var my_id = multiplayer.get_unique_id()
+	if multiplayer.is_server():
+		if players.has(my_id):
+			players[my_id]["class"] = class_name
+			_sync_lobby.rpc(players)
+	else:
+		_request_set_class.rpc_id(1, class_name)
+
+@rpc("any_peer", "reliable")
+func _request_set_class(class_name: String) -> void:
+	var sender_id = multiplayer.get_remote_sender_id()
+	if multiplayer.is_server() and players.has(sender_id):
+		players[sender_id]["class"] = class_name
+		_sync_lobby.rpc(players)
 
 ## Host İçin Oyunu Başlat
 func start_game() -> void:

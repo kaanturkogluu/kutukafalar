@@ -9,11 +9,9 @@ const PICKUP_SCENE_PATH: String = "res://scenes/interactables/pickup.tscn"
 @onready var players_container: Node3D = $Players
 @onready var enemies_container: Node3D = $Enemies
 @onready var barrels_container: Node3D = $Barrels
-@onready var player_spawner: MultiplayerSpawner = $MultiplayerSpawner
-@onready var enemy_spawner: MultiplayerSpawner = $EnemySpawner
-@onready var barrel_spawner: MultiplayerSpawner = $BarrelSpawner
 @onready var elevator: Node3D = $Elevator
 @onready var shop_ui: CanvasLayer = $ShopUI
+@onready var default_camera: Camera3D = $DefaultCamera
 
 @onready var spawn_points: Array[Node] = $SpawnPoints.get_children()
 @onready var zombie_spawn_points: Array[Node] = $ZombieSpawnPoints.get_children()
@@ -28,68 +26,100 @@ var active_zombie_count: int = 0
 var zombie_id_counter: int = 0
 var barrel_id_counter: int = 0
 var wave_loop_token: int = 0
+var initial_barrels_spawned: bool = false
+var peers_ready: Dictionary = {}
+var is_wave_in_progress: bool = false
 
 @onready var floor_label: Label = $WaveUI/WaveInfo/FloorLabel
 @onready var wave_label: Label = $WaveUI/WaveInfo/WaveLabel
 @onready var enemies_label: Label = $WaveUI/WaveInfo/EnemiesLabel
 
 func _ready() -> void:
-	player_spawner.spawn_path = players_container.get_path()
-	player_spawner.add_spawnable_scene(PLAYER_SCENE_PATH)
-
-	enemy_spawner.spawn_path = enemies_container.get_path()
-	enemy_spawner.add_spawnable_scene(ZOMBIE_SCENE_PATH)
-
-	barrel_spawner.spawn_path = barrels_container.get_path()
-	barrel_spawner.add_spawnable_scene(BARREL_SCENE_PATH)
-	
 	if elevator:
 		elevator.players_entered_elevator.connect(_on_players_entered_elevator)
 	if shop_ui:
 		shop_ui.next_floor_requested.connect(_on_next_floor_requested)
-	
-	player_spawner.spawned.connect(func(node):
-		if node is CharacterBody3D and node.has_signal("player_died"):
-			if not node.player_died.is_connected(_on_player_died):
-				node.player_died.connect(_on_player_died.bind(node))
-	)
 
 	NetworkManager.server_disconnected.connect(_on_server_disconnected)
 
 	if multiplayer.is_server():
 		NetworkManager.player_connected.connect(_on_player_connected)
 		NetworkManager.player_disconnected.connect(_on_player_disconnected)
-		
-		# Host oyuncuyu doğur
-		spawn_player(1)
-		
-		for id in NetworkManager.players.keys():
-			if id != 1:
-				spawn_player(id)
 
-		# Başlangıç varillerini doğur
+	# Seviye yüklendiğinde sunucuya hazır olduğumuzu bildir (Host ve tüm Client'lar)
+	_notify_peer_level_ready.rpc_id(1, multiplayer.get_unique_id())
+
+@rpc("any_peer", "call_local", "reliable")
+func _notify_peer_level_ready(peer_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+	print("[MainLevel] Seviyeye giriş yapan oyuncu hazır: ", peer_id)
+	peers_ready[peer_id] = true
+	
+	# 1) Bu oyuncuya sahnede zaten mevcut olan TÜM oyuncuları doğurt:
+	for existing_player in players_container.get_children():
+		var p_id = existing_player.name.to_int()
+		sync_spawn_player.rpc_id(peer_id, p_id, existing_player.position)
+	
+	# 2) Bu yeni oyuncunun kendi karakterini doğur ve HERKESE bildir:
+	if not players_container.has_node(str(peer_id)):
+		var spawn_pos = _get_spawn_position(peer_id)
+		sync_spawn_player.rpc(peer_id, spawn_pos)
+	
+	# 3) Sahnede zaten mevcut olan varilleri bu oyuncuya doğurt:
+	for existing_barrel in barrels_container.get_children():
+		sync_spawn_barrel.rpc_id(peer_id, existing_barrel.name, existing_barrel.position)
+		
+	# 4) Sahnede zaten mevcut olan zombileri bu oyuncuya doğurt:
+	for existing_zombie in enemies_container.get_children():
+		var speed_val = existing_zombie.get("speed", 3.6)
+		var hp_val = existing_zombie.get("current_health", 100.0)
+		sync_spawn_zombie.rpc_id(peer_id, existing_zombie.name, existing_zombie.global_position, speed_val, hp_val)
+	
+	# 5) Güncel dalga/kat durumunu bildir:
+	_sync_floor_ui.rpc_id(peer_id, current_floor, current_wave, active_zombie_count + zombies_remaining_to_spawn)
+	
+	# Eğer host hazırsa ve başlangıç varilleri konmadıysa koy:
+	if peer_id == 1 and not initial_barrels_spawned:
+		initial_barrels_spawned = true
 		_spawn_initial_barrels()
-
+		
 		# 2 saniye sonra 1. Dalgayı Başlat
-		await get_tree().create_timer(2.0).timeout
-		_start_next_wave()
+		get_tree().create_timer(2.0).timeout.connect(func():
+			if current_wave == 1 and current_floor == 1 and not is_wave_in_progress:
+				_start_next_wave()
+		)
 
-func spawn_player(id: int) -> void:
+func _get_spawn_position(peer_id: int) -> Vector3:
+	if spawn_points.size() > 0:
+		var idx = 0
+		if peer_id != 1:
+			idx = peer_id % spawn_points.size()
+		return spawn_points[idx % spawn_points.size()].global_position
+	return Vector3(0, 1.5, 0)
+
+@rpc("call_local", "reliable")
+func sync_spawn_player(id: int, spawn_pos: Vector3) -> void:
 	if players_container.has_node(str(id)):
 		return
 	
 	var player_scene = load(PLAYER_SCENE_PATH)
+	if not player_scene:
+		return
 	var player = player_scene.instantiate()
 	player.name = str(id)
-	
-	if spawn_points.size() > 0:
-		var index = id % spawn_points.size()
-		player.position = spawn_points[index].global_position
-	else:
-		player.position = Vector3(0, 1.5, 0)
-	
+	player.position = spawn_pos
 	player.player_died.connect(_on_player_died.bind(player))
 	players_container.add_child(player, true)
+	print("[MainLevel] Oyuncu doğuruldu: ", id, " (Yerel mi: ", id == multiplayer.get_unique_id(), ")")
+
+func spawn_player(id: int) -> void:
+	if not multiplayer.is_server():
+		return
+	if players_container.has_node(str(id)):
+		return
+	var spawn_pos = _get_spawn_position(id)
+	sync_spawn_player.rpc(id, spawn_pos)
 
 func _spawn_initial_barrels() -> void:
 	var initial_positions = [
@@ -102,16 +132,23 @@ func _spawn_initial_barrels() -> void:
 	for pos in initial_positions:
 		spawn_barrel(pos)
 
-func spawn_barrel(pos: Vector3) -> void:
-	if not multiplayer.is_server():
+@rpc("call_local", "reliable")
+func sync_spawn_barrel(b_name: String, pos: Vector3) -> void:
+	if barrels_container.has_node(b_name):
 		return
 	var barrel_scene = load(BARREL_SCENE_PATH)
 	if barrel_scene:
 		var barrel = barrel_scene.instantiate()
-		barrel_id_counter += 1
-		barrel.name = "Barrel_" + str(barrel_id_counter)
+		barrel.name = b_name
 		barrel.position = pos
 		barrels_container.add_child(barrel, true)
+
+func spawn_barrel(pos: Vector3) -> void:
+	if not multiplayer.is_server():
+		return
+	barrel_id_counter += 1
+	var b_name = "Barrel_" + str(barrel_id_counter)
+	sync_spawn_barrel.rpc(b_name, pos)
 
 func _on_player_connected(id: int, _info: Dictionary) -> void:
 	if multiplayer.is_server():
@@ -120,9 +157,7 @@ func _on_player_connected(id: int, _info: Dictionary) -> void:
 
 func _on_player_disconnected(id: int) -> void:
 	if multiplayer.is_server():
-		var player_node = players_container.get_node_or_null(str(id))
-		if player_node:
-			player_node.queue_free()
+		sync_despawn_node.rpc("Players", str(id))
 		get_tree().create_timer(0.1).timeout.connect(_check_all_players_dead)
 
 func _on_server_disconnected() -> void:
@@ -136,6 +171,7 @@ func _start_next_wave() -> void:
 	if not multiplayer.is_server():
 		return
 
+	is_wave_in_progress = true
 	wave_loop_token += 1
 	var current_token = wave_loop_token
 	zombies_remaining_to_spawn = 4 + (current_floor * 2) + (current_wave * 2)
@@ -158,29 +194,47 @@ func _spawn_zombie_loop(token: int) -> void:
 		active_zombie_count += 1
 		_sync_floor_ui.rpc(current_floor, current_wave, active_zombie_count + zombies_remaining_to_spawn)
 
-func _spawn_single_zombie() -> void:
+@rpc("call_local", "reliable")
+func sync_spawn_zombie(z_name: String, pos: Vector3, speed_val: float, hp_val: float) -> void:
+	if enemies_container.has_node(z_name):
+		return
 	var zombie_scene = load(ZOMBIE_SCENE_PATH)
-	var zombie = zombie_scene.instantiate()
-	
+	if zombie_scene:
+		var zombie = zombie_scene.instantiate()
+		zombie.name = z_name
+		zombie.position = pos
+		zombie.speed = speed_val
+		zombie.max_health = hp_val
+		zombie.current_health = hp_val
+		zombie.died.connect(_on_zombie_died.bind(zombie))
+		enemies_container.add_child(zombie, true)
+
+func _spawn_single_zombie() -> void:
 	zombie_id_counter += 1
-	zombie.name = "Zombie_" + str(zombie_id_counter)
-	
-	# Kat ilerledikçe zombiler hafif hızlanır ve güçlenir
-	zombie.speed = 3.6 + (current_floor * 0.2)
-	zombie.max_health = 100.0 + (current_floor * 15.0)
+	var z_name = "Zombie_" + str(zombie_id_counter)
+	var speed_val = 3.6 + (current_floor * 0.2)
+	var hp_val = 100.0 + (current_floor * 15.0)
 
+	var spawn_pos = Vector3(randf_range(-10, 10), 1.5, randf_range(-10, 10))
 	if zombie_spawn_points.size() > 0:
-		var spawn_point = zombie_spawn_points.pick_random()
-		zombie.position = spawn_point.global_position
-	else:
-		zombie.position = Vector3(randf_range(-10, 10), 1.5, randf_range(-10, 10))
+		spawn_pos = zombie_spawn_points.pick_random().global_position
 	
-	zombie.died.connect(_on_zombie_died)
-	enemies_container.add_child(zombie, true)
+	sync_spawn_zombie.rpc(z_name, spawn_pos, speed_val, hp_val)
 
-func _on_zombie_died(_zombie_ref) -> void:
+@rpc("call_local", "reliable")
+func sync_despawn_node(container_name: String, node_name: String) -> void:
+	var container = get_node_or_null(container_name)
+	if container:
+		var n = container.get_node_or_null(node_name)
+		if n and is_instance_valid(n):
+			n.queue_free()
+
+func _on_zombie_died(zombie_ref = null) -> void:
 	if not multiplayer.is_server():
 		return
+
+	if zombie_ref and is_instance_valid(zombie_ref):
+		sync_despawn_node.rpc("Enemies", zombie_ref.name)
 
 	active_zombie_count = max(0, active_zombie_count - 1)
 	_sync_floor_ui.rpc(current_floor, current_wave, active_zombie_count + zombies_remaining_to_spawn)
@@ -328,19 +382,7 @@ func _restart_game() -> void:
 	zombies_remaining_to_spawn = 0
 	
 	_close_shop_ui.rpc()
-	
-	# Sahnedeki tüm düşmanları temizle
-	for child in enemies_container.get_children():
-		child.queue_free()
-	
-	# Sahnedeki tüm varilleri temizle
-	for child in barrels_container.get_children():
-		child.queue_free()
-	
-	# Sahnedeki tüm toplanabilir eşyaları temizle
-	var pickups = get_tree().get_nodes_in_group("pickups")
-	for p in pickups:
-		p.queue_free()
+	sync_clear_all_entities.rpc()
 	
 	# Başlangıç varillerini yeniden doğur
 	_spawn_initial_barrels()
@@ -359,6 +401,16 @@ func _restart_game() -> void:
 	_sync_floor_ui.rpc(current_floor, current_wave, 0)
 	await get_tree().create_timer(1.8).timeout
 	_start_next_wave()
+
+@rpc("call_local", "reliable")
+func sync_clear_all_entities() -> void:
+	for child in enemies_container.get_children():
+		child.queue_free()
+	for child in barrels_container.get_children():
+		child.queue_free()
+	var pickups = get_tree().get_nodes_in_group("pickups")
+	for p in pickups:
+		p.queue_free()
 
 ## Çok Oyunculu Senkronize Büyü Oluşturma (Tüm ekranlarda görünür!)
 @rpc("call_local", "reliable")

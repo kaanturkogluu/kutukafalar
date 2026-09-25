@@ -57,17 +57,9 @@ shadow_enabled = true
 
 [node name="Barrels" type="Node3D" parent="."]
 
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://scenes/player/player.tscn")
-spawn_path = NodePath("Players")
-
-[node name="EnemySpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://scenes/enemies/zombie.tscn")
-spawn_path = NodePath("Enemies")
-
-[node name="BarrelSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://scenes/interactables/barrel_red.tscn")
-spawn_path = NodePath("Barrels")
+[node name="DefaultCamera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 16, 12)
+current = true
 
 [node name="Elevator" parent="." instance=ExtResource("2_elev")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -13.5)
