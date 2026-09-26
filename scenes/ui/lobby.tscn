@@ -1,6 +1,28 @@
-[gd_scene load_steps=2 format=3 uid="uid://c51wup2e3a1k8"]
+[gd_scene load_steps=5 format=3 uid="uid://c51wup2e3a1k8"]
 
 [ext_resource type="Script" path="res://scripts/ui/Lobby.gd" id="1_lobby"]
+[ext_resource type="PackedScene" uid="uid://squad_bg_3d_01" path="res://scenes/ui/squad_background_3d.tscn" id="2_squad_bg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glass"]
+bg_color = Color(0.07, 0.085, 0.12, 0.88)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.45, 0.7, 0.55)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_left = 14
+corner_radius_bottom_right = 14
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
+bg_color = Color(0.05, 0.06, 0.09, 0.75)
+border_width_bottom = 1
+border_color = Color(0.2, 0.35, 0.55, 0.4)
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [node name="Lobby" type="Control"]
 layout_mode = 3
@@ -11,33 +33,103 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_lobby")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="ViewportContainer" type="SubViewportContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.08, 0.09, 0.12, 1)
+mouse_filter = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="ViewportContainer"]
+handle_input_locally = false
+size = Vector2i(1920, 1080)
+render_target_update_mode = 4
+
+[node name="SquadBackground3D" parent="ViewportContainer/SubViewport" instance=ExtResource("2_squad_bg")]
+unique_name_in_owner = true
+
+[node name="VignetteOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.02, 0.03, 0.05, 0.32)
+
+[node name="TopBar" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 54.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_topbar")
+
+[node name="Margin" type="MarginContainer" parent="TopBar"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 8
+
+[node name="HBox" type="HBoxContainer" parent="TopBar/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="GameTitle" type="Label" parent="TopBar/Margin/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "📦 KUTU KAFALAR"
+
+[node name="Tagline" type="Label" parent="TopBar/Margin/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.65, 0.78, 1)
+theme_override_font_sizes/font_size = 12
+text = "| 3D ÇOK OYUNCULU TAKTİK TİM"
+
+[node name="Spacer" type="Control" parent="TopBar/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FullscreenQuickBtn" type="Button" parent="TopBar/Margin/HBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(130, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "⛶ Tam Ekran"
+
+[node name="OpenSettingsBtn" type="Button" parent="TopBar/Margin/HBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(110, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "⚙️ Ayarlar"
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = 54.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="ConnectPanel" type="PanelContainer" parent="CenterContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(420, 400)
+custom_minimum_size = Vector2(440, 420)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_glass")
 
 [node name="MarginContainer" type="MarginContainer" parent="CenterContainer/ConnectPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 24
+theme_override_constants/margin_left = 28
 theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 24
+theme_override_constants/margin_right = 28
 theme_override_constants/margin_bottom = 24
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/ConnectPanel/MarginContainer"]
@@ -46,15 +138,15 @@ theme_override_constants/separation = 12
 
 [node name="TitleLabel" type="Label" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "📦 KUTU KAFALAR"
+theme_override_font_sizes/font_size = 24
+text = "OPERASYON BAĞLANTISI"
 horizontal_alignment = 1
 
 [node name="SubtitleLabel" type="Label" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.65, 0.7, 0.8, 1)
-theme_override_font_sizes/font_size = 14
-text = "1. ŞAHIS CO-OP HORDE SHOOTER"
+theme_override_colors/font_color = Color(0.65, 0.75, 0.88, 1)
+theme_override_font_sizes/font_size = 13
+text = "Taktik timinizi seçin ve operasyona başlayın"
 horizontal_alignment = 1
 
 [node name="HSeparator1" type="HSeparator" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
@@ -62,7 +154,7 @@ layout_mode = 2
 
 [node name="NameInput" type="LineEdit" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 38)
 layout_mode = 2
 placeholder_text = "Oyuncu Adınız..."
 text = "Kutu Asker"
@@ -70,7 +162,7 @@ alignment = 1
 
 [node name="ClassOption" type="OptionButton" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 38)
 layout_mode = 2
 alignment = 1
 
@@ -78,6 +170,7 @@ alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
+theme_override_font_sizes/font_size = 14
 text = "🎮 ODA KUR (HOST)"
 
 [node name="HSeparator2" type="HSeparator" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
@@ -85,7 +178,7 @@ layout_mode = 2
 
 [node name="IpInput" type="LineEdit" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 38)
 layout_mode = 2
 placeholder_text = "Sunucu IP Adresi (Hamachi veya 127.0.0.1)"
 text = "127.0.0.1"
@@ -95,13 +188,14 @@ alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
+theme_override_font_sizes/font_size = 14
 text = "🔗 ODAYA KATIL (JOIN)"
 
 [node name="StatusLabel" type="Label" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.85, 0.85, 0.5, 1)
+theme_override_colors/font_color = Color(0.88, 0.88, 0.55, 1)
 theme_override_font_sizes/font_size = 12
 text = "Sınıfınızı seçin, oda kurun veya arkadaşınıza bağlanın."
 horizontal_alignment = 1
@@ -114,14 +208,14 @@ alignment = 1
 [node name="VersionLabel" type="Label" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer/FooterBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.5, 0.6, 1)
+theme_override_colors/font_color = Color(0.48, 0.55, 0.65, 1)
 theme_override_font_sizes/font_size = 11
-text = "v1.0.0"
+text = "v1.1.7"
 
 [node name="CheckUpdateBtn" type="Button" parent="CenterContainer/ConnectPanel/MarginContainer/VBoxContainer/FooterBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.6, 0.75, 1, 1)
+theme_override_colors/font_color = Color(0.65, 0.8, 1, 1)
 theme_override_font_sizes/font_size = 11
 flat = true
 text = "🔄 Güncelleme Denetle"
@@ -129,14 +223,15 @@ text = "🔄 Güncelleme Denetle"
 [node name="RoomPanel" type="PanelContainer" parent="CenterContainer"]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(480, 490)
+custom_minimum_size = Vector2(500, 500)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_glass")
 
 [node name="Margin" type="MarginContainer" parent="CenterContainer/RoomPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 24
+theme_override_constants/margin_left = 28
 theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 24
+theme_override_constants/margin_right = 28
 theme_override_constants/margin_bottom = 24
 
 [node name="VBox" type="VBoxContainer" parent="CenterContainer/RoomPanel/Margin"]
@@ -145,7 +240,7 @@ theme_override_constants/separation = 12
 
 [node name="RoomTitle" type="Label" parent="CenterContainer/RoomPanel/Margin/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.2, 0.85, 1, 1)
+theme_override_colors/font_color = Color(0.3, 0.9, 1, 1)
 theme_override_font_sizes/font_size = 22
 text = "🎮 BEKLEME ODASI"
 horizontal_alignment = 1
@@ -153,7 +248,7 @@ horizontal_alignment = 1
 [node name="RoomInfoLabel" type="Label" parent="CenterContainer/RoomPanel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 1)
+theme_override_colors/font_color = Color(0.75, 0.85, 0.95, 1)
 theme_override_font_sizes/font_size = 13
 text = "Oda Bilgisi Yükleniyor..."
 horizontal_alignment = 1
@@ -165,7 +260,7 @@ alignment = 1
 
 [node name="ClassSelectLabel" type="Label" parent="CenterContainer/RoomPanel/Margin/VBox/ClassSelectBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_colors/font_color = Color(1, 0.85, 0.35, 1)
 theme_override_font_sizes/font_size = 14
 text = "🎭 Sınıfını Değiştir:"
 
@@ -195,7 +290,7 @@ layout_mode = 2
 [node name="RoomStatusLabel" type="Label" parent="CenterContainer/RoomPanel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.85, 0.4, 1)
+theme_override_colors/font_color = Color(0.9, 0.85, 0.45, 1)
 theme_override_font_sizes/font_size = 12
 text = "Tüm oyuncuların hazır olması bekleniyor..."
 horizontal_alignment = 1
@@ -224,6 +319,140 @@ custom_minimum_size = Vector2(100, 42)
 layout_mode = 2
 text = "🚪 AYRIL"
 
+[node name="SettingsOverlay" type="ColorRect" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.72)
+
+[node name="Center" type="CenterContainer" parent="SettingsOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SettingsPanel" type="PanelContainer" parent="SettingsOverlay/Center"]
+custom_minimum_size = Vector2(460, 460)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_glass")
+
+[node name="Margin" type="MarginContainer" parent="SettingsOverlay/Center/SettingsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="SettingsOverlay/Center/SettingsPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="SettingsTitle" type="Label" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "⚙️ OYUN VE EKRAN AYARLARI"
+horizontal_alignment = 1
+
+[node name="HSeparator1" type="HSeparator" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="WindowModeBox" type="HBoxContainer" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox/WindowModeBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🖥️ Ekran Modu:"
+
+[node name="WindowModeOption" type="OptionButton" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox/WindowModeBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(210, 36)
+layout_mode = 2
+
+[node name="ResolutionBox" type="HBoxContainer" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox/ResolutionBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "📐 Çözünürlük:"
+
+[node name="ResolutionOption" type="OptionButton" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox/ResolutionBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(210, 36)
+layout_mode = 2
+
+[node name="VSyncBox" type="HBoxContainer" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox/VSyncBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "⚡ VSync (Dikey Eşitleme):"
+
+[node name="VSyncCheck" type="CheckBox" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox/VSyncBox"]
+unique_name_in_owner = true
+layout_mode = 2
+button_pressed = true
+text = "Etkin"
+
+[node name="HSeparator2" type="HSeparator" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="VolumeBox" type="VBoxContainer" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="VolumeLabel" type="Label" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox/VolumeBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "🔊 Ana Ses: %85"
+
+[node name="VolumeSlider" type="HSlider" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox/VolumeBox"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 1.0
+step = 0.05
+value = 0.85
+
+[node name="SensBox" type="VBoxContainer" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="SensLabel" type="Label" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox/SensBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "🖱️ Fare Hassasiyeti: 2.5"
+
+[node name="SensSlider" type="HSlider" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox/SensBox"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 0.0005
+max_value = 0.007
+step = 0.0005
+value = 0.0025
+
+[node name="HSeparator3" type="HSeparator" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="CloseSettingsBtn" type="Button" parent="SettingsOverlay/Center/SettingsPanel/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "KAPAT [ESC]"
+
 [node name="UpdateOverlay" type="ColorRect" parent="."]
 unique_name_in_owner = true
 visible = false
@@ -246,6 +475,7 @@ grow_vertical = 2
 [node name="UpdatePanel" type="PanelContainer" parent="UpdateOverlay/Center"]
 custom_minimum_size = Vector2(440, 280)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_glass")
 
 [node name="Margin" type="MarginContainer" parent="UpdateOverlay/Center/UpdatePanel"]
 layout_mode = 2
@@ -270,7 +500,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.85, 0.3, 1)
 theme_override_font_sizes/font_size = 14
-text = "Yeni Sürüm: v1.0.1 (Boyut: ~250 KB)"
+text = "Yeni Sürüm: v1.1.7"
 horizontal_alignment = 1
 
 [node name="UpdateNotesLabel" type="Label" parent="UpdateOverlay/Center/UpdatePanel/Margin/VBox"]

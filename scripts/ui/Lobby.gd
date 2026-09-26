@@ -33,6 +33,23 @@ const GAME_SCENE_PATH: String = "res://scenes/levels/main_level.tscn"
 @onready var start_update_btn: Button = %StartUpdateBtn
 @onready var dismiss_update_btn: Button = %DismissUpdateBtn
 
+# 3D Taktik Tim Arka Planı
+@onready var squad_bg: SquadBackground3D = %SquadBackground3D
+
+# Ayarlar Arayüz Elemanları
+@onready var settings_overlay: ColorRect = %SettingsOverlay
+@onready var open_settings_btn: Button = %OpenSettingsBtn
+@onready var close_settings_btn: Button = %CloseSettingsBtn
+@onready var fullscreen_quick_btn: Button = %FullscreenQuickBtn
+@onready var window_mode_option: OptionButton = %WindowModeOption
+@onready var resolution_box: HBoxContainer = %ResolutionBox
+@onready var resolution_option: OptionButton = %ResolutionOption
+@onready var vsync_check: CheckBox = %VSyncCheck
+@onready var volume_slider: HSlider = %VolumeSlider
+@onready var volume_label: Label = %VolumeLabel
+@onready var sens_slider: HSlider = %SensSlider
+@onready var sens_label: Label = %SensLabel
+
 var is_local_ready: bool = false
 
 func _ready() -> void:
@@ -47,6 +64,7 @@ func _ready() -> void:
 	class_option.add_item("❄️ Buz Muhafızı (Kriyojenik Dondurucu)", 2)
 	class_option.add_item("💚 Sahra Sıhhiyesi (Şifa Bombası & Diriltme)", 3)
 	class_option.select(0)
+	class_option.item_selected.connect(_on_main_class_selected)
 
 	room_class_option.add_item("🔥 Kutu Büyücüsü (Ateş Dalgası & Meteor)", 0)
 	room_class_option.add_item("⚙️ Mühendis (Manyetik Vortex Çekimi)", 1)
@@ -68,6 +86,13 @@ func _ready() -> void:
 	NetworkManager.lobby_updated.connect(_on_lobby_updated)
 	NetworkManager.game_rejected.connect(_on_game_rejected)
 	
+	# Ayarlar Arayüzünü Başlat
+	_setup_settings_ui()
+	
+	# 3D Sahnede varsayılan sınıfı seç
+	if squad_bg:
+		squad_bg.select_class("Pyromancer", true)
+	
 	# AutoUpdater bağlantıları
 	if check_update_btn:
 		check_update_btn.pressed.connect(_on_check_update_pressed)
@@ -87,16 +112,131 @@ func _ready() -> void:
 	# Açılışta sessizce güncelleme denetle
 	get_tree().create_timer(0.5).timeout.connect(func(): AutoUpdater.check_for_updates())
 
-func _on_room_class_selected(index: int) -> void:
-	var selected_class = "Pyromancer"
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion and squad_bg:
+		squad_bg.update_cursor(event.position, get_viewport_rect().size)
+	if event.is_action_pressed("ui_cancel"):
+		if settings_overlay and settings_overlay.visible:
+			settings_overlay.visible = false
+			get_viewport().set_input_as_handled()
+
+func _setup_settings_ui() -> void:
+	if open_settings_btn:
+		open_settings_btn.pressed.connect(func():
+			if settings_overlay:
+				settings_overlay.visible = true
+				_sync_settings_to_ui()
+		)
+	if close_settings_btn:
+		close_settings_btn.pressed.connect(func():
+			if settings_overlay:
+				settings_overlay.visible = false
+		)
+	if fullscreen_quick_btn:
+		fullscreen_quick_btn.pressed.connect(_on_fullscreen_quick_toggle)
+		_update_fullscreen_btn_text()
+
+	if window_mode_option:
+		window_mode_option.clear()
+		window_mode_option.add_item("🪟 Pencereli (Windowed)", 0)
+		window_mode_option.add_item("🔲 Kenarlıksız (Borderless)", 1)
+		window_mode_option.add_item("🖥️ Tam Ekran (Fullscreen)", 2)
+		window_mode_option.item_selected.connect(_on_window_mode_selected)
+
+	if resolution_option:
+		resolution_option.clear()
+		for i in range(SettingsManager.RESOLUTION_PRESETS.size()):
+			var res = SettingsManager.RESOLUTION_PRESETS[i]
+			resolution_option.add_item(str(res.x) + " x " + str(res.y), i)
+		resolution_option.item_selected.connect(_on_resolution_selected)
+
+	if vsync_check:
+		vsync_check.toggled.connect(func(enabled: bool):
+			SettingsManager.set_vsync(enabled)
+		)
+
+	if volume_slider:
+		volume_slider.value_changed.connect(func(val: float):
+			SettingsManager.set_master_volume(val)
+			if volume_label:
+				volume_label.text = "🔊 Ana Ses: %" + str(int(val * 100))
+		)
+
+	if sens_slider:
+		sens_slider.value_changed.connect(func(val: float):
+			SettingsManager.set_mouse_sensitivity(val)
+			if sens_label:
+				sens_label.text = "🖱️ Fare Hassasiyeti: " + str(snapped(val * 1000.0, 0.1))
+		)
+
+	_sync_settings_to_ui()
+
+func _sync_settings_to_ui() -> void:
+	if window_mode_option:
+		window_mode_option.select(SettingsManager.current_window_mode)
+	if resolution_box:
+		resolution_box.visible = (SettingsManager.current_window_mode == SettingsManager.WindowMode.WINDOWED)
+	if vsync_check:
+		vsync_check.button_pressed = SettingsManager.vsync_enabled
+	if volume_slider:
+		volume_slider.value = SettingsManager.master_volume
+		if volume_label:
+			volume_label.text = "🔊 Ana Ses: %" + str(int(SettingsManager.master_volume * 100))
+	if sens_slider:
+		sens_slider.value = SettingsManager.mouse_sensitivity
+		if sens_label:
+			sens_label.text = "🖱️ Fare Hassasiyeti: " + str(snapped(SettingsManager.mouse_sensitivity * 1000.0, 0.1))
+	_update_fullscreen_btn_text()
+
+func _on_window_mode_selected(idx: int) -> void:
+	SettingsManager.set_window_mode(idx)
+	if resolution_box:
+		resolution_box.visible = (idx == SettingsManager.WindowMode.WINDOWED)
+	_update_fullscreen_btn_text()
+
+func _on_resolution_selected(idx: int) -> void:
+	if idx >= 0 and idx < SettingsManager.RESOLUTION_PRESETS.size():
+		SettingsManager.set_resolution(SettingsManager.RESOLUTION_PRESETS[idx])
+
+func _on_fullscreen_quick_toggle() -> void:
+	if SettingsManager.current_window_mode == SettingsManager.WindowMode.FULLSCREEN:
+		SettingsManager.set_window_mode(SettingsManager.WindowMode.WINDOWED)
+	else:
+		SettingsManager.set_window_mode(SettingsManager.WindowMode.FULLSCREEN)
+	_sync_settings_to_ui()
+
+func _update_fullscreen_btn_text() -> void:
+	if not fullscreen_quick_btn:
+		return
+	if SettingsManager.current_window_mode == SettingsManager.WindowMode.FULLSCREEN:
+		fullscreen_quick_btn.text = "🪟 Pencereli Yap"
+	else:
+		fullscreen_quick_btn.text = "⛶ Tam Ekran"
+
+func _get_class_code_from_index(index: int) -> String:
 	match index:
-		0: selected_class = "Pyromancer"
-		1: selected_class = "Engineer"
-		2: selected_class = "Cryomancer"
-		3: selected_class = "Medic"
+		0: return "Pyromancer"
+		1: return "Engineer"
+		2: return "Cryomancer"
+		3: return "Medic"
+	return "Pyromancer"
+
+func _on_main_class_selected(index: int) -> void:
+	var selected_class = _get_class_code_from_index(index)
+	NetworkManager.set_local_class(selected_class)
+	if room_class_option:
+		room_class_option.select(index)
+	if squad_bg:
+		squad_bg.select_class(selected_class)
+	print("[Lobi] Sınıf seçildi: ", selected_class)
+
+func _on_room_class_selected(index: int) -> void:
+	var selected_class = _get_class_code_from_index(index)
 	NetworkManager.set_local_class(selected_class)
 	if class_option:
 		class_option.select(index)
+	if squad_bg:
+		squad_bg.select_class(selected_class)
 	print("[Lobi Odası] Sınıf değiştirildi: ", selected_class)
 
 func _show_connect_panel() -> void:

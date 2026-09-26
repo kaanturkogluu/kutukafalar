@@ -160,6 +160,16 @@ func _ready() -> void:
 	_hide_all_muzzle_flashes()
 	_update_gun_visuals()
 	
+	if SettingsManager:
+		mouse_sensitivity = SettingsManager.mouse_sensitivity
+		if camera:
+			camera.fov = SettingsManager.fov_val
+		SettingsManager.settings_changed.connect(func():
+			mouse_sensitivity = SettingsManager.mouse_sensitivity
+			if camera:
+				camera.fov = SettingsManager.fov_val
+		)
+	
 	if restart_btn:
 		restart_btn.pressed.connect(_on_restart_pressed)
 	if lobby_btn:

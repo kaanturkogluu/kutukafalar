@@ -1,0 +1,80 @@
+[gd_scene load_steps=8 format=3 uid="uid://squad_bg_3d_01"]
+
+[ext_resource type="Script" path="res://scripts/ui/SquadBackground3D.gd" id="1_squad"]
+[ext_resource type="PackedScene" uid="uid://menu_character_01" path="res://scenes/ui/menu_character.tscn" id="2_char"]
+
+[sub_resource type="Environment" id="Environment_menu"]
+background_mode = 1
+background_color = Color(0.045, 0.055, 0.075, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.18, 0.22, 0.28, 1)
+ambient_light_energy = 0.8
+glow_enabled = true
+glow_bloom = 0.12
+glow_blend_mode = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
+albedo_color = Color(0.09, 0.1, 0.12, 1)
+roughness = 0.38
+metallic = 0.25
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor"]
+material = SubResource("StandardMaterial3D_floor")
+size = Vector3(26, 0.5, 18)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wall"]
+albedo_color = Color(0.06, 0.065, 0.08, 1)
+roughness = 0.85
+metallic = 0.1
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall"]
+material = SubResource("StandardMaterial3D_wall")
+size = Vector3(26, 9, 0.5)
+
+[node name="SquadBackground3D" type="Node3D"]
+script = ExtResource("1_squad")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_menu")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9962, 0.0872, 0, -0.0872, 0.9962, 0, 1.25, 3.8)
+fov = 62.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.25, 0.433, 0, 0.866, 0.5, -0.5, -0.433, 0.75, 0, 4, 3)
+light_color = Color(0.9, 0.92, 1, 1)
+light_energy = 0.75
+shadow_enabled = true
+
+[node name="RimLight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.7071, 0.3536, -0.6124, 0, 0.866, 0.5, 0.7071, 0.3536, -0.6124, 0, 3, -3)
+light_color = Color(0.4, 0.65, 1, 1)
+light_energy = 1.1
+
+[node name="Floor" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+mesh = SubResource("BoxMesh_floor")
+
+[node name="BackWall" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -3.5)
+mesh = SubResource("BoxMesh_wall")
+
+[node name="Characters" type="Node3D" parent="."]
+
+[node name="Pyromancer" parent="Characters" instance=ExtResource("2_char")]
+transform = Transform3D(0.9962, 0, 0.0872, 0, 1, 0, -0.0872, 0, 0.9962, -0.65, 0, -0.15)
+character_class = "Pyromancer"
+is_selected = true
+
+[node name="Engineer" parent="Characters" instance=ExtResource("2_char")]
+transform = Transform3D(0.9962, 0, -0.0872, 0, 1, 0, 0.0872, 0, 0.9962, 0.65, 0, -0.15)
+character_class = "Engineer"
+
+[node name="Cryomancer" parent="Characters" instance=ExtResource("2_char")]
+transform = Transform3D(0.9659, 0, 0.2588, 0, 1, 0, -0.2588, 0, 0.9659, -1.85, 0, -0.65)
+character_class = "Cryomancer"
+
+[node name="Medic" parent="Characters" instance=ExtResource("2_char")]
+transform = Transform3D(0.9659, 0, -0.2588, 0, 1, 0, 0.2588, 0, 0.9659, 1.85, 0, -0.65)
+character_class = "Medic"
