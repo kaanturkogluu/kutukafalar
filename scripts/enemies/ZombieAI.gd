@@ -4,9 +4,9 @@ extends CharacterBody3D
 signal died(zombie_ref)
 
 @export var max_health: float = 100.0
-@export var speed: float = 3.6
+@export var speed: float = 4.4
 @export var attack_damage: float = 15.0
-@export var attack_rate: float = 1.0
+@export var attack_rate: float = 0.8
 
 var current_health: float
 var attack_timer: float = 0.0
@@ -69,6 +69,21 @@ func _physics_process(delta: float) -> void:
 		if distance > 1.3 or vert_diff > 1.6:
 			# Zombi havadaysa veya oyuncudan çok uzaktaysa yaklaşmalı
 			var direction = diff.normalized()
+			
+			# Duvarlara ve ev köşelerine takılmayı engelleme (Wall Slide & Obstacle Deflection)
+			if is_on_wall():
+				var wall_n = get_wall_normal()
+				var slide_dir = direction.slide(wall_n).normalized()
+				if slide_dir.length_squared() > 0.05:
+					direction = slide_dir
+				else:
+					var to_center = (Vector3.ZERO - global_position).normalized()
+					to_center.y = 0
+					var side_vec = Vector3(-wall_n.z, 0, wall_n.x)
+					if side_vec.dot(to_center) < 0:
+						side_vec = -side_vec
+					direction = (to_center * 0.6 + side_vec * 0.8).normalized()
+
 			velocity.x = direction.x * move_speed
 			velocity.z = direction.z * move_speed
 		else:

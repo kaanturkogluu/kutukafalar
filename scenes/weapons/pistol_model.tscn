@@ -1,0 +1,214 @@
+[gd_scene load_steps=22 format=3 uid="uid://pistol_model_01"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fde_frame"]
+albedo_color = Color(0.72, 0.58, 0.42, 1)
+roughness = 0.65
+metallic = 0.05
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fde_stipple"]
+albedo_color = Color(0.58, 0.46, 0.32, 1)
+roughness = 0.88
+metallic = 0.02
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_black_slide"]
+albedo_color = Color(0.14, 0.15, 0.16, 1)
+roughness = 0.35
+metallic = 0.7
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dark_metal"]
+albedo_color = Color(0.09, 0.09, 0.1, 1)
+roughness = 0.28
+metallic = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sight_dot"]
+albedo_color = Color(0.95, 0.95, 0.95, 1)
+emission_enabled = true
+emission = Color(0.8, 0.8, 0.8, 1)
+emission_energy_multiplier = 0.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_grip"]
+material = SubResource("StandardMaterial3D_fde_frame")
+size = Vector3(0.046, 0.13, 0.065)
+
+[sub_resource type="BoxMesh" id="BoxMesh_grip_panel"]
+material = SubResource("StandardMaterial3D_fde_stipple")
+size = Vector3(0.004, 0.095, 0.05)
+
+[sub_resource type="BoxMesh" id="BoxMesh_mag_base"]
+material = SubResource("StandardMaterial3D_dark_metal")
+size = Vector3(0.048, 0.016, 0.072)
+
+[sub_resource type="BoxMesh" id="BoxMesh_receiver"]
+material = SubResource("StandardMaterial3D_fde_frame")
+size = Vector3(0.048, 0.032, 0.22)
+
+[sub_resource type="BoxMesh" id="BoxMesh_rail_cut"]
+material = SubResource("StandardMaterial3D_dark_metal")
+size = Vector3(0.036, 0.006, 0.08)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tg_bottom"]
+material = SubResource("StandardMaterial3D_fde_frame")
+size = Vector3(0.02, 0.008, 0.065)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tg_front"]
+material = SubResource("StandardMaterial3D_fde_frame")
+size = Vector3(0.02, 0.042, 0.008)
+
+[sub_resource type="BoxMesh" id="BoxMesh_trigger"]
+material = SubResource("StandardMaterial3D_dark_metal")
+size = Vector3(0.012, 0.032, 0.014)
+
+[sub_resource type="BoxMesh" id="BoxMesh_takedown"]
+material = SubResource("StandardMaterial3D_dark_metal")
+size = Vector3(0.052, 0.008, 0.012)
+
+[sub_resource type="BoxMesh" id="BoxMesh_slide_stop"]
+material = SubResource("StandardMaterial3D_dark_metal")
+size = Vector3(0.006, 0.008, 0.022)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_barrel"]
+material = SubResource("StandardMaterial3D_dark_metal")
+top_radius = 0.011
+bottom_radius = 0.011
+height = 0.24
+radial_segments = 12
+
+[sub_resource type="BoxMesh" id="BoxMesh_slide"]
+material = SubResource("StandardMaterial3D_black_slide")
+size = Vector3(0.048, 0.042, 0.23)
+
+[sub_resource type="BoxMesh" id="BoxMesh_slide_top"]
+material = SubResource("StandardMaterial3D_black_slide")
+size = Vector3(0.04, 0.008, 0.225)
+
+[sub_resource type="BoxMesh" id="BoxMesh_slide_front"]
+material = SubResource("StandardMaterial3D_black_slide")
+size = Vector3(0.046, 0.038, 0.018)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ejection"]
+material = SubResource("StandardMaterial3D_dark_metal")
+size = Vector3(0.026, 0.022, 0.045)
+
+[sub_resource type="BoxMesh" id="BoxMesh_serrations"]
+material = SubResource("StandardMaterial3D_dark_metal")
+size = Vector3(0.004, 0.032, 0.042)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sight_f"]
+material = SubResource("StandardMaterial3D_dark_metal")
+size = Vector3(0.008, 0.012, 0.014)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sight_dot"]
+material = SubResource("StandardMaterial3D_sight_dot")
+size = Vector3(0.004, 0.004, 0.002)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sight_r"]
+material = SubResource("StandardMaterial3D_dark_metal")
+size = Vector3(0.008, 0.012, 0.012)
+
+[node name="Pistol" type="Node3D"]
+
+[node name="Frame" type="Node3D" parent="."]
+
+[node name="Grip" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 0.9816, -0.1908, 0, 0.1908, 0.9816, 0, -0.09, 0.035)
+mesh = SubResource("BoxMesh_grip")
+
+[node name="GripPanelL" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 0.9816, -0.1908, 0, 0.1908, 0.9816, -0.024, -0.09, 0.035)
+mesh = SubResource("BoxMesh_grip_panel")
+
+[node name="GripPanelR" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 0.9816, -0.1908, 0, 0.1908, 0.9816, 0.024, -0.09, 0.035)
+mesh = SubResource("BoxMesh_grip_panel")
+
+[node name="MagBase" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 0.9816, -0.1908, 0, 0.1908, 0.9816, 0, -0.155, 0.048)
+mesh = SubResource("BoxMesh_mag_base")
+
+[node name="Receiver" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.012, -0.03)
+mesh = SubResource("BoxMesh_receiver")
+
+[node name="RailCut" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.027, -0.09)
+mesh = SubResource("BoxMesh_rail_cut")
+
+[node name="TriggerGuardBottom" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.058, -0.025)
+mesh = SubResource("BoxMesh_tg_bottom")
+
+[node name="TriggerGuardFront" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.038, -0.056)
+mesh = SubResource("BoxMesh_tg_front")
+
+[node name="Trigger" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 0.9511, 0.309, 0, -0.309, 0.9511, 0, -0.038, -0.022)
+mesh = SubResource("BoxMesh_trigger")
+
+[node name="TakedownBar" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.008, -0.04)
+mesh = SubResource("BoxMesh_takedown")
+
+[node name="SlideStop" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.025, 0.006, 0.01)
+mesh = SubResource("BoxMesh_slide_stop")
+
+[node name="Barrel" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0.018, -0.04)
+mesh = SubResource("CylinderMesh_barrel")
+
+[node name="Slide" type="Node3D" parent="."]
+
+[node name="SlideBody" type="MeshInstance3D" parent="Slide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.024, -0.025)
+mesh = SubResource("BoxMesh_slide")
+
+[node name="SlideTopChamfer" type="MeshInstance3D" parent="Slide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.047, -0.025)
+mesh = SubResource("BoxMesh_slide_top")
+
+[node name="SlideFrontBevel" type="MeshInstance3D" parent="Slide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.024, -0.142)
+mesh = SubResource("BoxMesh_slide_front")
+
+[node name="EjectionPort" type="MeshInstance3D" parent="Slide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.014, 0.032, -0.005)
+mesh = SubResource("BoxMesh_ejection")
+
+[node name="SerrationsL" type="MeshInstance3D" parent="Slide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.025, 0.024, 0.055)
+mesh = SubResource("BoxMesh_serrations")
+
+[node name="SerrationsR" type="MeshInstance3D" parent="Slide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.025, 0.024, 0.055)
+mesh = SubResource("BoxMesh_serrations")
+
+[node name="FrontSight" type="MeshInstance3D" parent="Slide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.055, -0.125)
+mesh = SubResource("BoxMesh_sight_f")
+
+[node name="FrontSightDot" type="MeshInstance3D" parent="Slide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.055, -0.117)
+mesh = SubResource("BoxMesh_sight_dot")
+
+[node name="RearSightL" type="MeshInstance3D" parent="Slide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.014, 0.055, 0.082)
+mesh = SubResource("BoxMesh_sight_r")
+
+[node name="RearSightR" type="MeshInstance3D" parent="Slide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.014, 0.055, 0.082)
+mesh = SubResource("BoxMesh_sight_r")
+
+[node name="RearSightDotL" type="MeshInstance3D" parent="Slide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.014, 0.055, 0.075)
+mesh = SubResource("BoxMesh_sight_dot")
+
+[node name="RearSightDotR" type="MeshInstance3D" parent="Slide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.014, 0.055, 0.075)
+mesh = SubResource("BoxMesh_sight_dot")
+
+[node name="MuzzleFlash" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.018, -0.18)
+light_color = Color(1, 0.85, 0.35, 1)
+light_energy = 3.0
+omni_range = 3.0

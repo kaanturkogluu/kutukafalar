@@ -33,13 +33,13 @@ func set_elevator_state(open: bool) -> void:
 
 func _open_doors() -> void:
 	var tween = create_tween().set_parallel(true)
-	tween.tween_property(left_door, "position:x", -1.8, 1.0)
-	tween.tween_property(right_door, "position:x", 1.8, 1.0)
+	tween.tween_property(left_door, "position:x", -2.0, 0.8)
+	tween.tween_property(right_door, "position:x", 2.0, 0.8)
 
 func _close_doors() -> void:
 	var tween = create_tween().set_parallel(true)
-	tween.tween_property(left_door, "position:x", -0.7, 1.0)
-	tween.tween_property(right_door, "position:x", 0.7, 1.0)
+	tween.tween_property(left_door, "position:x", -0.7, 0.8)
+	tween.tween_property(right_door, "position:x", 0.7, 0.8)
 
 func _on_body_entered(body: Node3D) -> void:
 	if not is_open:

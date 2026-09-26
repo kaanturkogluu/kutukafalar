@@ -1,0 +1,182 @@
+[gd_scene load_steps=22 format=3 uid="uid://bixi_model_01"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fde_frame"]
+albedo_color = Color(0.72, 0.58, 0.42, 1)
+roughness = 0.65
+metallic = 0.05
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fde_stipple"]
+albedo_color = Color(0.58, 0.46, 0.32, 1)
+roughness = 0.88
+metallic = 0.02
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_black_metal"]
+albedo_color = Color(0.14, 0.15, 0.16, 1)
+roughness = 0.35
+metallic = 0.7
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dark_metal"]
+albedo_color = Color(0.09, 0.09, 0.1, 1)
+roughness = 0.28
+metallic = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_olive"]
+albedo_color = Color(0.36, 0.40, 0.24, 1)
+roughness = 0.6
+metallic = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_brass"]
+albedo_color = Color(0.85, 0.68, 0.28, 1)
+roughness = 0.25
+metallic = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_receiver"]
+material = SubResource("StandardMaterial3D_black_metal")
+size = Vector3(0.062, 0.078, 0.36)
+
+[sub_resource type="BoxMesh" id="BoxMesh_feed_cover"]
+material = SubResource("StandardMaterial3D_black_metal")
+size = Vector3(0.056, 0.024, 0.28)
+
+[sub_resource type="BoxMesh" id="BoxMesh_stock"]
+material = SubResource("StandardMaterial3D_black_metal")
+size = Vector3(0.048, 0.12, 0.28)
+
+[sub_resource type="BoxMesh" id="BoxMesh_stock_hole"]
+material = SubResource("StandardMaterial3D_dark_metal")
+size = Vector3(0.052, 0.055, 0.14)
+
+[sub_resource type="BoxMesh" id="BoxMesh_grip"]
+material = SubResource("StandardMaterial3D_fde_frame")
+size = Vector3(0.042, 0.12, 0.058)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tg"]
+material = SubResource("StandardMaterial3D_black_metal")
+size = Vector3(0.02, 0.008, 0.06)
+
+[sub_resource type="BoxMesh" id="BoxMesh_trigger"]
+material = SubResource("StandardMaterial3D_dark_metal")
+size = Vector3(0.01, 0.028, 0.012)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ammo_can"]
+material = SubResource("StandardMaterial3D_olive")
+size = Vector3(0.082, 0.14, 0.16)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ammo_belt"]
+material = SubResource("StandardMaterial3D_brass")
+size = Vector3(0.038, 0.055, 0.08)
+
+[sub_resource type="BoxMesh" id="BoxMesh_handguard"]
+material = SubResource("StandardMaterial3D_fde_stipple")
+size = Vector3(0.058, 0.052, 0.18)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_barrel"]
+material = SubResource("StandardMaterial3D_black_metal")
+top_radius = 0.013
+bottom_radius = 0.013
+height = 0.65
+radial_segments = 14
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_gas_tube"]
+material = SubResource("StandardMaterial3D_black_metal")
+top_radius = 0.011
+bottom_radius = 0.011
+height = 0.42
+radial_segments = 14
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_flash_hider"]
+material = SubResource("StandardMaterial3D_dark_metal")
+top_radius = 0.016
+bottom_radius = 0.013
+height = 0.055
+radial_segments = 14
+
+[sub_resource type="BoxMesh" id="BoxMesh_sight_post"]
+material = SubResource("StandardMaterial3D_dark_metal")
+size = Vector3(0.022, 0.05, 0.018)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bipod_leg"]
+material = SubResource("StandardMaterial3D_dark_metal")
+size = Vector3(0.012, 0.22, 0.012)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bipod_foot"]
+material = SubResource("StandardMaterial3D_dark_metal")
+size = Vector3(0.035, 0.01, 0.035)
+
+[node name="Bixi" type="Node3D"]
+
+[node name="Frame" type="Node3D" parent="."]
+
+[node name="Receiver" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.012, -0.05)
+mesh = SubResource("BoxMesh_receiver")
+
+[node name="FeedCover" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.058, -0.04)
+mesh = SubResource("BoxMesh_feed_cover")
+
+[node name="Stock" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 0.9976, 0.0698, 0, -0.0698, 0.9976, 0, -0.03, 0.26)
+mesh = SubResource("BoxMesh_stock")
+
+[node name="Grip" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 0.9659, -0.2588, 0, 0.2588, 0.9659, 0, -0.09, 0.05)
+mesh = SubResource("BoxMesh_grip")
+
+[node name="TriggerGuard" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.045, 0.01)
+mesh = SubResource("BoxMesh_tg")
+
+[node name="Trigger" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 0.9659, 0.2588, 0, -0.2588, 0.9659, 0, -0.032, 0.015)
+mesh = SubResource("BoxMesh_trigger")
+
+[node name="AmmoCan" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.02, -0.14, -0.06)
+mesh = SubResource("BoxMesh_ammo_can")
+
+[node name="AmmoBelt" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.025, -0.01, -0.06)
+mesh = SubResource("BoxMesh_ammo_belt")
+
+[node name="Handguard" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.018, -0.28)
+mesh = SubResource("BoxMesh_handguard")
+
+[node name="Barrel" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0.015, -0.52)
+mesh = SubResource("CylinderMesh_barrel")
+
+[node name="GasTube" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, -0.018, -0.42)
+mesh = SubResource("CylinderMesh_gas_tube")
+
+[node name="FlashHider" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0.015, -0.85)
+mesh = SubResource("CylinderMesh_flash_hider")
+
+[node name="FrontSight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.045, -0.80)
+mesh = SubResource("BoxMesh_sight_post")
+
+[node name="BipodLegL" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9511, 0.309, 0, -0.309, 0.9511, 0, 0, 0, 1, -0.065, -0.12, -0.68)
+mesh = SubResource("BoxMesh_bipod_leg")
+
+[node name="BipodFootL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.10, -0.23, -0.68)
+mesh = SubResource("BoxMesh_bipod_foot")
+
+[node name="BipodLegR" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9511, -0.309, 0, 0.309, 0.9511, 0, 0, 0, 1, 0.065, -0.12, -0.68)
+mesh = SubResource("BoxMesh_bipod_leg")
+
+[node name="BipodFootR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.10, -0.23, -0.68)
+mesh = SubResource("BoxMesh_bipod_foot")
+
+[node name="MuzzleFlash" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, -0.92)
+light_color = Color(1, 0.85, 0.35, 1)
+light_energy = 4.0
+omni_range = 4.0

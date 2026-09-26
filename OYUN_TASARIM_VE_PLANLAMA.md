@@ -81,33 +81,30 @@ Silah kullanımını zenginleştiren, takım oyununu ve sınıf rollerini belirl
 
 ---
 
-## 4. Bölüm Yapısı: "Sonsuz Tesis" (The Infinite Complex)
+## 4. Bölüm ve Seviye Yapısı: 11 Bölüm & 99 Seviye Şeması (Leveller Entegrasyonu)
 
-Oyunun 2-3 aşamada bitmemesini sağlayan asansör ve kat döngüsü.
+Oyun `leveller` dosyasında belirlenen 11 tematik bölüme ve her biri 9 seviyeden oluşan 99 seviyelik derin bir ilerleme sistemine sahiptir.
 
-```
-Kat 1-4 (Temizleme & Isınma) 
-   ➔ Asansör (Skill Seçimi)
-Kat 5 (BOSS KAT 1) 
-   ➔ Tahliye mi? / Devam mı? (Risk vs Reward)
-Kat 6-9 (Zorlaşan Katlar, Çevre Tuzakları)
-   ➔ Asansör (Gelişmiş Skill Seçimi)
-Kat 10 (BOSS KAT 2 - Mega Devil) 
-   ➔ Çevre Tehlikeleri Başlar (Karanlık, Gaz vb.)
-... (Kat Sayısı Sınırsız İlerler)
-```
+| Bölüm | Seviye Aralığı | Tema | İkon | Bölüm Sonu Boss'u |
+|---|---|---|---|---|
+| **1** | **1–9** | **Terk Edilmiş Mahalle** | 🏚️ | **Mahalle Şefi (Brute Crusher)** |
+| 2 | 10–18 | Şehir Merkezi | 🏙️ | Şehir Celladı (City Slayer) |
+| 3 | 19–27 | Market & Ticari Bölge | 🏪 | Kasap Zombi (The Butcher) |
+| 4 | 28–36 | Apartmanlar | 🏢 | Bina Yöneticisi (Overlord) |
+| 5 | 37–45 | Otopark & Metro | 🚇 | Metro Canavarı (Tunnel Stalker) |
+| 6 | 46–54 | Hastane | 🏥 | Başhekim Kutu (Dr. Plague) |
+| 7 | 55–63 | Fabrika | 🏭 | Demir Ezici (Steel Golem) |
+| 8 | 64–72 | Kanalizasyon | 🕳️ | Asit Yutan (Toxic Abomination) |
+| 9 | 73–81 | Askeri Tesis | 🎖️ | Zırhlı Komutan (General Dread) |
+| 10 | 82–90 | Kutu Kafalar Laboratuvarı | 🧪 | Denek-0 (Subject Zero) |
+| 11 | 91–99 | Ana Tesis / Final | ☢️ | Nihai Kutu Kafa (Apex Destroyer) |
 
-1. **Katlar (Floors):** Her kat rastgele üretilen bir odadır (Depo, Laboratuvar, Dar Tüneller, Reaktör Çekirdeği).
-2. **Asansör (Yükseltme Molası):** Kat temizlendiğinde asansöre binilir ve her oyuncu 3 rastgele karttan bir skill güçlendirmesi seçer:
-   * *Örn: "Vortex içine çekilen zombileri patlatır."*
-   * *Örn: "Ateş Duvarı düşman mermilerini yok eder."*
-3. **Her 5 Katta Bir: BOSS SAVAŞI:**
-   * Kat 5: Zırhlı Kutu Ezici (Armored Boxhead Crusher).
-   * Kat 10: Çift Kırmızı Şeytan Boss (Twin Devils).
-4. **Tahliye mi, Kumar mı? (Risk vs. Reward):**
-   * Her 5. kattan sonra oyunculara iki kapı açılır:
-     * **Yeşil Kapı (Tahliye - Escape):** Güvenle oyunu bitir, kazanılan XP ve skorları kaydet.
-     * **Kırmızı Kapı (Daha Derine İn):** Skoru **2x Çarpan** ile katla ama takım silinirse toplam skorun yarısı kaybolur!
+### Bölüm 1: Terk Edilmiş Mahalle (Cul-de-sac Meydanı)
+* **Harita Yerleşimi (Cul-de-sac):** Evler, bahçe çitleri ve dükkan cepheleriyle çevrili dairesel bir banliyö çıkmazı.
+* **Merkez Park Adası & Araçlar:** Meydanın ortasında döner park adası ve terk edilmiş minibüs (`Van Wreck`). Doğu ve batı kaldırımlarda park etmiş mavi sedan ve sarı taksi.
+* **Patlayabilir Hurda Araçlar (`CarWreck.gd`):** Mermi ve patlayıcılarla hasar alabilen hurda araçlar (150 HP). Canı tükendiğinde 1.2 sn kırmızı ışıklı acil durum geri sayımı yapar ve 7.5 metre çapında 350 hasarlı devasa bir voxel patlaması gerçekleştirir. Patlama sonrası yanmış iskelet olarak siper görevi görmeye devam eder.
+* **Alacakaranlık Atmosferi & Sokak Lambaları:** Alacakaranlık / puslu gün batımı gökyüzü, 4 adet sıcak sarı sokak lambası, sokak konteynerleri ve taktik patlayıcı variller.
+* **9. Seviye Boss Savaşı:** Bölümün son seviyesinde (Level 9 Wave 3) devasa zırhlı kırmızı **Mahalle Şefi (Brute Crusher)** doğar. Boss alt edildiğinde Bölüm 1 tamamlanır ve Asansör açılır!
 
 ---
 
@@ -164,7 +161,12 @@ $$\text{Toplam Skor} = (\text{Ulaşılan Kat} \times 10.000) + (\text{Öldürül
   * Tek tık derleyici scripti (`build_release.ps1`) ile Windows standalone exe ve pck üretimi.
   * Oyun içi GitHub Releases otomatik güncelleyicisi (`AutoUpdater.gd`) ve Windows dosya kilitleme engelleme döngüsü.
   * İki aşamalı lobi, hazır olma durumu, geç katılım reddi ve yetkisiz yeniden başlatma kilidi.
-* [ ] **Faz 7: Bosslar, Steam Entegrasyonu & Skor Tablosu**
-  * Kırmızı Şeytanlar ve Boss yapay zekası.
+* [x] **Faz 7: Taktik Silah Modelleri, Mekanik Animasyonlar, Asansör Odası ve Kalıntı Temizliği (v1.1.7)**
+  * 4 Yeni Taktik 3D Silah: Pompalı (Pump Action), Uzi (Cocking Knob Cycle), Bixi/PKM (Ağır makineli, bipod, mayon şeridi), Roketatar RPG-7 (Uçan başlık reload).
+  * Harita çevresi tel örgüler ve şehir binaları arka planı.
+  * Harita dışı asansör odası ve ızgara seviye seçim paneli.
+  * Önceki sürümlerden kalan artık ve geçici dosyaların otomatik derin temizliği (`_deep_cleanup_residuals`).
+* [ ] **Faz 8: Steam Entegrasyonu & Küresel Skor Tablosu**
   * Steam Leaderboard bağlantısı ve ses/görsel cilalama (Polish).
+
 

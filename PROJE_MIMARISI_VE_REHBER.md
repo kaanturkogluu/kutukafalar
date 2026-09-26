@@ -134,6 +134,29 @@ Projeyi geliştirirken token tüketimini minimumda tutmak ve hızlı ilerlemek i
   * **GDScript & Seviye Başlangıç Güvenliği:**
     * GDScript `Object.get()` tek parametre kuralı (`p.get("current_health") != null`) uygulanarak parse hataları önlenmiştir.
     * Seviye yüklendiğinde sunucunun `_notify_peer_level_ready(1)` metodunu doğrudan yerel çağırması sağlanarak döngüsel RPC takılmaları ve haritanın üstten boş kamerasında asılı kalma sorunu tamamen giderilmiştir.
-    * `AutoUpdater.gd` ve `apply_update.bat` 20 saniyelik dosya kilitleme bekleme döngüsü (`:wait_loop`) ve `user://` indirme yolu ile Windows yetki ve paylaşım ihlali hatalarına karşı zırhlanmıştır.
+* [x] **Faz 9: 11 Bölüm & 99 Seviye Şeması, Terk Edilmiş Mahalle (Cul-de-sac), Patlayabilir Araçlar ve Boss Sistemi:**
+  * **11 Tematik Bölüm Veri Mimarisi (`LevelData.gd`):** `leveller` dosyasında belirlenen 11 bölüm (Terk Edilmiş Mahalle, Şehir Merkezi, Market, Apartmanlar, Metro, Hastane, Fabrika, Kanalizasyon, Askeri Tesis, Laboratuvar, Final) ve 99 seviye tek bir merkezi veri yapısında toplandı.
+  * **Cul-de-sac Mahalle Çıkmazı (`main_level.tscn`):** 52x52 metre dairesel asfalt yol, merkezdeki yeşil park döner adası, evler, bakkal vitrini, bahçe çitleri, 4 adet sıcak sarı sokak lambası (`OmniLight3D`), çöp konteynerleri ve alacakaranlık gökyüzüyle gerçekçi retro Boxhead haritası inşa edildi.
+  * **Patlayabilir Hurda Araçlar (`CarWreck.gd` & `car_wreck.tscn`):** Siper olarak kullanılan sedan, van ve taksi modelleri. 150 HP canı bittiğinde 1.2 sn kırmızı ışıklı acil durum geri sayımı yapar ve 7.5m çapında 350 hasarlı devasa alan patlaması gerçekleştirir; ardından yanmış iskelet olarak siper görevini sürdürür.
+  * **Bölüm 1 Sonu Boss'u: Mahalle Şefi (`boss_zombie.tscn`):** Seviye 9 Wave 3'te doğan 1.7x büyüklüğünde, zırhlı omuzluklu, kırmızı parlayan gözlüklü ve 1200 HP cana sahip boss zombi. HUD üzerinde boss yaklaşma uyarısı (`BossNoticeLabel`) ile desteklendi.
+* [x] **Faz 10: Taktik Silah Modelleri, Mekanik Animasyonlar, Dış Asansör Odası, Izgara Seviye Seçimi ve Derin Kalıntı Temizliği (v1.1.7):**
+  * **4 Yeni Taktik 3D Silah Modeli & Gerçekçi Mekanik Animasyonlar (`scenes/weapons/`):**
+    * **Pompalı Tüfek (`shotgun_model.tscn`):** FDE polimer dipçik ve kabza, mat koyu çelik gövde, çift namlu + alt şarjör tüpü. Ateş edildikten sonra taktik oluklu kurma kolunun (`PumpHandle`) geriye çekilip ileri itildiği mekanik pompalama animasyonu.
+    * **Uzi (`uzi_model.tscn`):** Çelik alıcı gövde, katlanır tel dipçik, FDE dikey tutamak ve düz kutu şarjör. Seri atış esnasında üstteki kurma mandalının (`CockingKnob`) her mermide geriye fırlayıp ileri kilitlendiği çevrim animasyonu.
+    * **Bixi / PKM (`bixi_model.tscn`):** Ağır makineli gövde, iskelet dipçik, haki mühimmat kutusu, pirinç mermi mayon şeridi, açılmış çatal ayak (bipod) ve alev gizleyen. Yüksek geri tepme, yatay sarsıntı ve kamera travması.
+    * **Roketatar / RPG-7 (`rocket_model.tscn`):** Genişleyen arka egzoz hunisi, FDE ısı kalkanı, optik dürbün ve namluya takılı PG-7V savaş başlığı (`Warhead`). Ateşlendiğinde başlığın uçup kaybolması, yeniden yükleme süresi bittiğinde yerine oturması.
+    * Bağımsız namlu alevleri (`MuzzleFlash`) ve ağ üzerinden diğer oyuncular için silah senkronizasyonu (`_sync_weapon.rpc`).
+  * **Harita Güvenlik Çitleri & Şehir Silüeti (`main_level.tscn`):**
+    * Haritanın tüm dış sınırları modüler tel çit ve beton bariyerlerle çevrildi, oyuncu ve zombilerin boşluğa düşmesi engellendi.
+    * Arka plandaki boş gri düzlük, gece gökyüzüne uzanan ışıklı gökdelen silüetleri ve kentsel arka plan modelleriyle zenginleştirildi.
+  * **Harita Dışı Asansör Odası & Modern Izgara (Grid) Seviye Seçimi:**
+    * Asansör oyun alanının dışına taşındı ve kapısı mahalle çevre çitleriyle kusursuz şekilde hizalandı.
+    * Aşama tamamlandığında asansörün içine binildiğinde profesyonel ızgara (grid) seviye seçim penceresi (`level_select.tscn`) açılır; oyuncular açılmış seviyeler arasında seçim yaparak geçiş yapabilir.
+  * **Zombi Yapay Zekası & Akış Hızlandırması (`ZombieAI.gd`):**
+    * Zombilerin binaların arkasında veya dar köşelerde takılı kalmasını önlemek için NavMesh hedef güncellemesi ve doğrudan görüş engeli denetimi optimize edildi; zombiler oyunculara daha agresif ve hızlı akmaya başladı.
+  * **Yeniden Başlatma İyileştirmesi:**
+    * Oyun yeniden başlatıldığında her seferinde Seviye 1'e dönmek yerine en son oynanan mevcut seviyeden başlatma desteği sağlandı.
+  * **Eski Sürümler İçin Derin Kalıntı Temizliği (`AutoUpdater.gd`):**
+    * Önceki sürümlerden (v1.1.0 - v1.1.6) kalan artık `user://KutuKafalar.pck`, `user://*.new`, `user://*.tmp`, `user://*.bak`, `user://*.old` dosyaları ile oyun dizinindeki geçici dosyaları oyun başlangıcında, güncelleme indirilmeden hemen önce ve `apply_update.bat` çalıştığında otomatik temizleyen derin temizlik mimarisi (`_deep_cleanup_residuals`) devreye alındı.
 
 

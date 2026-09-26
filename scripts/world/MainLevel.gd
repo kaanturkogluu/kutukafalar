@@ -3,6 +3,7 @@ extends Node3D
 # --- Ana Oyun Seviyesi, Çok Oyunculu Doğurma, Asansör ve Kat İlerlemesi ---
 const PLAYER_SCENE_PATH: String = "res://scenes/player/player.tscn"
 const ZOMBIE_SCENE_PATH: String = "res://scenes/enemies/zombie.tscn"
+const BOSS_SCENE_PATH: String = "res://scenes/enemies/boss_zombie.tscn"
 const BARREL_SCENE_PATH: String = "res://scenes/interactables/barrel_red.tscn"
 const PICKUP_SCENE_PATH: String = "res://scenes/interactables/pickup.tscn"
 
@@ -33,12 +34,18 @@ var is_wave_in_progress: bool = false
 @onready var floor_label: Label = $WaveUI/WaveInfo/FloorLabel
 @onready var wave_label: Label = $WaveUI/WaveInfo/WaveLabel
 @onready var enemies_label: Label = $WaveUI/WaveInfo/EnemiesLabel
+@onready var boss_notice_label: Label = get_node_or_null("WaveUI/BossNoticeLabel")
+@onready var level_select_ui: CanvasLayer = get_node_or_null("LevelSelectUI")
 
 func _ready() -> void:
+	add_to_group("main_level")
 	if elevator:
 		elevator.players_entered_elevator.connect(_on_players_entered_elevator)
 	if shop_ui:
 		shop_ui.next_floor_requested.connect(_on_next_floor_requested)
+	if level_select_ui:
+		level_select_ui.level_start_requested.connect(_on_level_start_requested)
+		level_select_ui.shop_requested.connect(_on_level_select_shop_requested)
 
 	NetworkManager.server_disconnected.connect(_on_server_disconnected)
 
@@ -91,8 +98,8 @@ func _notify_peer_level_ready(peer_id: int) -> void:
 		initial_barrels_spawned = true
 		_spawn_initial_barrels()
 		
-		# 2 saniye sonra 1. Dalgayı Başlat
-		get_tree().create_timer(2.0).timeout.connect(func():
+		# 1 saniye sonra 1. Dalgayı Başlat
+		get_tree().create_timer(1.0).timeout.connect(func():
 			if current_wave == 1 and current_floor == 1 and not is_wave_in_progress:
 				_start_next_wave()
 		)
@@ -130,11 +137,11 @@ func spawn_player(id: int) -> void:
 
 func _spawn_initial_barrels() -> void:
 	var initial_positions = [
-		Vector3(-6, 0.5, -6),
-		Vector3(6, 0.5, -6),
-		Vector3(-6, 0.5, 6),
-		Vector3(6, 0.5, 6),
-		Vector3(0, 0.5, 0)
+		Vector3(-4.5, 0.5, 2.5),
+		Vector3(4.5, 0.5, -2.5),
+		Vector3(9.0, 0.5, -7.0),
+		Vector3(-9.0, 0.5, 7.0),
+		Vector3(0.0, 0.5, -14.0)
 	]
 	for pos in initial_positions:
 		spawn_barrel(pos)
@@ -181,17 +188,60 @@ func _start_next_wave() -> void:
 	is_wave_in_progress = true
 	wave_loop_token += 1
 	var current_token = wave_loop_token
+	
+	var is_boss_wave = LevelData.is_boss_level(current_floor) and current_wave == WAVES_PER_FLOOR
 	zombies_remaining_to_spawn = 4 + (current_floor * 2) + (current_wave * 2)
 	active_zombie_count = 0
 	_sync_floor_ui.rpc(current_floor, current_wave, zombies_remaining_to_spawn)
+	
+	if is_boss_wave:
+		_show_boss_notice.rpc(true)
+		_spawn_boss_zombie()
+		active_zombie_count += 1
+		_sync_floor_ui.rpc(current_floor, current_wave, active_zombie_count + zombies_remaining_to_spawn)
+	else:
+		_show_boss_notice.rpc(false)
+
 	_spawn_zombie_loop(current_token)
+
+@rpc("call_local", "reliable")
+func _show_boss_notice(show: bool) -> void:
+	if boss_notice_label:
+		boss_notice_label.visible = show
+		if show:
+			var info = LevelData.get_chapter_for_level(current_floor)
+			boss_notice_label.text = "⚠️ DİKKAT: %s YAKLAŞIYOR! ⚠️" % info.get("boss_name", "BÖLÜM BOSS'U").to_upper()
+			get_tree().create_timer(4.5).timeout.connect(func():
+				if is_instance_valid(boss_notice_label):
+					boss_notice_label.visible = false
+			)
+
+func _spawn_boss_zombie() -> void:
+	zombie_id_counter += 1
+	var b_name = "BossZombie_" + str(zombie_id_counter)
+	var spawn_pos = Vector3(0, 1.5, -23)
+	if zombie_spawn_points.size() > 0:
+		spawn_pos = zombie_spawn_points[0].global_position
+	sync_spawn_boss.rpc(b_name, spawn_pos)
+
+@rpc("call_local", "reliable")
+func sync_spawn_boss(b_name: String, pos: Vector3) -> void:
+	if enemies_container.has_node(b_name):
+		return
+	var boss_scene = load(BOSS_SCENE_PATH)
+	if boss_scene:
+		var boss = boss_scene.instantiate()
+		boss.name = b_name
+		boss.position = pos
+		boss.died.connect(_on_zombie_died)
+		enemies_container.add_child(boss, true)
 
 func _spawn_zombie_loop(token: int) -> void:
 	while zombies_remaining_to_spawn > 0:
 		if not is_instance_valid(self) or token != wave_loop_token:
 			return
 		
-		var spawn_delay = max(0.5, 1.2 - (current_floor * 0.08))
+		var spawn_delay = max(0.24, 0.55 - (current_floor * 0.03))
 		await get_tree().create_timer(spawn_delay).timeout
 		if token != wave_loop_token:
 			return
@@ -219,8 +269,8 @@ func sync_spawn_zombie(z_name: String, pos: Vector3, speed_val: float, hp_val: f
 func _spawn_single_zombie() -> void:
 	zombie_id_counter += 1
 	var z_name = "Zombie_" + str(zombie_id_counter)
-	var speed_val = 3.6 + (current_floor * 0.2)
-	var hp_val = 100.0 + (current_floor * 15.0)
+	var speed_val = 4.4 + (current_floor * 0.15)
+	var hp_val = 100.0 + (current_floor * 12.0)
 
 	var spawn_pos = Vector3(randf_range(-10, 10), 1.5, randf_range(-10, 10))
 	if zombie_spawn_points.size() > 0:
@@ -253,7 +303,7 @@ func _on_zombie_died(zombie_ref = null, _extra = null) -> void:
 			# Kat içindeki bir sonraki dalga
 			current_wave += 1
 			_announce_wave_cleared.rpc()
-			await get_tree().create_timer(3.0).timeout
+			await get_tree().create_timer(1.2).timeout
 			if token == wave_loop_token:
 				_start_next_wave()
 		else:
@@ -261,8 +311,9 @@ func _on_zombie_died(zombie_ref = null, _extra = null) -> void:
 			_on_floor_cleared()
 
 func _on_floor_cleared() -> void:
-	print("[Kat Tamamlandı] Kat ", current_floor, " temizlendi! Asansör kapıları açılıyor...")
-	_announce_floor_cleared.rpc()
+	var info = LevelData.get_chapter_for_level(current_floor)
+	print("[Seviye Tamamlandı] Seviye ", current_floor, " (", info["theme"], ") temizlendi! Asansör kapıları açılıyor...")
+	_announce_floor_cleared.rpc(info.get("is_boss_level", false))
 	elevator.set_elevator_state.rpc(true)
 
 func _on_players_entered_elevator() -> void:
@@ -277,12 +328,51 @@ func _on_players_entered_elevator() -> void:
 				p.revive.rpc(p.max_health * 0.5, elevator.global_position)
 			print("[Asansör] Oyuncu yeniden canlandırıldı: ", p.name)
 
-	# Mağazayı tüm oyunculara aç
+	# Seviye Seçim Penceresini tüm oyunculara aç
+	_open_level_select_ui.rpc(current_floor)
+
+@rpc("call_local", "reliable")
+func _open_level_select_ui(completed_lvl: int) -> void:
+	if level_select_ui:
+		level_select_ui.open_level_window(completed_lvl)
+
+@rpc("call_local", "reliable")
+func _close_level_select_ui() -> void:
+	if level_select_ui:
+		level_select_ui.close_level_window()
+
+func _on_level_start_requested(target_lvl: int) -> void:
+	_request_start_level.rpc_id(1, target_lvl)
+
+func _on_level_select_shop_requested() -> void:
+	_close_level_select_ui.rpc()
 	_open_shop_ui.rpc(current_floor)
+
+@rpc("any_peer", "call_local", "reliable")
+func _request_start_level(target_lvl: int) -> void:
+	if not multiplayer.is_server():
+		return
+
+	_close_level_select_ui.rpc()
+	_close_shop_ui.rpc()
+
+	current_floor = target_lvl
+	current_wave = 1
+	elevator.set_elevator_state.rpc(false)
+
+	# Oyuncuları asansörden doğuş noktalarına geri taşı
+	var players = get_tree().get_nodes_in_group("players")
+	for i in range(players.size()):
+		var spawn_pt = spawn_points[i % spawn_points.size()]
+		players[i].position = spawn_pt.global_position
+
+	_sync_floor_ui.rpc(current_floor, current_wave, 0)
+	print("[Yeni Seviye] Seviye ", current_floor, " başladı!")
+	await get_tree().create_timer(1.2).timeout
+	_start_next_wave()
 
 @rpc("call_local", "reliable")
 func _open_shop_ui(floor_num: int) -> void:
-	# Yerel oyuncuyu bul
 	var local_id = multiplayer.get_unique_id()
 	var local_player = players_container.get_node_or_null(str(local_id))
 	if local_player and shop_ui:
@@ -294,48 +384,35 @@ func _close_shop_ui() -> void:
 		shop_ui.close_shop()
 
 func _on_next_floor_requested() -> void:
-	_request_next_floor.rpc_id(1)
-
-@rpc("any_peer", "call_local", "reliable")
-func _request_next_floor() -> void:
-	if not multiplayer.is_server():
-		return
-
-	_close_shop_ui.rpc()
-
-	current_floor += 1
-	current_wave = 1
-	elevator.set_elevator_state.rpc(false)
-
-	# Oyuncuları asansörden doğuş noktalarına geri taşı
-	var players = get_tree().get_nodes_in_group("players")
-	for i in range(players.size()):
-		var spawn_pt = spawn_points[i % spawn_points.size()]
-		players[i].position = spawn_pt.global_position
-
-	_sync_floor_ui.rpc(current_floor, current_wave, 0)
-	print("[Yeni Kat] Kat ", current_floor, " başladı!")
-	await get_tree().create_timer(3.0).timeout
-	_start_next_wave()
+	_request_start_level.rpc_id(1, current_floor + 1)
 
 @rpc("call_local", "reliable")
 func _sync_floor_ui(floor_num: int, wave_num: int, remaining: int) -> void:
+	current_floor = floor_num
+	current_wave = wave_num
+	var info = LevelData.get_chapter_for_level(floor_num)
 	if floor_label:
-		floor_label.text = "🏢 KAT: " + str(floor_num)
+		floor_label.text = "BÖLÜM %d: %s" % [info.get("chapter", 1), str(info.get("theme", "BÖLGE")).to_upper()]
 	if wave_label:
-		wave_label.text = "DALGA: " + str(wave_num) + " / " + str(WAVES_PER_FLOOR)
+		if info.get("is_boss_level", false) and wave_num == WAVES_PER_FLOOR:
+			wave_label.text = "SEVİYE %d / %d | BOSS: %s" % [info.get("level_in_chapter", 1), info.get("max_in_chapter", 9), info.get("boss_name", "ŞEF")]
+		else:
+			wave_label.text = "SEVİYE %d / %d | DALGA: %d / %d" % [info.get("level_in_chapter", 1), info.get("max_in_chapter", 9), wave_num, WAVES_PER_FLOOR]
 	if enemies_label:
 		enemies_label.text = "KALAN DÜŞMAN: " + str(remaining)
 
 @rpc("call_local", "reliable")
 func _announce_wave_cleared() -> void:
 	if enemies_label:
-		enemies_label.text = "🎉 DALGA TEMİZLENDİ! HAZIRLANIN..."
+		enemies_label.text = "DALGA TEMİZLENDİ! HAZIRLANIN..."
 
 @rpc("call_local", "reliable")
-func _announce_floor_cleared() -> void:
+func _announce_floor_cleared(was_boss: bool = false) -> void:
 	if enemies_label:
-		enemies_label.text = "🏆 KAT TEMİZLENDİ! ASANSÖRE BİNİN! 🛗"
+		if was_boss:
+			enemies_label.text = "BÖLÜM ŞEFİ YENİLDİ! ASANSÖRE BİNİN!"
+		else:
+			enemies_label.text = "SEVİYE TEMİZLENDİ! ASANSÖRE BİNİN!"
 
 func _on_player_died(_player_node: Node) -> void:
 	if not multiplayer.is_server():
@@ -363,7 +440,7 @@ func _check_all_players_dead() -> void:
 @rpc("call_local", "reliable")
 func _announce_game_over() -> void:
 	if enemies_label:
-		enemies_label.text = "💀 OYUN BİTTİ! TÜM TAKIM ELENDİ 💀"
+		enemies_label.text = "OYUN BİTTİ! TÜM TAKIM ELENDİ"
 	
 	var players = get_tree().get_nodes_in_group("players")
 	for p in players:
@@ -382,17 +459,19 @@ func _request_server_restart() -> void:
 		_restart_game()
 
 func _restart_game() -> void:
-	print("[MainLevel] Oyun sıfırlanıyor ve baştan başlatılıyor...")
+	print("[MainLevel] Mevcut seviye (", current_floor, ") yeniden başlatılıyor...")
 	wave_loop_token += 1
-	current_floor = 1
+	# Mevcut seviyeden baştan başla (current_floor korunur!)
 	current_wave = 1
 	active_zombie_count = 0
 	zombies_remaining_to_spawn = 0
 	is_wave_in_progress = false
 	
 	_close_shop_ui.rpc()
+	if level_select_ui:
+		_close_level_select_ui.rpc()
 	sync_clear_all_entities.rpc()
-	sync_reset_game_state.rpc()
+	sync_reset_game_state.rpc(current_floor)
 	
 	# Başlangıç varillerini yeniden doğur
 	_spawn_initial_barrels()
@@ -409,18 +488,23 @@ func _restart_game() -> void:
 	
 	elevator.set_elevator_state.rpc(false)
 	_sync_floor_ui.rpc(current_floor, current_wave, 0)
-	await get_tree().create_timer(1.8).timeout
+	await get_tree().create_timer(1.2).timeout
 	_start_next_wave()
 
 @rpc("call_local", "reliable")
-func sync_reset_game_state() -> void:
+func sync_reset_game_state(floor_num: int = 1) -> void:
+	current_floor = floor_num
+	current_wave = 1
 	is_wave_in_progress = false
+	if boss_notice_label:
+		boss_notice_label.visible = false
 	if enemies_label:
-		enemies_label.text = "⚔️ YENİ OYUN BAŞLADI!"
+		enemies_label.text = "SEVİYE YENİDEN BAŞLATILDI"
+	var info = LevelData.get_chapter_for_level(floor_num)
 	if floor_label:
-		floor_label.text = "KAT 1"
+		floor_label.text = "BÖLÜM %d: %s" % [info.get("chapter", 1), str(info.get("theme", "BÖLGE")).to_upper()]
 	if wave_label:
-		wave_label.text = "DALGA 1 / " + str(WAVES_PER_FLOOR)
+		wave_label.text = "SEVİYE %d / %d | DALGA 1 / %d" % [info.get("level_in_chapter", 1), info.get("max_in_chapter", 9), WAVES_PER_FLOOR]
 
 @rpc("call_local", "reliable")
 func sync_clear_all_entities() -> void:

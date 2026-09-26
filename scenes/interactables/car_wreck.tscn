@@ -1,0 +1,98 @@
+[gd_scene load_steps=12 format=3 uid="uid://car_wreck_scene_01"]
+
+[ext_resource type="Script" path="res://scripts/interactables/CarWreck.gd" id="1_car"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_car"]
+size = Vector3(2.2, 1.5, 4.0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
+albedo_color = Color(0.22, 0.42, 0.72, 1)
+metallic = 0.5
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_body"]
+material = SubResource("StandardMaterial3D_body")
+size = Vector3(2.2, 0.75, 4.0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cabin"]
+albedo_color = Color(0.15, 0.18, 0.22, 1)
+roughness = 0.2
+
+[sub_resource type="BoxMesh" id="BoxMesh_cabin"]
+material = SubResource("StandardMaterial3D_cabin")
+size = Vector3(1.8, 0.65, 2.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tire"]
+albedo_color = Color(0.12, 0.12, 0.12, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_tire"]
+material = SubResource("StandardMaterial3D_tire")
+size = Vector3(0.35, 0.6, 0.75)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bumper"]
+albedo_color = Color(0.3, 0.32, 0.35, 1)
+metallic = 0.7
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_bumper"]
+material = SubResource("StandardMaterial3D_bumper")
+size = Vector3(2.3, 0.3, 0.3)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_car"]
+properties/0/path = NodePath(".:is_exploded")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+
+[node name="CarWreck" type="StaticBody3D"]
+collision_layer = 5
+collision_mask = 7
+script = ExtResource("1_car")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+shape = SubResource("BoxShape3D_car")
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="Body" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+mesh = SubResource("BoxMesh_body")
+
+[node name="Cabin" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, -0.2)
+mesh = SubResource("BoxMesh_cabin")
+
+[node name="WheelFL" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.05, 0.3, 1.2)
+mesh = SubResource("BoxMesh_tire")
+
+[node name="WheelFR" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, 0.3, 1.2)
+mesh = SubResource("BoxMesh_tire")
+
+[node name="WheelRL" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.05, 0.3, -1.2)
+mesh = SubResource("BoxMesh_tire")
+
+[node name="WheelRR" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, 0.3, -1.2)
+mesh = SubResource("BoxMesh_tire")
+
+[node name="BumperFront" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 2.05)
+mesh = SubResource("BoxMesh_bumper")
+
+[node name="BumperRear" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, -2.05)
+mesh = SubResource("BoxMesh_bumper")
+
+[node name="WarningLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+visible = false
+light_color = Color(1, 0.15, 0.1, 1)
+light_energy = 4.0
+omni_range = 8.0
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_car")

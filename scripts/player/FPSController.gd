@@ -92,7 +92,11 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 @onready var shoot_ray: RayCast3D = $Head/Camera3D/ShootRay
 @onready var kick_ray: RayCast3D = $Head/Camera3D/KickRay
 @onready var gun: Node3D = $Head/Camera3D/Gun
-@onready var muzzle_flash: OmniLight3D = $Head/Camera3D/Gun/MuzzleFlash
+@onready var model_pistol: Node3D = $Head/Camera3D/Gun.get_node_or_null("Pistol")
+@onready var model_shotgun: Node3D = $Head/Camera3D/Gun.get_node_or_null("Shotgun")
+@onready var model_uzi: Node3D = $Head/Camera3D/Gun.get_node_or_null("Uzi")
+@onready var model_bixi: Node3D = $Head/Camera3D/Gun.get_node_or_null("Bixi")
+@onready var model_rocket: Node3D = $Head/Camera3D/Gun.get_node_or_null("Rocket")
 @onready var hud: CanvasLayer = $HUD
 
 # HUD Elemanları
@@ -138,7 +142,10 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var player_id: int = 1
 var player_name: String = "Oyuncu"
 var player_class: String = "Pyromancer"
-var original_gun_pos: Vector3 = Vector3(0.28, -0.22, -0.45)
+var original_gun_pos: Vector3 = Vector3(0.24, -0.20, -0.42)
+var slide_tween: Tween = null
+var pump_tween: Tween = null
+var uzi_tween: Tween = null
 var kick_cam_tilt: float = 0.0
 
 func _enter_tree() -> void:
@@ -150,10 +157,7 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	add_to_group("players")
 	current_health = max_health
-	if gun:
-		original_gun_pos = gun.position
-	if muzzle_flash:
-		muzzle_flash.visible = false
+	_hide_all_muzzle_flashes()
 	_update_gun_visuals()
 	
 	if restart_btn:
@@ -406,7 +410,8 @@ func _physics_process(delta: float) -> void:
 
 	# Geri tepme yumuşatma
 	if gun:
-		gun.position = gun.position.lerp(original_gun_pos, 15.0 * delta)
+		gun.position = gun.position.lerp(original_gun_pos, 16.0 * delta)
+		gun.rotation = gun.rotation.lerp(Vector3.ZERO, 16.0 * delta)
 
 	# Zıplama (Düşürüldü ve bekleme süresi eklendi - Vortex ve takım taktiği değer kazandı)
 	if Input.is_action_just_pressed("jump") and is_on_floor() and jump_cooldown_timer <= 0:
@@ -440,12 +445,40 @@ func _shoot() -> void:
 	if is_dead:
 		return
 	if gun:
-		gun.position.z += 0.08
+		match current_weapon:
+			"pistol":
+				gun.position.z += 0.042
+				gun.rotation.x += deg_to_rad(3.2)
+				_animate_slide_recoil()
+			"shotgun":
+				gun.position.z += 0.075
+				gun.rotation.x += deg_to_rad(5.5)
+				_animate_shotgun_pump()
+			"uzi":
+				gun.position.z += 0.026
+				gun.rotation.x += deg_to_rad(1.8)
+				_animate_uzi_recoil()
+			"bixi":
+				gun.position.z += 0.055
+				gun.position.x += randf_range(-0.005, 0.005)
+				gun.rotation.x += deg_to_rad(4.2)
+			"rocket":
+				gun.position.z += 0.11
+				gun.rotation.x += deg_to_rad(7.5)
+				camera_trauma = min(1.0, camera_trauma + 0.35)
+				_animate_rocket_launch()
 	if head:
-		head.rotation.x += deg_to_rad(0.5)
-	if muzzle_flash:
+		match current_weapon:
+			"pistol": head.rotation.x += deg_to_rad(0.35)
+			"shotgun": head.rotation.x += deg_to_rad(0.75)
+			"uzi": head.rotation.x += deg_to_rad(0.18)
+			"bixi": head.rotation.x += deg_to_rad(0.42)
+			"rocket": head.rotation.x += deg_to_rad(1.1)
+
+	var cur_flash = _get_current_muzzle_flash()
+	if cur_flash:
 		_show_muzzle_flash.rpc()
-	
+
 	# Silah Ateşleme Ses Efekti (Yerel + Ağ 3D)
 	SoundManager.play_sfx(current_weapon)
 	_play_network_shoot_sfx.rpc(current_weapon)
@@ -509,7 +542,7 @@ func _fire_bullet(dmg: float, spread: Vector3) -> void:
 	if hit_collider.name == "HeadshotArea":
 		is_headshot = true
 		target = hit_collider.get_parent()
-	elif hit_collider.is_in_group("enemies") or hit_collider.is_in_group("barrels"):
+	elif hit_collider.is_in_group("enemies") or hit_collider.is_in_group("barrels") or hit_collider.is_in_group("destructibles"):
 		target = hit_collider
 
 	if target and target.has_method("take_damage"):
@@ -690,10 +723,17 @@ func switch_to_weapon(weapon_name: String) -> void:
 	current_weapon_index = weapon_inventory.find(weapon_name)
 	fire_timer = 0.12 # Küçük geçiş beklemesi
 	
+	_update_gun_visuals()
 	SoundManager.play_sfx("switch")
 	_animate_weapon_switch()
-	_update_gun_visuals()
 	_update_hud()
+	if multiplayer.has_multiplayer_peer():
+		_sync_weapon.rpc(current_weapon)
+
+@rpc("any_peer", "call_remote", "reliable")
+func _sync_weapon(w_name: String) -> void:
+	current_weapon = w_name
+	_update_gun_visuals()
 
 func _cycle_weapon(direction: int) -> void:
 	if weapon_inventory.size() <= 1:
@@ -738,20 +778,62 @@ func _animate_weapon_switch() -> void:
 	tw.tween_property(gun, "position:y", original_gun_pos.y - 0.08, 0.05).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tw.tween_property(gun, "position:y", original_gun_pos.y, 0.08).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
+func _get_current_weapon_model() -> Node3D:
+	match current_weapon:
+		"pistol": return model_pistol
+		"shotgun": return model_shotgun
+		"uzi": return model_uzi
+		"bixi": return model_bixi
+		"rocket": return model_rocket
+	return model_pistol
+
+func _get_current_muzzle_flash() -> OmniLight3D:
+	var cur_model = _get_current_weapon_model()
+	if cur_model and cur_model.has_node("MuzzleFlash"):
+		return cur_model.get_node("MuzzleFlash") as OmniLight3D
+	return null
+
+func _hide_all_muzzle_flashes() -> void:
+	for m in [model_pistol, model_shotgun, model_uzi, model_bixi, model_rocket]:
+		if m and m.has_node("MuzzleFlash"):
+			var fl = m.get_node("MuzzleFlash")
+			if fl:
+				fl.visible = false
+
 func _update_gun_visuals() -> void:
 	if not gun:
 		return
+	if model_pistol: model_pistol.visible = (current_weapon == "pistol")
+	if model_shotgun: model_shotgun.visible = (current_weapon == "shotgun")
+	if model_uzi: model_uzi.visible = (current_weapon == "uzi")
+	if model_bixi: model_bixi.visible = (current_weapon == "bixi")
+	if model_rocket: model_rocket.visible = (current_weapon == "rocket")
+
+	# Roketatar seçiliyse ve mermi varsa savaş başlığını (warhead) görünür yap
+	if current_weapon == "rocket" and model_rocket:
+		var warhead = model_rocket.get_node_or_null("Warhead")
+		if warhead:
+			warhead.visible = (weapon_ammo_dict.get("rocket", 0) > 0 or not is_multiplayer_authority())
+
+	# Silahın ekrandaki ideal FPS pozisyon ve ölçek hizalaması
 	match current_weapon:
 		"pistol":
 			gun.scale = Vector3(1.0, 1.0, 1.0)
+			original_gun_pos = Vector3(0.24, -0.20, -0.42)
 		"shotgun":
-			gun.scale = Vector3(1.3, 1.3, 1.4)
+			gun.scale = Vector3(1.0, 1.0, 1.0)
+			original_gun_pos = Vector3(0.24, -0.21, -0.46)
 		"uzi":
-			gun.scale = Vector3(0.9, 0.9, 0.85)
+			gun.scale = Vector3(1.0, 1.0, 1.0)
+			original_gun_pos = Vector3(0.22, -0.20, -0.40)
 		"bixi":
-			gun.scale = Vector3(1.35, 1.2, 1.85)
+			gun.scale = Vector3(0.95, 0.95, 0.95)
+			original_gun_pos = Vector3(0.25, -0.23, -0.50)
 		"rocket":
-			gun.scale = Vector3(1.5, 1.5, 1.6)
+			gun.scale = Vector3(0.95, 0.95, 0.95)
+			original_gun_pos = Vector3(0.22, -0.22, -0.48)
+
+	gun.position = original_gun_pos
 
 func _get_weapon_display_name(w_name: String) -> String:
 	match w_name:
@@ -772,14 +854,86 @@ func _show_weapon_notice(msg: String) -> void:
 	weapon_notice_tween = create_tween()
 	weapon_notice_tween.tween_property(weapon_notice_label, "modulate:a", 0.0, 2.2).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 
+## Tabanca Üst Mekanizma Geri Tepme Animasyonu (Glock Blowback)
+func _animate_slide_recoil() -> void:
+	if not model_pistol:
+		return
+	var gun_slide = model_pistol.get_node_or_null("Slide")
+	if not gun_slide:
+		return
+	if slide_tween and slide_tween.is_valid():
+		slide_tween.kill()
+	
+	slide_tween = create_tween()
+	# Üst mekanizmanın hızla geriye fırlaması (Blowback: 0.055m geriye)
+	slide_tween.tween_property(gun_slide, "position:z", 0.055, 0.035).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	# Mekanizmanın yayla hızla öne kilitlenmesi (Return to battery: 0.0m)
+	slide_tween.tween_property(gun_slide, "position:z", 0.0, 0.045).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+## Pompalı Tüfek Kurma Kolu Animasyonu (Shotgun Pump Action)
+func _animate_shotgun_pump() -> void:
+	if not model_shotgun:
+		return
+	var pump = model_shotgun.get_node_or_null("PumpHandle")
+	if not pump:
+		return
+	if pump_tween and pump_tween.is_valid():
+		pump_tween.kill()
+	
+	pump_tween = create_tween()
+	pump_tween.tween_interval(0.08)
+	# Kurma kolunun geriye çekilmesi (-0.22 -> -0.14)
+	pump_tween.tween_property(pump, "position:z", -0.14, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	# Kurma kolunun ileri itilmesi (-0.14 -> -0.22)
+	pump_tween.tween_property(pump, "position:z", -0.22, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+## Uzi Üst Kurma Mandalı Mekanizma Hareketi (Rapid Cycling Knob)
+func _animate_uzi_recoil() -> void:
+	if not model_uzi:
+		return
+	var knob = model_uzi.get_node_or_null("CockingKnob")
+	if not knob:
+		return
+	if uzi_tween and uzi_tween.is_valid():
+		uzi_tween.kill()
+	
+	uzi_tween = create_tween()
+	uzi_tween.tween_property(knob, "position:z", 0.02, 0.03).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	uzi_tween.tween_property(knob, "position:z", -0.02, 0.04).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+## Roketatar Fırlatma ve Yeniden Doldurma Animasyonu (RPG-7 Rocket Launch)
+func _animate_rocket_launch() -> void:
+	if not model_rocket:
+		return
+	var warhead = model_rocket.get_node_or_null("Warhead")
+	if not warhead:
+		return
+	# Roket namludan fırlar, başlık kaybolur
+	warhead.visible = false
+	var remaining = weapon_ammo_dict.get("rocket", 0)
+	if remaining > 0:
+		var reload_time = 0.70 / stat_firerate_mult
+		get_tree().create_timer(reload_time).timeout.connect(func():
+			if is_instance_valid(warhead) and current_weapon == "rocket":
+				warhead.visible = true
+		)
+
 @rpc("call_local", "unreliable")
 func _show_muzzle_flash() -> void:
-	if not muzzle_flash or not is_inside_tree():
+	var flash = _get_current_muzzle_flash()
+	if not flash or not is_inside_tree():
 		return
-	muzzle_flash.visible = true
+	flash.visible = true
+	# Ağdaki diğer istemciler için silah animasyonunu tetikle
+	if not is_multiplayer_authority():
+		match current_weapon:
+			"pistol": _animate_slide_recoil()
+			"shotgun": _animate_shotgun_pump()
+			"uzi": _animate_uzi_recoil()
+			"rocket": _animate_rocket_launch()
 	await get_tree().create_timer(0.05).timeout
-	if muzzle_flash:
-		muzzle_flash.visible = false
+	if is_instance_valid(flash):
+		flash.visible = false
 
 @rpc("call_local", "unreliable")
 func _spawn_hit_effect(pos: Vector3, normal: Vector3) -> void:
@@ -789,7 +943,10 @@ func _spawn_hit_effect(pos: Vector3, normal: Vector3) -> void:
 		get_parent().add_child(effect)
 		effect.global_position = pos
 		if normal != Vector3.ZERO:
-			effect.look_at(pos + normal, Vector3.UP)
+			var up_vec = Vector3.UP
+			if abs(normal.dot(Vector3.UP)) > 0.98:
+				up_vec = Vector3.RIGHT
+			effect.look_at(pos + normal, up_vec)
 
 static var hurt_material: StandardMaterial3D = null
 
@@ -1039,14 +1196,14 @@ func _update_spectator_hud() -> void:
 		if backdrop:
 			backdrop.color = Color(0.06, 0.01, 0.01, 0.88)
 		if death_title_label:
-			death_title_label.text = "💀 OYUN BİTTİ 💀"
+			death_title_label.text = "OYUN BİTTİ"
 		if death_reason_label:
 			death_reason_label.text = "Tüm takım alt edildi!"
 		if death_info_label:
 			if multiplayer.is_server():
-				death_info_label.text = "[R] veya [Boşluk] tuşuna basarak yeniden başlatın."
+				death_info_label.text = "[R] veya [Boşluk] tuşuna basarak mevcut seviyeyi yeniden başlatın."
 			else:
-				death_info_label.text = "Oda sahibinin oyunu yeniden başlatması bekleniyor..."
+				death_info_label.text = "Oda sahibinin seviyeyi yeniden başlatması bekleniyor..."
 		if restart_btn:
 			restart_btn.visible = multiplayer.is_server()
 			restart_btn.disabled = not multiplayer.is_server()
@@ -1258,19 +1415,25 @@ func reset_to_default_loadout(spawn_pos: Vector3 = Vector3.ZERO) -> void:
 func _on_restart_pressed() -> void:
 	if not is_multiplayer_authority():
 		return
-	# Sadece sunucu (Host) oyunu baştan başlatabilir
-	if not multiplayer.is_server():
-		_show_weapon_notice("⚠️ Yalnızca oda sahibi oyunu baştan başlatabilir!")
-		return
 	# Yaşayan takım arkadaşı varken kazara baştan başlatmayı engelle
 	if not all_players_dead and not _get_living_teammates().is_empty():
-		_show_weapon_notice("⚠️ Takım arkadaşların hayatta! İzleyici modunda bekle.")
+		_show_weapon_notice("Takım arkadaşların hayatta! İzleyici modunda bekle.")
 		return
-	var main_level = get_tree().current_scene
+	# Sadece sunucu (veya tüm takım elendiğinde client) yeniden başlatabilir
+	if not multiplayer.is_server() and not all_players_dead:
+		_show_weapon_notice("Yalnızca oda sahibi oyunu baştan başlatabilir!")
+		return
+	
+	var main_level = get_tree().get_first_node_in_group("main_level")
+	if not main_level:
+		main_level = get_tree().current_scene
+	if not main_level or not main_level.has_method("request_restart"):
+		main_level = get_node_or_null("/root/MainLevel")
+
 	if main_level and main_level.has_method("request_restart"):
 		main_level.request_restart()
 	else:
-		get_tree().reload_current_scene()
+		push_error("[FPSController] MainLevel düğümü bulunamadı!")
 
 func _on_lobby_pressed() -> void:
 	if not is_multiplayer_authority():

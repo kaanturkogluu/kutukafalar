@@ -1,6 +1,6 @@
 {
-  "version": "v1.1.6",
+  "version": "v1.1.7",
   "download_url": "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-  "pck_size": 262140,
-  "changelog": "- Oyun başlarken karakterlerin doğmama ve haritanın üstten kamerada takılı kalma (GDScript parse error) hatası giderildi.\n- Sunucunun seviye başlangıcında doğrudan oyuncuyu doğurması güvenceye alındı.\n- reset_to_default_loadout değişken uyumluluğu düzeltildi."
+  "pck_size": 364812,
+  "changelog": "- 4 Yeni Taktik Silah Modeli (Pompalı, Uzi, Bixi/PKM, RPG-7 Roketatar) ve gerçekçi mekanik animasyonlar (kurma kolu, blowback, roket namlusu) eklendi.\n- Harita çevresi güvenlik çitleri ve şehir silüeti eklendi, boşluğa düşme engellendi.\n- Dış asansör odası ve modern ızgara (grid) seviye seçim ekranı entegre edildi.\n- Zombi yapay zekası optimize edildi; binaların arkasında sıkışma sorunu çözüldü.\n- Önceki sürümlerden kalan artık ve geçici dosyaların otomatik derin temizliği eklendi."
 }

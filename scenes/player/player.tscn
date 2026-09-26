@@ -2,6 +2,11 @@
 
 [ext_resource type="Script" path="res://scripts/player/FPSController.gd" id="1_fps"]
 [ext_resource type="Script" path="res://scripts/player/SpellManager.gd" id="2_spell"]
+[ext_resource type="PackedScene" uid="uid://pistol_model_01" path="res://scenes/weapons/pistol_model.tscn" id="3_pistol"]
+[ext_resource type="PackedScene" uid="uid://shotgun_model_01" path="res://scenes/weapons/shotgun_model.tscn" id="4_shotgun"]
+[ext_resource type="PackedScene" uid="uid://uzi_model_01" path="res://scenes/weapons/uzi_model.tscn" id="5_uzi"]
+[ext_resource type="PackedScene" uid="uid://bixi_model_01" path="res://scenes/weapons/bixi_model.tscn" id="6_bixi"]
+[ext_resource type="PackedScene" uid="uid://rocket_model_01" path="res://scenes/weapons/rocket_model.tscn" id="7_rocket"]
 
 [sub_resource type="Gradient" id="Gradient_vignette"]
 offsets = PackedFloat32Array(0.35, 1)
@@ -31,15 +36,6 @@ roughness = 0.4
 [sub_resource type="BoxMesh" id="BoxMesh_head"]
 material = SubResource("StandardMaterial3D_head")
 size = Vector3(0.5, 0.5, 0.5)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gun"]
-albedo_color = Color(0.2, 0.22, 0.25, 1)
-metallic = 0.6
-roughness = 0.3
-
-[sub_resource type="BoxMesh" id="BoxMesh_gun"]
-material = SubResource("StandardMaterial3D_gun")
-size = Vector3(0.12, 0.14, 0.45)
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_player"]
 properties/0/path = NodePath(".:position")
@@ -90,14 +86,19 @@ collide_with_areas = true
 [node name="Gun" type="Node3D" parent="Head/Camera3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, -0.22, -0.45)
 
-[node name="GunMesh" type="MeshInstance3D" parent="Head/Camera3D/Gun"]
-mesh = SubResource("BoxMesh_gun")
+[node name="Pistol" parent="Head/Camera3D/Gun" instance=ExtResource("3_pistol")]
 
-[node name="MuzzleFlash" type="OmniLight3D" parent="Head/Camera3D/Gun"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.25)
-light_color = Color(1, 0.85, 0.35, 1)
-light_energy = 3.0
-omni_range = 3.0
+[node name="Shotgun" parent="Head/Camera3D/Gun" instance=ExtResource("4_shotgun")]
+visible = false
+
+[node name="Uzi" parent="Head/Camera3D/Gun" instance=ExtResource("5_uzi")]
+visible = false
+
+[node name="Bixi" parent="Head/Camera3D/Gun" instance=ExtResource("6_bixi")]
+visible = false
+
+[node name="Rocket" parent="Head/Camera3D/Gun" instance=ExtResource("7_rocket")]
+visible = false
 
 [node name="NameLabel" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.05, 0)

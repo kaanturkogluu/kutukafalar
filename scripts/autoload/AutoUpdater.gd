@@ -12,7 +12,7 @@ signal update_failed(reason: String)
 
 const REPO_OWNER: String = "kaanturkogluu"
 const REPO_NAME: String = "kutukafalar"
-const CURRENT_VERSION: String = "v1.1.6"
+const CURRENT_VERSION: String = "v1.1.7"
 const RAW_VERSION_URL: String = "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/version.json"
 const GITHUB_API_URL: String = "https://api.github.com/repos/kaanturkogluu/kutukafalar/releases/latest"
 
@@ -27,11 +27,7 @@ var temp_pck_path: String = ""
 
 func _ready() -> void:
 	_determine_paths()
-	
-	# user:// içinde eski artık bir pck kalmışsa temizle ki ana oyunu ezmesin veya kilitlemesin
-	var user_pck = ProjectSettings.globalize_path("user://KutuKafalar.pck")
-	if FileAccess.file_exists(user_pck):
-		DirAccess.remove_absolute(user_pck)
+	_deep_cleanup_residuals()
 	
 	check_http = HTTPRequest.new()
 	add_child(check_http)
@@ -144,6 +140,46 @@ func _on_check_request_completed(result: int, response_code: int, _headers: Pack
 	latest_pck_url = pck_url
 	update_available.emit(tag_name, changelog, pck_url, pck_size)
 
+## Önceki sürümlerden kalma geçici, artık veya kilitli dosyaları temizle
+func _deep_cleanup_residuals() -> void:
+	# 1. user:// klasöründeki artık dosyaların taranması ve temizlenmesi
+	var user_dir_access = DirAccess.open("user://")
+	if user_dir_access:
+		user_dir_access.list_dir_begin()
+		var file_name = user_dir_access.get_next()
+		while file_name != "":
+			if not user_dir_access.current_is_dir():
+				var lower = file_name.to_lower()
+				# Eski pck, yeni inmiş ama yarım kalmış .new, geçici .tmp, .bak, .old kalıntıları
+				if lower.ends_with(".new") or lower.ends_with(".tmp") or lower.ends_with(".bak") or lower.ends_with(".old") or lower == "kutukafalar.pck":
+					var full_path = ProjectSettings.globalize_path("user://" + file_name)
+					print("[AutoUpdater] Kalıntı temizlendi (user): ", file_name)
+					DirAccess.remove_absolute(full_path)
+			file_name = user_dir_access.get_next()
+		user_dir_access.list_dir_end()
+	
+	# 2. Oyun ana klasöründeki (base_dir) artık dosyaların temizlenmesi
+	var base_dir: String
+	if OS.has_feature("editor"):
+		base_dir = ProjectSettings.globalize_path("res://builds")
+	else:
+		base_dir = OS.get_executable_path().get_base_dir()
+	
+	if DirAccess.dir_exists_absolute(base_dir):
+		var base_dir_access = DirAccess.open(base_dir)
+		if base_dir_access:
+			base_dir_access.list_dir_begin()
+			var b_file = base_dir_access.get_next()
+			while b_file != "":
+				if not base_dir_access.current_is_dir():
+					var b_lower = b_file.to_lower()
+					if b_lower.ends_with(".tmp") or b_lower.ends_with(".old") or b_lower.ends_with(".bak") or b_lower == "apply_update.bat.bak" or b_lower == "update.bat":
+						var b_full = base_dir.path_join(b_file)
+						print("[AutoUpdater] Kalıntı temizlendi (base): ", b_file)
+						DirAccess.remove_absolute(b_full)
+				b_file = base_dir_access.get_next()
+			base_dir_access.list_dir_end()
+
 ## Yeni PCK dosyasını indir
 func start_download(pck_url: String = "") -> void:
 	if is_downloading:
@@ -155,9 +191,8 @@ func start_download(pck_url: String = "") -> void:
 		update_failed.emit("İndirilecek dosya bağlantısı bulunamadı.")
 		return
 	
-	# Eski indirme artığı varsa temizle
-	if FileAccess.file_exists(temp_pck_path):
-		DirAccess.remove_absolute(temp_pck_path)
+	# İndirme öncesi kalıntıları temizle
+	_deep_cleanup_residuals()
 	
 	is_downloading = true
 	download_http.download_file = temp_pck_path
@@ -207,6 +242,7 @@ func apply_update_and_restart() -> void:
 	var exe_name = OS.get_executable_path().get_file()
 	
 	var user_permanent_pck = ProjectSettings.globalize_path("user://KutuKafalar.pck")
+	var user_dir_path = ProjectSettings.globalize_path("user://").replace("/", "\\").trim_suffix("\\")
 	
 	# Eğer editördeysek, doğrudan çalışma zamanında paketi yükle
 	if OS.has_feature("editor"):
@@ -224,16 +260,31 @@ set /a tries=0
 :wait_loop
 timeout /t 1 /nobreak >nul
 set /a tries+=1
+
+:: Güncelleme öncesi eski sürüm kalıntılarını ve geçici dosyaları temizle
+if exist "%~dp0KutuKafalar.pck.old" del /f /q "%~dp0KutuKafalar.pck.old" >nul 2>&1
+if exist "%~dp0KutuKafalar.pck.bak" del /f /q "%~dp0KutuKafalar.pck.bak" >nul 2>&1
+if exist "%~dp0KutuKafalar.pck.tmp" del /f /q "%~dp0KutuKafalar.pck.tmp" >nul 2>&1
+if exist "%~dp0*.tmp" del /f /q "%~dp0*.tmp" >nul 2>&1
+if exist "{USER_DIR}\\KutuKafalar.pck" del /f /q "{USER_DIR}\\KutuKafalar.pck" >nul 2>&1
+if exist "{USER_DIR}\\*.tmp" del /f /q "{USER_DIR}\\*.tmp" >nul 2>&1
+if exist "{USER_DIR}\\*.old" del /f /q "{USER_DIR}\\*.old" >nul 2>&1
+if exist "{USER_DIR}\\*.bak" del /f /q "{USER_DIR}\\*.bak" >nul 2>&1
+
 copy /y "{TEMP_PCK}" "%~dp0KutuKafalar.pck" >nul 2>&1
 if not errorlevel 1 goto copy_done
 if %tries% lss 20 goto wait_loop
 
 :copy_done
+:: Temizlik: Geçici indirme dosyalarını ve kalıntıları sil
 if exist "{USER_PCK}" del /f /q "{USER_PCK}" >nul 2>&1
 if exist "{TEMP_PCK}" del /f /q "{TEMP_PCK}" >nul 2>&1
+if exist "{USER_DIR}\\*.tmp" del /f /q "{USER_DIR}\\*.tmp" >nul 2>&1
+if exist "{USER_DIR}\\*.new" del /f /q "{USER_DIR}\\*.new" >nul 2>&1
+if exist "%~dp0*.tmp" del /f /q "%~dp0*.tmp" >nul 2>&1
 start "" "%~dp0{EXE_NAME}"
 del "%~f0"
-""".replace("{TEMP_PCK}", temp_pck_path.replace("/", "\\")).replace("{USER_PCK}", user_permanent_pck.replace("/", "\\")).replace("{EXE_NAME}", exe_name)
+""".replace("{TEMP_PCK}", temp_pck_path.replace("/", "\\")).replace("{USER_PCK}", user_permanent_pck.replace("/", "\\")).replace("{USER_DIR}", user_dir_path).replace("{EXE_NAME}", exe_name)
 	
 	var bat_file = FileAccess.open(bat_path, FileAccess.WRITE)
 	if bat_file:

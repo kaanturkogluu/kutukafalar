@@ -140,3 +140,13 @@ res://
   - Always download update PCK files to `user://` (`OS.get_user_data_dir()`) to avoid program directory permission errors.
   - `apply_update.bat` must implement a retry loop (`:wait_loop` up to 20 seconds) before replacing `KutuKafalar.pck` to prevent Windows file-sharing lock violations (`Error 32`).art.
   - When teammates reach the elevator, dead players are revived via `revive.rpc()`, resetting camera transforms and collisions cleanly.
+
+## 11. Level Progression & Thematic Environment Architecture
+- **11 Chapters & 99 Levels Data Model (`LevelData`):**
+  - Mapped directly from `leveller`: Chapters 1-11 each hold 9 levels (e.g. Chapter 1: Level 1–9 "Terk Edilmiş Mahalle", Chapter 2: Level 10–18 "Şehir Merkezi").
+  - Final level of each chapter (e.g. Level 9 Wave 3) triggers the Chapter Boss (`BossZombie` / "Mahalle Şefi" 1200 HP).
+- **Cul-de-sac Abandoned Neighborhood Design:**
+  - 52x52m circular asphalt roadway with central park island roundabout, houses, storefronts, boarded windows, streetlights (`OmniLight3D`), dumpsters, and twilight procedural sky.
+- **Destructible Car Wrecks (`CarWreck.gd` & `car_wreck.tscn`):**
+  - Group `barrels` & `destructibles` so hitscan, rockets, and barrel explosions all damage it.
+  - 150 HP health pool with red warning light countdown before 7.5m radius 350-damage explosion, leaving behind a permanent burnt metal cover.

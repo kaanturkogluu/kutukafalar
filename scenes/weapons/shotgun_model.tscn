@@ -1,0 +1,159 @@
+[gd_scene load_steps=17 format=3 uid="uid://shotgun_model_01"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fde_frame"]
+albedo_color = Color(0.72, 0.58, 0.42, 1)
+roughness = 0.65
+metallic = 0.05
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fde_stipple"]
+albedo_color = Color(0.58, 0.46, 0.32, 1)
+roughness = 0.88
+metallic = 0.02
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_black_metal"]
+albedo_color = Color(0.14, 0.15, 0.16, 1)
+roughness = 0.35
+metallic = 0.7
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dark_metal"]
+albedo_color = Color(0.09, 0.09, 0.1, 1)
+roughness = 0.28
+metallic = 0.85
+
+[sub_resource type="BoxMesh" id="BoxMesh_receiver"]
+material = SubResource("StandardMaterial3D_black_metal")
+size = Vector3(0.052, 0.068, 0.24)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ejection"]
+material = SubResource("StandardMaterial3D_dark_metal")
+size = Vector3(0.028, 0.032, 0.075)
+
+[sub_resource type="BoxMesh" id="BoxMesh_stock"]
+material = SubResource("StandardMaterial3D_fde_frame")
+size = Vector3(0.046, 0.105, 0.26)
+
+[sub_resource type="BoxMesh" id="BoxMesh_buttpad"]
+material = SubResource("StandardMaterial3D_dark_metal")
+size = Vector3(0.050, 0.115, 0.022)
+
+[sub_resource type="BoxMesh" id="BoxMesh_grip"]
+material = SubResource("StandardMaterial3D_fde_frame")
+size = Vector3(0.046, 0.12, 0.062)
+
+[sub_resource type="BoxMesh" id="BoxMesh_grip_panel"]
+material = SubResource("StandardMaterial3D_fde_stipple")
+size = Vector3(0.004, 0.085, 0.045)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tg"]
+material = SubResource("StandardMaterial3D_black_metal")
+size = Vector3(0.02, 0.008, 0.06)
+
+[sub_resource type="BoxMesh" id="BoxMesh_trigger"]
+material = SubResource("StandardMaterial3D_dark_metal")
+size = Vector3(0.01, 0.028, 0.014)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_barrel"]
+material = SubResource("StandardMaterial3D_black_metal")
+top_radius = 0.014
+bottom_radius = 0.014
+height = 0.62
+radial_segments = 14
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_mag_tube"]
+material = SubResource("StandardMaterial3D_black_metal")
+top_radius = 0.013
+bottom_radius = 0.013
+height = 0.52
+radial_segments = 14
+
+[sub_resource type="BoxMesh" id="BoxMesh_clamp"]
+material = SubResource("StandardMaterial3D_dark_metal")
+size = Vector3(0.036, 0.056, 0.018)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pump"]
+material = SubResource("StandardMaterial3D_fde_stipple")
+size = Vector3(0.056, 0.052, 0.19)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pump_rib"]
+material = SubResource("StandardMaterial3D_fde_frame")
+size = Vector3(0.058, 0.054, 0.014)
+
+[node name="Shotgun" type="Node3D"]
+
+[node name="Frame" type="Node3D" parent="."]
+
+[node name="Receiver" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, -0.02)
+mesh = SubResource("BoxMesh_receiver")
+
+[node name="EjectionPort" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.018, 0.02, 0.01)
+mesh = SubResource("BoxMesh_ejection")
+
+[node name="Stock" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 0.9976, 0.0698, 0, -0.0698, 0.9976, 0, -0.02, 0.22)
+mesh = SubResource("BoxMesh_stock")
+
+[node name="StockButtpad" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 0.9976, 0.0698, 0, -0.0698, 0.9976, 0, -0.02, 0.35)
+mesh = SubResource("BoxMesh_buttpad")
+
+[node name="Grip" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 0.9659, -0.2588, 0, 0.2588, 0.9659, 0, -0.08, 0.075)
+mesh = SubResource("BoxMesh_grip")
+
+[node name="GripPanelL" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 0.9659, -0.2588, 0, 0.2588, 0.9659, -0.024, -0.08, 0.075)
+mesh = SubResource("BoxMesh_grip_panel")
+
+[node name="GripPanelR" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 0.9659, -0.2588, 0, 0.2588, 0.9659, 0.024, -0.08, 0.075)
+mesh = SubResource("BoxMesh_grip_panel")
+
+[node name="TriggerGuard" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.035, 0.02)
+mesh = SubResource("BoxMesh_tg")
+
+[node name="Trigger" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 0.9659, 0.2588, 0, -0.2588, 0.9659, 0, -0.025, 0.022)
+mesh = SubResource("BoxMesh_trigger")
+
+[node name="Barrel" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0.028, -0.34)
+mesh = SubResource("CylinderMesh_barrel")
+
+[node name="MagTube" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, -0.012, -0.29)
+mesh = SubResource("CylinderMesh_mag_tube")
+
+[node name="BarrelClamp" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.008, -0.52)
+mesh = SubResource("BoxMesh_clamp")
+
+[node name="PumpHandle" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.012, -0.22)
+
+[node name="PumpMesh" type="MeshInstance3D" parent="PumpHandle"]
+mesh = SubResource("BoxMesh_pump")
+
+[node name="Rib1" type="MeshInstance3D" parent="PumpHandle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.06)
+mesh = SubResource("BoxMesh_pump_rib")
+
+[node name="Rib2" type="MeshInstance3D" parent="PumpHandle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.02)
+mesh = SubResource("BoxMesh_pump_rib")
+
+[node name="Rib3" type="MeshInstance3D" parent="PumpHandle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.02)
+mesh = SubResource("BoxMesh_pump_rib")
+
+[node name="Rib4" type="MeshInstance3D" parent="PumpHandle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.06)
+mesh = SubResource("BoxMesh_pump_rib")
+
+[node name="MuzzleFlash" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.028, -0.66)
+light_color = Color(1, 0.85, 0.35, 1)
+light_energy = 3.5
+omni_range = 3.5
