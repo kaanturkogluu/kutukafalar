@@ -216,6 +216,16 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_btn_shop_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_shop_hover")
 text = "MAĞAZA VE GELİŞTİRME"
 
+[node name="CloseButton" type="Button" parent="Panel/VBoxContainer/HBoxActions"]
+visible = false
+custom_minimum_size = Vector2(180, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_shop")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_shop_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_shop_hover")
+text = "GERİ DÖN"
+
 [node name="StartLevelButton" type="Button" parent="Panel/VBoxContainer/HBoxActions"]
 custom_minimum_size = Vector2(270, 44)
 layout_mode = 2

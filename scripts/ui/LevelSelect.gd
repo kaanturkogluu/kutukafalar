@@ -3,6 +3,7 @@ extends CanvasLayer
 # --- Profesyonel Taktiksel Seviye Seçim Penceresi (11 Sektör & 99 Kat Desteği) ---
 signal level_start_requested(target_level: int)
 signal shop_requested
+signal map_chosen_for_lobby(floor_num: int)
 
 @onready var panel: Panel = $Panel
 @onready var header_box: VBoxContainer = $Panel/VBoxContainer/HeaderBox
@@ -13,7 +14,9 @@ signal shop_requested
 @onready var detail_desc: Label = $Panel/VBoxContainer/DetailCard/VBox/DetailDesc
 @onready var start_button: Button = $Panel/VBoxContainer/HBoxActions/StartLevelButton
 @onready var shop_button: Button = $Panel/VBoxContainer/HBoxActions/ShopButton
+@onready var close_button: Button = get_node_or_null("Panel/VBoxContainer/HBoxActions/CloseButton")
 
+var is_in_lobby: bool = false
 var current_completed_level: int = 1
 var selected_level: int = 1
 var max_unlocked_level: int = 1
@@ -30,6 +33,8 @@ func _ready() -> void:
 		start_button.pressed.connect(_on_start_pressed)
 	if shop_button:
 		shop_button.pressed.connect(_on_shop_pressed)
+	if close_button:
+		close_button.pressed.connect(close_level_window)
 	_setup_sector_navigation()
 
 func _setup_sector_navigation() -> void:
@@ -64,7 +69,36 @@ func _on_next_sector_pressed() -> void:
 		current_viewed_sector += 1
 		_build_level_grid()
 
+func open_for_lobby(current_lvl: int, p_max_unlocked: int = -1) -> void:
+	is_in_lobby = true
+	if p_max_unlocked > 0:
+		max_unlocked_level = p_max_unlocked
+	else:
+		max_unlocked_level = SaveManager.get_highest_unlocked_floor()
+	
+	selected_level = clampi(current_lvl, 1, max_unlocked_level)
+	current_completed_level = max(0, max_unlocked_level - 1)
+	
+	var info = LevelData.get_chapter_for_level(selected_level)
+	current_viewed_sector = info.get("sector", 1)
+	
+	if shop_button:
+		shop_button.visible = false
+	if close_button:
+		close_button.visible = true
+	
+	visible = true
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	_build_level_grid()
+	_update_details()
+
 func open_level_window(completed_lvl: int, p_max_unlocked: int = -1) -> void:
+	is_in_lobby = false
+	if shop_button:
+		shop_button.visible = true
+	if close_button:
+		close_button.visible = false
+	
 	current_completed_level = completed_lvl
 	if p_max_unlocked > 0:
 		max_unlocked_level = p_max_unlocked
@@ -82,7 +116,10 @@ func open_level_window(completed_lvl: int, p_max_unlocked: int = -1) -> void:
 
 func close_level_window() -> void:
 	visible = false
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	if not is_in_lobby:
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	else:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func _build_level_grid() -> void:
 	if not grid_container:
@@ -200,14 +237,14 @@ func _style_button(btn: Button, lvl: int) -> void:
 		btn.add_theme_color_override("font_color", Color(0.7, 0.92, 0.76))
 		btn.add_theme_color_override("font_hover_color", Color(0.9, 1.0, 0.94))
 	elif is_locked:
-		normal_sb.bg_color = Color(0.05, 0.06, 0.08, 0.6)
-		normal_sb.border_color = Color(0.16, 0.18, 0.22, 0.4)
+		normal_sb.bg_color = Color(0.02, 0.025, 0.035, 0.85)
+		normal_sb.border_color = Color(0.09, 0.11, 0.14, 0.45)
 		normal_sb.border_width_left = 1
 		normal_sb.border_width_top = 1
 		normal_sb.border_width_right = 1
 		normal_sb.border_width_bottom = 1
 		hover_sb = normal_sb
-		btn.add_theme_color_override("font_disabled_color", Color(0.36, 0.4, 0.46))
+		btn.add_theme_color_override("font_disabled_color", Color(0.25, 0.28, 0.33))
 	else:
 		if is_boss:
 			normal_sb.bg_color = Color(0.18, 0.07, 0.08, 0.95)
@@ -258,7 +295,10 @@ func _update_details() -> void:
 			detail_desc.text = "Sektör %d: %s. Zombi sürüleri açık koridor ve aralıklardan hücum edecek. Hedef: Asansörü açıp bir sonraki kata tırmanın." % [info.get("sector", 1), str(info.get("theme", ""))]
 	
 	if start_button:
-		if multiplayer.is_server():
+		if is_in_lobby:
+			start_button.text = "BU HARİTAYI SEÇ [KAT %02d]" % selected_level
+			start_button.disabled = false
+		elif multiplayer.is_server():
 			start_button.text = "KAT %02d BAŞLAT" % selected_level
 			start_button.disabled = false
 		else:
@@ -266,8 +306,16 @@ func _update_details() -> void:
 			start_button.disabled = true
 
 func _on_start_pressed() -> void:
-	if multiplayer.is_server():
+	if is_in_lobby:
+		map_chosen_for_lobby.emit(selected_level)
+		close_level_window()
+	elif multiplayer.is_server():
 		level_start_requested.emit(selected_level)
 
 func _on_shop_pressed() -> void:
 	shop_requested.emit()
+
+func _input(event: InputEvent) -> void:
+	if visible and is_in_lobby and event.is_action_pressed("ui_cancel"):
+		close_level_window()
+		get_viewport().set_input_as_handled()

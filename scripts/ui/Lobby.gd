@@ -14,7 +14,9 @@ const GAME_SCENE_PATH: String = "res://scenes/levels/main_level.tscn"
 @onready var single_panel: PanelContainer = %SingleplayerPanel
 @onready var single_name_input: LineEdit = %SingleNameInput
 @onready var single_class_option: OptionButton = %SingleClassOption
-@onready var single_floor_option: OptionButton = %SingleFloorOption
+@onready var selected_map_title: Label = %SelectedMapTitle
+@onready var selected_map_sector: Label = %SelectedMapSector
+@onready var select_map_btn: Button = %SelectMapBtn
 @onready var single_resume_btn: Button = %SingleResumeBtn
 @onready var single_floor1_btn: Button = %SingleFloor1Btn
 @onready var floor_progress_label: Label = %FloorProgressLabel
@@ -72,14 +74,19 @@ const GAME_SCENE_PATH: String = "res://scenes/levels/main_level.tscn"
 @onready var sens_slider: HSlider = %SensSlider
 @onready var sens_label: Label = %SensLabel
 
-# 8. Sınıf Taktik Yetenek Kartı (Glassmorphism & HUD)
-@onready var class_skill_card: PanelContainer = %ClassSkillCard
+# 8. Sınıf Taktik Yetenek Kartı (Glassmorphism & HUD - 2 Ayrı Kutucuk)
+@onready var class_skills_container: VBoxContainer = %ClassSkillsContainer
 @onready var skill_class_title: Label = %SkillClassTitle
 @onready var skill_role_desc: Label = %SkillRoleDesc
+@onready var tactical_skill_box: PanelContainer = %TacticalSkillBox
 @onready var skill_tactical_title: Label = %SkillTacticalTitle
 @onready var skill_tactical_desc: Label = %SkillTacticalDesc
+@onready var ult_skill_box: PanelContainer = %UltSkillBox
 @onready var skill_ult_title: Label = %SkillUltTitle
 @onready var skill_ult_desc: Label = %SkillUltDesc
+
+# 9. Seviye / Harita Seçim Arayüzü
+@onready var level_select_ui: CanvasLayer = %LevelSelectUI
 
 const CLASS_SKILLS: Dictionary = {
 	"Pyromancer": {
@@ -151,12 +158,14 @@ func _ready() -> void:
 	# Tek Oyunculu Butonları
 	single_start_btn.pressed.connect(_on_single_start_pressed)
 	single_back_btn.pressed.connect(_show_main_nav)
-	if single_floor_option:
-		single_floor_option.item_selected.connect(_on_single_floor_selected)
+	if select_map_btn:
+		select_map_btn.pressed.connect(_on_select_map_pressed)
 	if single_resume_btn:
 		single_resume_btn.pressed.connect(_on_single_resume_pressed)
 	if single_floor1_btn:
 		single_floor1_btn.pressed.connect(_on_single_floor1_pressed)
+	if level_select_ui:
+		level_select_ui.map_chosen_for_lobby.connect(_on_map_chosen_from_level_select)
 	
 	# Çok Oyunculu Butonları
 	host_btn.pressed.connect(_on_host_pressed)
@@ -200,6 +209,22 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and squad_bg:
 		squad_bg.update_cursor(event.position, get_viewport_rect().size)
+		# 3D karakterin üzerinde miyiz kontrolü
+		if event.position.x > 468 and (single_panel.visible or multi_panel.visible or room_panel.visible):
+			var hover_char = squad_bg.get_character_under_mouse(event.position, get_viewport_rect().size)
+			if hover_char != "":
+				Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
+			else:
+				Input.set_default_cursor_shape(Input.CURSOR_ARROW)
+		else:
+			Input.set_default_cursor_shape(Input.CURSOR_ARROW)
+	
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if squad_bg and event.position.x > 468 and (single_panel.visible or multi_panel.visible or room_panel.visible):
+			var clicked_class = squad_bg.get_character_under_mouse(event.position, get_viewport_rect().size)
+			if clicked_class != "":
+				var idx = _get_index_from_class_code(clicked_class)
+				_on_class_selected(idx)
 		
 	if event.is_action_pressed("ui_cancel"):
 		if settings_overlay and settings_overlay.visible:
@@ -256,6 +281,14 @@ func _get_class_code_from_index(index: int) -> String:
 		3: return "Medic"
 	return "Pyromancer"
 
+func _get_index_from_class_code(code: String) -> int:
+	match code:
+		"Pyromancer": return 0
+		"Engineer": return 1
+		"Cryomancer": return 2
+		"Medic": return 3
+	return 0
+
 func _get_class_display_title(class_code: String) -> String:
 	match class_code:
 		"Pyromancer": return "ATEŞ UZMANI"
@@ -265,12 +298,19 @@ func _get_class_display_title(class_code: String) -> String:
 		_: return class_code.to_upper()
 
 func _update_class_skill_card(class_code: String) -> void:
-	if not class_skill_card:
+	if not class_skills_container:
 		return
 	
 	var data = CLASS_SKILLS.get(class_code, CLASS_SKILLS["Pyromancer"])
 	if skill_class_title:
 		skill_class_title.text = data["title"]
+		var title_color = Color(1.0, 0.85, 0.35)
+		match class_code:
+			"Pyromancer": title_color = Color(1.0, 0.82, 0.30)
+			"Engineer": title_color = Color(1.0, 0.95, 0.25)
+			"Cryomancer": title_color = Color(0.40, 0.95, 1.0)
+			"Medic": title_color = Color(0.35, 1.0, 0.65)
+		skill_class_title.add_theme_color_override("font_color", title_color)
 	if skill_role_desc:
 		skill_role_desc.text = data["role"]
 	if skill_tactical_title:
@@ -290,19 +330,25 @@ func _show_main_nav() -> void:
 	single_panel.visible = false
 	multi_panel.visible = false
 	room_panel.visible = false
+	if class_skills_container:
+		class_skills_container.visible = false
 
 func _show_single_panel() -> void:
 	main_nav.visible = false
 	single_panel.visible = true
 	multi_panel.visible = false
 	room_panel.visible = false
-	_refresh_singleplayer_floors()
+	if class_skills_container:
+		class_skills_container.visible = true
+	_update_selected_map_display()
 
 func _show_multi_panel() -> void:
 	main_nav.visible = false
 	single_panel.visible = false
 	multi_panel.visible = true
 	room_panel.visible = false
+	if class_skills_container:
+		class_skills_container.visible = true
 	status_label.text = ""
 
 func _show_room_panel() -> void:
@@ -310,6 +356,8 @@ func _show_room_panel() -> void:
 	single_panel.visible = false
 	multi_panel.visible = false
 	room_panel.visible = true
+	if class_skills_container:
+		class_skills_container.visible = true
 	is_local_ready = false
 	_update_room_buttons()
 
@@ -344,50 +392,53 @@ func _on_nav_quit_pressed() -> void:
 
 # --- Tek Oyunculu Başlatma ve Kat Seçimi ---
 
-func _refresh_singleplayer_floors() -> void:
-	if not single_floor_option:
-		return
-	single_floor_option.clear()
+func _update_selected_map_display() -> void:
+	var starting_floor = SaveManager.get_starting_floor()
 	var max_unlocked = SaveManager.get_highest_unlocked_floor()
 	var last_played = SaveManager.get_last_played_floor()
-	var current_start = SaveManager.get_starting_floor()
 	
-	for f in range(1, max_unlocked + 1):
-		var fname = LevelData.FLOOR_NAMES.get(f, "Kat " + str(f))
-		var is_boss = LevelData.is_boss_level(f)
-		var item_text = "KAT %02d: %s" % [f, fname]
+	if starting_floor > max_unlocked:
+		starting_floor = max_unlocked
+		SaveManager.set_starting_floor(starting_floor)
+	
+	var fname = LevelData.FLOOR_NAMES.get(starting_floor, "Kat " + str(starting_floor))
+	var is_boss = LevelData.is_boss_level(starting_floor)
+	var ch = LevelData.get_chapter_for_level(starting_floor)
+	
+	if selected_map_title:
+		selected_map_title.text = "KAT %02d: %s%s" % [starting_floor, fname.to_upper(), " [BOSS TEHLİKESİ]" if is_boss else ""]
 		if is_boss:
-			item_text += " [BOSS]"
-		if f == last_played:
-			item_text += " [SON KALINAN]"
-		single_floor_option.add_item(item_text, f)
-	
-	var select_idx = 0
-	for i in range(single_floor_option.item_count):
-		if single_floor_option.get_item_id(i) == current_start:
-			select_idx = i
-			break
-	single_floor_option.select(select_idx)
+			selected_map_title.add_theme_color_override("font_color", Color(1.0, 0.45, 0.45))
+		else:
+			selected_map_title.add_theme_color_override("font_color", Color(0.96, 0.96, 1.0))
+			
+	if selected_map_sector:
+		selected_map_sector.text = "SEKTÖR %d // %s" % [ch.get("sector", 1), str(ch.get("theme", "")).to_upper()]
 	
 	if single_resume_btn:
 		single_resume_btn.text = "[SON KALINAN: KAT %02d]" % last_played
 	
 	if floor_progress_label:
-		var sector_num = LevelData.get_chapter_for_level(max_unlocked).get("sector", 1)
-		floor_progress_label.text = "EN YÜKSEK AÇIK SEVİYE: KAT %02d / 99 (SEKTÖR %d)" % [max_unlocked, sector_num]
+		floor_progress_label.text = "EN YÜKSEK AÇIK SEVİYE: KAT %02d / 99" % max_unlocked
 
-func _on_single_floor_selected(index: int) -> void:
-	var floor_id = single_floor_option.get_item_id(index)
-	SaveManager.set_starting_floor(floor_id)
+func _on_select_map_pressed() -> void:
+	if level_select_ui:
+		var current_start = SaveManager.get_starting_floor()
+		var max_unlocked = SaveManager.get_highest_unlocked_floor()
+		level_select_ui.open_for_lobby(current_start, max_unlocked)
+
+func _on_map_chosen_from_level_select(floor_num: int) -> void:
+	SaveManager.set_starting_floor(floor_num)
+	_update_selected_map_display()
 
 func _on_single_resume_pressed() -> void:
 	var last_floor = SaveManager.get_last_played_floor()
 	SaveManager.set_starting_floor(last_floor)
-	_refresh_singleplayer_floors()
+	_update_selected_map_display()
 
 func _on_single_floor1_pressed() -> void:
 	SaveManager.set_starting_floor(1)
-	_refresh_singleplayer_floors()
+	_update_selected_map_display()
 
 func _on_single_start_pressed() -> void:
 	var player_name = single_name_input.text.strip_edges()
@@ -398,10 +449,6 @@ func _on_single_start_pressed() -> void:
 	NetworkManager.local_player_info["class"] = chosen_class
 	
 	var chosen_floor = SaveManager.get_starting_floor()
-	if single_floor_option and single_floor_option.selected >= 0:
-		chosen_floor = single_floor_option.get_selected_id()
-		SaveManager.set_starting_floor(chosen_floor)
-	
 	single_start_btn.disabled = true
 	single_start_btn.text = "KAT %02d BAŞLATILIYOR..." % chosen_floor
 	

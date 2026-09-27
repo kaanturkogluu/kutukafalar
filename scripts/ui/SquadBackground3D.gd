@@ -47,3 +47,34 @@ func update_cursor(mouse_pos: Vector2, viewport_size: Vector2) -> void:
 		var target_cam_y = camera_base_pos.y - norm.y * 0.10
 		camera.position.x = lerp(camera.position.x, target_cam_x, 0.05)
 		camera.position.y = lerp(camera.position.y, target_cam_y, 0.05)
+
+## Fare imlecinin altındaki 3D askeri tespit eder
+func get_character_under_mouse(mouse_pos: Vector2, vp_size: Vector2) -> String:
+	if not camera or vp_size.x <= 0 or vp_size.y <= 0:
+		return ""
+	
+	var scale_x = 1920.0 / vp_size.x
+	var scale_y = 1080.0 / vp_size.y
+	var scaled_pos = Vector2(mouse_pos.x * scale_x, mouse_pos.y * scale_y)
+	
+	var ray_origin = camera.project_ray_origin(scaled_pos)
+	var ray_dir = camera.project_ray_normal(scaled_pos)
+	
+	var closest_class = ""
+	var closest_dist = 999.0
+	
+	for c_key in characters:
+		var c_node: MenuCharacter = characters[c_key]
+		if not c_node:
+			continue
+		var char_center = c_node.global_position + Vector3(0, 0.75, 0)
+		var to_char = char_center - ray_origin
+		var proj = to_char.dot(ray_dir)
+		if proj > 0.0:
+			var point_on_ray = ray_origin + ray_dir * proj
+			var dist = point_on_ray.distance_to(char_center)
+			if dist < 0.65 and dist < closest_dist:
+				closest_dist = dist
+				closest_class = c_key
+				
+	return closest_class

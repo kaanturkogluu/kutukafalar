@@ -1,0 +1,203 @@
+[gd_scene load_steps=18 format=3 uid="uid://caged_zombie_01"]
+
+[ext_resource type="Script" path="res://scripts/ui/CagedZombie.gd" id="1_cage"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_steel"]
+albedo_color = Color(0.12, 0.14, 0.18, 1)
+metallic = 0.85
+roughness = 0.35
+
+[sub_resource type="BoxMesh" id="Mesh_cage_plate"]
+material = SubResource("Mat_steel")
+size = Vector3(1.4, 0.12, 1.4)
+
+[sub_resource type="BoxMesh" id="Mesh_cage_post"]
+material = SubResource("Mat_steel")
+size = Vector3(0.1, 1.85, 0.1)
+
+[sub_resource type="CylinderMesh" id="Mesh_cage_bar"]
+material = SubResource("Mat_steel")
+top_radius = 0.025
+bottom_radius = 0.025
+height = 1.85
+radial_segments = 12
+
+[sub_resource type="StandardMaterial3D" id="Mat_beacon"]
+albedo_color = Color(1, 0.35, 0.1, 1)
+emission_enabled = true
+emission = Color(1, 0.4, 0.15, 1)
+emission_energy_multiplier = 2.8
+
+[sub_resource type="CylinderMesh" id="Mesh_beacon"]
+material = SubResource("Mat_beacon")
+top_radius = 0.1
+bottom_radius = 0.14
+height = 0.22
+radial_segments = 12
+
+[sub_resource type="StandardMaterial3D" id="Mat_zombie_skin"]
+albedo_color = Color(0.42, 0.62, 0.38, 1)
+roughness = 0.85
+
+[sub_resource type="BoxMesh" id="Mesh_zombie_body"]
+material = SubResource("Mat_zombie_skin")
+size = Vector3(0.65, 0.85, 0.45)
+
+[sub_resource type="BoxMesh" id="Mesh_zombie_head"]
+material = SubResource("Mat_zombie_skin")
+size = Vector3(0.48, 0.48, 0.48)
+
+[sub_resource type="StandardMaterial3D" id="Mat_zombie_eyes"]
+albedo_color = Color(1, 0.1, 0.1, 1)
+emission_enabled = true
+emission = Color(1, 0.15, 0.15, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="BoxMesh" id="Mesh_zombie_eyes"]
+material = SubResource("Mat_zombie_eyes")
+size = Vector3(0.42, 0.1, 0.06)
+
+[sub_resource type="BoxMesh" id="Mesh_zombie_arm"]
+material = SubResource("Mat_zombie_skin")
+size = Vector3(0.15, 0.65, 0.16)
+
+[sub_resource type="StandardMaterial3D" id="Mat_toxic_green"]
+albedo_color = Color(0.18, 0.85, 0.25, 1)
+emission_enabled = true
+emission = Color(0.2, 0.95, 0.3, 1)
+emission_energy_multiplier = 2.2
+
+[sub_resource type="CylinderMesh" id="Mesh_toxic_barrel"]
+material = SubResource("Mat_toxic_green")
+top_radius = 0.28
+bottom_radius = 0.28
+height = 0.95
+radial_segments = 16
+
+[node name="CagedZombie" type="Node3D"]
+script = ExtResource("1_cage")
+
+[node name="Cage" type="Node3D" parent="."]
+
+[node name="FloorPlate" type="MeshInstance3D" parent="Cage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
+mesh = SubResource("Mesh_cage_plate")
+
+[node name="RoofPlate" type="MeshInstance3D" parent="Cage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.95, 0)
+mesh = SubResource("Mesh_cage_plate")
+
+[node name="Post1" type="MeshInstance3D" parent="Cage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62, 1.0, -0.62)
+mesh = SubResource("Mesh_cage_post")
+
+[node name="Post2" type="MeshInstance3D" parent="Cage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62, 1.0, -0.62)
+mesh = SubResource("Mesh_cage_post")
+
+[node name="Post3" type="MeshInstance3D" parent="Cage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62, 1.0, 0.62)
+mesh = SubResource("Mesh_cage_post")
+
+[node name="Post4" type="MeshInstance3D" parent="Cage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62, 1.0, 0.62)
+mesh = SubResource("Mesh_cage_post")
+
+[node name="BarFront1" type="MeshInstance3D" parent="Cage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.38, 1.0, 0.62)
+mesh = SubResource("Mesh_cage_bar")
+
+[node name="BarFront2" type="MeshInstance3D" parent="Cage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 1.0, 0.62)
+mesh = SubResource("Mesh_cage_bar")
+
+[node name="BarFront3" type="MeshInstance3D" parent="Cage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 1.0, 0.62)
+mesh = SubResource("Mesh_cage_bar")
+
+[node name="BarFront4" type="MeshInstance3D" parent="Cage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.38, 1.0, 0.62)
+mesh = SubResource("Mesh_cage_bar")
+
+[node name="BarBack1" type="MeshInstance3D" parent="Cage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 1.0, -0.62)
+mesh = SubResource("Mesh_cage_bar")
+
+[node name="BarBack2" type="MeshInstance3D" parent="Cage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, 1.0, -0.62)
+mesh = SubResource("Mesh_cage_bar")
+
+[node name="BarSideL1" type="MeshInstance3D" parent="Cage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62, 1.0, -0.25)
+mesh = SubResource("Mesh_cage_bar")
+
+[node name="BarSideL2" type="MeshInstance3D" parent="Cage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62, 1.0, 0.25)
+mesh = SubResource("Mesh_cage_bar")
+
+[node name="BarSideR1" type="MeshInstance3D" parent="Cage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62, 1.0, -0.25)
+mesh = SubResource("Mesh_cage_bar")
+
+[node name="BarSideR2" type="MeshInstance3D" parent="Cage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62, 1.0, 0.25)
+mesh = SubResource("Mesh_cage_bar")
+
+[node name="BeaconDome" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.12, 0)
+mesh = SubResource("Mesh_beacon")
+
+[node name="BeaconLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+light_color = Color(1, 0.42, 0.15, 1)
+light_energy = 1.6
+omni_range = 3.8
+
+[node name="WarningSign" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.95, 0.65)
+text = "[ DİKKAT: CANLI TEST DENEĞİ // TİP-Z ]"
+font_size = 18
+outline_size = 6
+outline_modulate = Color(0, 0, 0, 0.95)
+modulate = Color(1, 0.65, 0.2, 1)
+
+[node name="Zombie" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0)
+
+[node name="Body" type="MeshInstance3D" parent="Zombie"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.48, 0)
+mesh = SubResource("Mesh_zombie_body")
+
+[node name="Head" type="Node3D" parent="Zombie"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+
+[node name="HeadMesh" type="MeshInstance3D" parent="Zombie/Head"]
+mesh = SubResource("Mesh_zombie_head")
+
+[node name="Eyes" type="MeshInstance3D" parent="Zombie/Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0.25)
+mesh = SubResource("Mesh_zombie_eyes")
+
+[node name="ArmL" type="Node3D" parent="Zombie"]
+transform = Transform3D(0.9659, 0, 0.2588, 0, 1, 0, -0.2588, 0, 0.9659, -0.38, 0.72, 0.08)
+
+[node name="Mesh" type="MeshInstance3D" parent="Zombie/ArmL"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+mesh = SubResource("Mesh_zombie_arm")
+
+[node name="ArmR" type="Node3D" parent="Zombie"]
+transform = Transform3D(0.9659, 0, -0.2588, 0, 1, 0, 0.2588, 0, 0.9659, 0.38, 0.72, 0.08)
+
+[node name="Mesh" type="MeshInstance3D" parent="Zombie/ArmR"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+mesh = SubResource("Mesh_zombie_arm")
+
+[node name="ToxicBarrel" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9659, 0, 0.2588, 0, 1, 0, -0.2588, 0, 0.9659, 0.95, 0.48, 0.2)
+mesh = SubResource("Mesh_toxic_barrel")
+
+[node name="ToxicLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.95, 0.8, 0.2)
+light_color = Color(0.2, 1, 0.35, 1)
+light_energy = 1.4
+omni_range = 2.4

@@ -1,6 +1,6 @@
 {
-    "version":  "v1.3.12",
+    "version":  "v1.3.13",
     "download_url":  "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-    "pck_size":  695700,
-    "changelog":  "- Sağ Alt Sınıf Taktik Yetenek Kartı (HUD): Tek ve çok oyunculu lobide seçilen sınıfa ait [E] Taktiksel ve [Q] Nihai (Ulti) yetenek açıklamaları, bekleme süreleri ve rolleri sağ alt köşede dinamik olarak gösteriliyor.\n- Glassmorphism Arayüz Tasarımı: Tüm lobi ve menü pencerelerine yarı saydam buzlu koyu cam efekti, yumuşak sınır parıltısı ve derinlik eklendi.\n- Ciddi Taktiksel Tipografi: Menüdeki tüm emojiler kaldırılarak profesyonel askeri köşeli stil getirildi."
+    "pck_size":  714680,
+    "changelog":  "- Canlı \u0026 Renkli 3D Menü Atmosferi: Hangar ortamına kafese kilitlenmiş, alarm lambalı ve parmaklıkları sarsan Tip-Z zombi test deneği eklendi.\n- Renkli Variller ve Silahlar: Yeşil radyoaktif parıldayan toksik variller, kriyojenik mavi variller, tezgah üstü silahlar ve askılık spot ışığı eklendi.\n- Ortalanmış Başlık Düzeni: \u0027KUTU KAFALAR\u0027 başlığı ve taktik alt yazısı sol üstten ekranın üst-ortasına taşınarak estetik denge sağlandı.\n- Yüksek Kontrastlı Sınıf İsimleri: 3D karakter etiketleri ve arayüz sınıf başlıkları arka plandan kolayca ayırt edilebilen parlak neon renklere ve 12px derin siyah kontura kavuşturuldu."
 }

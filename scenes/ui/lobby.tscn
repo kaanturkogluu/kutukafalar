@@ -1,7 +1,8 @@
-[gd_scene load_steps=11 format=3 uid="uid://c51wup2e3a1k8"]
+[gd_scene load_steps=14 format=3 uid="uid://c51wup2e3a1k8"]
 
 [ext_resource type="Script" path="res://scripts/ui/Lobby.gd" id="1_lobby"]
 [ext_resource type="PackedScene" uid="uid://squad_bg_3d_01" path="res://scenes/ui/squad_background_3d.tscn" id="2_squad_bg"]
+[ext_resource type="PackedScene" uid="uid://level_select_scene_01" path="res://scenes/ui/level_select.tscn" id="3_lvlselect"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glass"]
 bg_color = Color(0.035, 0.045, 0.07, 0.76)
@@ -17,8 +18,8 @@ corner_radius_bottom_right = 10
 shadow_color = Color(0, 0, 0, 0.6)
 shadow_size = 22
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glass_skill"]
-bg_color = Color(0.03, 0.04, 0.065, 0.80)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glass_tactical"]
+bg_color = Color(0.03, 0.04, 0.065, 0.82)
 border_width_left = 3
 border_width_top = 1
 border_width_right = 1
@@ -28,8 +29,56 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.65)
-shadow_size = 22
+shadow_color = Color(0, 0, 0, 0.55)
+shadow_size = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glass_ult"]
+bg_color = Color(0.03, 0.04, 0.065, 0.82)
+border_width_left = 3
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.8, 1, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.55)
+shadow_size = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_map_card"]
+bg_color = Color(0.04, 0.055, 0.08, 0.88)
+border_width_left = 2
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.95, 0.68, 0.18, 0.7)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_start_primary"]
+bg_color = Color(0.10, 0.22, 0.14, 0.85)
+border_width_left = 3
+border_color = Color(0.3, 0.85, 0.45, 0.95)
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+content_margin_left = 20.0
+content_margin_top = 12.0
+content_margin_right = 20.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_start_primary_hover"]
+bg_color = Color(0.14, 0.30, 0.18, 0.95)
+border_width_left = 5
+border_color = Color(0.4, 0.95, 0.55, 1)
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+content_margin_left = 24.0
+content_margin_top = 12.0
+content_margin_right = 20.0
+content_margin_bottom = 12.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
 bg_color = Color(0.06, 0.08, 0.12, 0.65)
@@ -80,7 +129,7 @@ content_margin_right = 14.0
 
 [sub_resource type="Gradient" id="Gradient_menu_bg"]
 offsets = PackedFloat32Array(0, 0.35, 0.7, 1)
-colors = PackedColorArray(0.015, 0.02, 0.035, 0.88, 0.015, 0.02, 0.035, 0.65, 0.01, 0.015, 0.025, 0.2, 0.01, 0.01, 0.02, 0)
+colors = PackedColorArray(0.015, 0.02, 0.035, 0.52, 0.015, 0.02, 0.035, 0.28, 0.01, 0.015, 0.025, 0.06, 0.01, 0.01, 0.02, 0)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_menu_bg"]
 gradient = SubResource("Gradient_menu_bg")
@@ -125,11 +174,15 @@ texture = SubResource("GradientTexture2D_menu_bg")
 expand_mode = 1
 
 [node name="HeaderContainer" type="MarginContainer" parent="."]
-layout_mode = 0
-offset_left = 48.0
-offset_top = 28.0
-offset_right = 440.0
-offset_bottom = 92.0
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -340.0
+offset_top = 22.0
+offset_right = 340.0
+offset_bottom = 90.0
+grow_horizontal = 2
 
 [node name="VBox" type="VBoxContainer" parent="HeaderContainer"]
 layout_mode = 2
@@ -137,22 +190,33 @@ theme_override_constants/separation = 2
 
 [node name="TitleLabel" type="Label" parent="HeaderContainer/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.96, 0.96, 0.98, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_y = 2
+theme_override_constants/shadow_outline_size = 4
+theme_override_font_sizes/font_size = 36
 text = "KUTU KAFALAR"
+horizontal_alignment = 1
 
 [node name="SubtitleLabel" type="Label" parent="HeaderContainer/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.55, 0.65, 0.78, 1)
-theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(1, 0.76, 0.28, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.75)
+theme_override_constants/shadow_offset_y = 1
+theme_override_constants/shadow_outline_size = 2
+theme_override_font_sizes/font_size = 12
 text = "HORDE TACTICAL SURVIVAL"
+horizontal_alignment = 1
 
 [node name="MenuContainer" type="MarginContainer" parent="."]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
 offset_left = 48.0
-offset_top = 104.0
-offset_right = 460.0
-offset_bottom = 530.0
+offset_top = 100.0
+offset_right = 468.0
+offset_bottom = -46.0
+grow_vertical = 2
 
 [node name="MainNavigation" type="VBoxContainer" parent="MenuContainer"]
 unique_name_in_owner = true
@@ -214,8 +278,9 @@ text = "ÇIKIŞ"
 [node name="SingleplayerPanel" type="PanelContainer" parent="MenuContainer"]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(400, 480)
+custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
+size_flags_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_glass")
 
 [node name="Margin" type="MarginContainer" parent="MenuContainer/SingleplayerPanel"]
@@ -262,17 +327,58 @@ text = "SINIF SEÇİMİ"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 38)
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 
 [node name="FloorLabel" type="Label" parent="MenuContainer/SingleplayerPanel/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.72, 0.25, 1)
 theme_override_font_sizes/font_size = 12
-text = "BAŞLANGIÇ KATI (Kaldığın Yer)"
+text = "GÖREV HARİTASI"
 
-[node name="SingleFloorOption" type="OptionButton" parent="MenuContainer/SingleplayerPanel/Margin/VBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+[node name="SelectedMapCard" type="PanelContainer" parent="MenuContainer/SingleplayerPanel/Margin/VBox"]
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_map_card")
+
+[node name="Margin" type="MarginContainer" parent="MenuContainer/SingleplayerPanel/Margin/VBox/SelectedMapCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="MenuContainer/SingleplayerPanel/Margin/VBox/SelectedMapCard/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="SelectedMapTitle" type="Label" parent="MenuContainer/SingleplayerPanel/Margin/VBox/SelectedMapCard/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.96, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "KAT 01: SOKAK GİRİŞİ"
+
+[node name="SelectedMapSector" type="Label" parent="MenuContainer/SingleplayerPanel/Margin/VBox/SelectedMapCard/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.72, 0.85, 1)
+theme_override_font_sizes/font_size = 11
+text = "SEKTÖR 1 // TERK EDİLMİŞ MAHALLE"
+
+[node name="SelectMapBtn" type="Button" parent="MenuContainer/SingleplayerPanel/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.9, 0.7, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "HARİTA SEÇ"
 
 [node name="QuickFloorButtons" type="HBoxContainer" parent="MenuContainer/SingleplayerPanel/Margin/VBox"]
 layout_mode = 2
@@ -307,12 +413,12 @@ size_flags_vertical = 3
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.95, 1, 0.95, 1)
 theme_override_font_sizes/font_size = 15
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-text = "OYUNA BAŞLA"
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_start_primary")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_start_primary_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_start_primary_hover")
+text = "GÖREVE BAŞLA"
 
 [node name="SingleBackBtn" type="Button" parent="MenuContainer/SingleplayerPanel/Margin/VBox"]
 unique_name_in_owner = true
@@ -374,6 +480,12 @@ text = "SINIF SEÇİMİ"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 
 [node name="HostBtn" type="Button" parent="MenuContainer/MultiplayerPanel/Margin/VBox"]
 unique_name_in_owner = true
@@ -515,6 +627,12 @@ text = "SINIF:"
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 
 [node name="HSeparator3" type="HSeparator" parent="MenuContainer/RoomPanel/Margin/VBox"]
 layout_mode = 2
@@ -574,8 +692,9 @@ theme_override_font_sizes/font_size = 13
 text = "AYRIL"
 flat = true
 
-[node name="ClassSkillCard" type="PanelContainer" parent="."]
+[node name="ClassSkillsContainer" type="VBoxContainer" parent="."]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -583,36 +702,33 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -448.0
-offset_top = -296.0
+offset_top = -288.0
 offset_right = -28.0
-offset_bottom = -46.0
+offset_bottom = -50.0
 grow_horizontal = 0
 grow_vertical = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_glass_skill")
+theme_override_constants/separation = 10
 
-[node name="Margin" type="MarginContainer" parent="ClassSkillCard"]
+[node name="HeaderCard" type="MarginContainer" parent="ClassSkillsContainer"]
 layout_mode = 2
-theme_override_constants/margin_left = 18
-theme_override_constants/margin_top = 14
-theme_override_constants/margin_right = 18
-theme_override_constants/margin_bottom = 14
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_right = 6
 
-[node name="VBox" type="VBoxContainer" parent="ClassSkillCard/Margin"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="HeaderHBox" type="HBoxContainer" parent="ClassSkillCard/Margin/VBox"]
+[node name="HeaderHBox" type="HBoxContainer" parent="ClassSkillsContainer/HeaderCard"]
 layout_mode = 2
 
-[node name="SkillClassTitle" type="Label" parent="ClassSkillCard/Margin/VBox/HeaderHBox"]
+[node name="SkillClassTitle" type="Label" parent="ClassSkillsContainer/HeaderCard/HeaderHBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.95, 0.72, 0.25, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(1, 0.88, 0.35, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_y = 1
+theme_override_constants/shadow_outline_size = 3
+theme_override_font_sizes/font_size = 16
 text = "ATEŞ UZMANI"
 
-[node name="SkillRoleDesc" type="Label" parent="ClassSkillCard/Margin/VBox/HeaderHBox"]
+[node name="SkillRoleDesc" type="Label" parent="ClassSkillsContainer/HeaderCard/HeaderHBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.65, 0.75, 0.88, 0.85)
@@ -620,40 +736,80 @@ theme_override_font_sizes/font_size = 11
 text = "[SALDIRI / ALAN HASARI]"
 horizontal_alignment = 2
 
-[node name="HSeparator" type="HSeparator" parent="ClassSkillCard/Margin/VBox"]
-layout_mode = 2
-
-[node name="SkillTacticalTitle" type="Label" parent="ClassSkillCard/Margin/VBox"]
+[node name="TacticalSkillBox" type="PanelContainer" parent="ClassSkillsContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.85, 0.92, 1, 1)
-theme_override_font_sizes/font_size = 12
-text = "[E] TAKTİK: ALEV DALGASI (14s)"
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_glass_tactical")
 
-[node name="SkillTacticalDesc" type="Label" parent="ClassSkillCard/Margin/VBox"]
+[node name="Margin" type="MarginContainer" parent="ClassSkillsContainer/TacticalSkillBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="ClassSkillsContainer/TacticalSkillBox/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="SkillTacticalBadge" type="Label" parent="ClassSkillsContainer/TacticalSkillBox/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.72, 0.25, 1)
+theme_override_font_sizes/font_size = 11
+text = "[E] TAKTİKSEL YETENEK"
+
+[node name="SkillTacticalTitle" type="Label" parent="ClassSkillsContainer/TacticalSkillBox/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.68, 0.75, 0.84, 1)
+theme_override_colors/font_color = Color(0.92, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "ALEV DALGASI (14s Bekleme)"
+
+[node name="SkillTacticalDesc" type="Label" parent="ClassSkillsContainer/TacticalSkillBox/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.68, 0.76, 0.86, 1)
 theme_override_font_sizes/font_size = 10
-text = "İleriye doğru yayılan alev dalgası gönderir. Zombileri yakarak yüksek hasar verir ve alan kontrolü sağlar."
+text = "İleriye doğru yayılan yakıcı alev dalgası savurur. Sürüleri ateşe verir ve yüksek alan hasarı uygular."
 autowrap_mode = 2
 
-[node name="HSeparator2" type="HSeparator" parent="ClassSkillCard/Margin/VBox"]
+[node name="UltSkillBox" type="PanelContainer" parent="ClassSkillsContainer"]
+unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_glass_ult")
 
-[node name="SkillUltTitle" type="Label" parent="ClassSkillCard/Margin/VBox"]
+[node name="Margin" type="MarginContainer" parent="ClassSkillsContainer/UltSkillBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="ClassSkillsContainer/UltSkillBox/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="SkillUltBadge" type="Label" parent="ClassSkillsContainer/UltSkillBox/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "[Q] NİHAİ YETENEK (ULTİ)"
+
+[node name="SkillUltTitle" type="Label" parent="ClassSkillsContainer/UltSkillBox/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.45, 0.35, 1)
-theme_override_font_sizes/font_size = 12
-text = "[Q] NİHAİ: KIYAMET METEORU"
+theme_override_font_sizes/font_size = 13
+text = "KIYAMET METEORU"
 
-[node name="SkillUltDesc" type="Label" parent="ClassSkillCard/Margin/VBox"]
+[node name="SkillUltDesc" type="Label" parent="ClassSkillsContainer/UltSkillBox/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.68, 0.75, 0.84, 1)
+theme_override_colors/font_color = Color(0.68, 0.76, 0.86, 1)
 theme_override_font_sizes/font_size = 10
-text = "Gökyüzünden devasa bir meteor indirir. Geniş alandaki tüm hedefleri yok eder ve yakıcı krater bırakır."
+text = "Hedef noktaya gökyüzünden alevli meteor düşürür. Etki alanındaki tüm zombileri anında yok eder."
 autowrap_mode = 2
 
 [node name="BottomRightInfo" type="MarginContainer" parent="."]
@@ -912,3 +1068,7 @@ custom_minimum_size = Vector2(100, 40)
 layout_mode = 2
 text = "DAHA SONRA"
 flat = true
+
+[node name="LevelSelectUI" parent="." instance=ExtResource("3_lvlselect")]
+unique_name_in_owner = true
+visible = false

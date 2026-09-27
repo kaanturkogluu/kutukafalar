@@ -27,7 +27,7 @@ const CLASS_CONFIG: Dictionary = {
 	"Pyromancer": {
 		"title": "ATEŞ UZMANI",
 		"body_color": Color(0.78, 0.22, 0.16),
-		"accent_color": Color(1.0, 0.40, 0.20),
+		"accent_color": Color(1.0, 0.82, 0.30),
 		"vest_color": Color(0.16, 0.14, 0.14),
 		"weapon_scene": "res://scenes/weapons/rocket_model.tscn",
 		"weapon_scale": Vector3(0.72, 0.72, 0.72),
@@ -37,7 +37,7 @@ const CLASS_CONFIG: Dictionary = {
 	"Engineer": {
 		"title": "DUVARCI",
 		"body_color": Color(0.90, 0.54, 0.12),
-		"accent_color": Color(1.0, 0.75, 0.15),
+		"accent_color": Color(1.0, 0.95, 0.25),
 		"vest_color": Color(0.22, 0.20, 0.18),
 		"weapon_scene": "res://scenes/weapons/bixi_model.tscn",
 		"weapon_scale": Vector3(0.68, 0.68, 0.68),
@@ -47,7 +47,7 @@ const CLASS_CONFIG: Dictionary = {
 	"Cryomancer": {
 		"title": "BUZ MUHAFIZI",
 		"body_color": Color(0.18, 0.62, 0.85),
-		"accent_color": Color(0.45, 0.85, 1.0),
+		"accent_color": Color(0.40, 0.95, 1.0),
 		"vest_color": Color(0.14, 0.18, 0.24),
 		"weapon_scene": "res://scenes/weapons/uzi_model.tscn",
 		"weapon_scale": Vector3(0.85, 0.85, 0.85),
@@ -57,7 +57,7 @@ const CLASS_CONFIG: Dictionary = {
 	"Medic": {
 		"title": "SIHHİYE",
 		"body_color": Color(0.18, 0.72, 0.38),
-		"accent_color": Color(0.28, 0.95, 0.65),
+		"accent_color": Color(0.35, 1.0, 0.65),
 		"vest_color": Color(0.14, 0.24, 0.16),
 		"weapon_scene": "res://scenes/weapons/shotgun_model.tscn",
 		"weapon_scale": Vector3(0.70, 0.70, 0.70),
@@ -108,10 +108,15 @@ func apply_class_visuals() -> void:
 		glass_mat.emission_energy_multiplier = 0.8
 		glasses_mesh.material_override = glass_mat
 	
-	# Başlık etiketi
+	# Başlık etiketi (Maksimum kontrast, keskin siyah dış çizgi ve parlak neon sınıf rengi)
 	if class_label:
-		class_label.text = cfg["title"]
+		class_label.text = "[ " + cfg["title"] + " ]"
 		class_label.modulate = cfg["accent_color"]
+		class_label.outline_size = 12
+		class_label.outline_modulate = Color(0.0, 0.0, 0.0, 1.0)
+		class_label.font_size = 30
+		class_label.no_depth_test = true
+		class_label.render_priority = 3
 	
 	# Silahın yüklenmesi
 	if weapon_mount:
@@ -135,9 +140,9 @@ func apply_class_visuals() -> void:
 func set_selected(selected: bool, instant: bool = false) -> void:
 	is_selected = selected
 	var target_z = base_position.z + (0.65 if is_selected else 0.0)
-	var target_scale = Vector3(1.06, 1.06, 1.06) if is_selected else Vector3(0.94, 0.94, 0.94)
-	var target_light_energy = 1.1 if is_selected else 0.35
-	var label_alpha = 1.0 if is_selected else 0.45
+	var target_scale = Vector3(1.08, 1.08, 1.08) if is_selected else Vector3(0.94, 0.94, 0.94)
+	var target_light_energy = 1.4 if is_selected else 0.35
+	var label_alpha = 1.0 if is_selected else 0.70
 	
 	if instant:
 		position.z = target_z
