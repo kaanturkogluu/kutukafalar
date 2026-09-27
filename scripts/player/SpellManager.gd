@@ -22,6 +22,10 @@ func setup(p_player: CharacterBody3D, p_class: String = "Pyromancer") -> void:
 	player = p_player
 	player_class = p_class
 	ultimate_charge = 0.0 # Sıfırdan başlar, hak edilmesi gerekir!
+	if player_class == "Engineer":
+		tactical_cooldown = 25.0
+	else:
+		tactical_cooldown = 14.0
 
 func _process(delta: float) -> void:
 	if not player or not player.is_multiplayer_authority():
@@ -36,8 +40,7 @@ func _process(delta: float) -> void:
 		if player and player.has_method("is_targeting_downed_teammate") and player.is_targeting_downed_teammate():
 			pass
 		elif player_class == "Engineer":
-			if player and player.has_method("try_place_wall"):
-				player.try_place_wall()
+			cast_engineer_turret()
 		else:
 			cast_tactical()
 
@@ -51,6 +54,66 @@ func _process(delta: float) -> void:
 func add_ultimate_charge(amount: float = 2.5) -> void:
 	var mult = ProgressionManager.get_stat("ult_charge_mult", 1.0)
 	ultimate_charge = clamp(ultimate_charge + (amount * mult), 0.0, MAX_ULTIMATE)
+
+## Mühendis: Otomatik Taret Yerleştirme (25 sn Cooldown, Sadece Düz Zemin)
+func cast_engineer_turret() -> void:
+	if tactical_timer > 0:
+		return
+	if not player or not is_instance_valid(player):
+		return
+	
+	# Zemin Kontrolü (Sadece düz zemine yerleşir!)
+	var space = player.get_world_3d().direct_space_state
+	var cam = player.get_node_or_null("Head/Camera3D")
+	var cam_forward = -cam.global_transform.basis.z if cam else -player.transform.basis.z
+	
+	# Kameradan ileri ve aşağıya doğru raycast
+	var from_pos = cam.global_position if cam else (player.global_position + Vector3.UP * 1.5)
+	var to_pos = from_pos + cam_forward * 6.0
+	
+	var ray = PhysicsRayQueryParameters3D.create(from_pos, to_pos, 1)
+	var hit = space.intersect_ray(ray)
+	
+	var valid_floor_point: Vector3 = Vector3.ZERO
+	var has_valid_ground: bool = false
+	
+	if hit and hit.collider:
+		if hit.normal.dot(Vector3.UP) >= 0.70:
+			valid_floor_point = hit.position
+			has_valid_ground = true
+	
+	# Eğer kamera doğrudan zemine çarpmadıysa, oyuncunun 2.2m önüne aşağı doğru bak
+	if not has_valid_ground:
+		var check_pos = player.global_position - player.transform.basis.z * 2.2 + Vector3.UP * 0.5
+		var down_ray = PhysicsRayQueryParameters3D.create(check_pos, check_pos + Vector3.DOWN * 2.5, 1)
+		var down_hit = space.intersect_ray(down_ray)
+		if down_hit and down_hit.collider and down_hit.normal.dot(Vector3.UP) >= 0.70:
+			valid_floor_point = down_hit.position
+			has_valid_ground = true
+
+	if not has_valid_ground:
+		SoundManager.play_sfx("empty")
+		if player.has_method("_show_weapon_notice"):
+			player._show_weapon_notice("⚠️ TARET SADECE DÜZ ZEMİNE YERLEŞTİRİLEBİLİR!")
+		return
+	
+	# Cooldown başlat (25 sn)
+	var cd_red = ProgressionManager.get_stat("tactical_cooldown_reduction", 0.0)
+	tactical_timer = max(6.0, tactical_cooldown - cd_red)
+	
+	SoundManager.play_sfx("switch")
+	if player.has_method("_show_weapon_notice"):
+		player._show_weapon_notice("🎯 OTOMATİK TARET KURULDU! (25 sn)")
+	
+	# Sunucuda taret oluştur
+	_request_spawn_turret.rpc_id(1, valid_floor_point, player.rotation.y)
+
+@rpc("any_peer", "call_local", "reliable")
+func _request_spawn_turret(pos: Vector3, rot_y: float) -> void:
+	if multiplayer.is_server():
+		var main_level = player.get_tree().current_scene
+		if main_level and main_level.has_method("spawn_turret"):
+			main_level.spawn_turret(pos, rot_y)
 
 ## [E] Taktiksel Büyü (Fırlatılabilir Proje Mekaniği)
 func cast_tactical() -> void:
@@ -70,9 +133,6 @@ func cast_tactical() -> void:
 		"Pyromancer":
 			# Büyücü: İleriye doğru genişleyen alev dalgası
 			_request_cast_spell.rpc_id(1, "fire_wave", throw_start, forward)
-		"Engineer":
-			# Mühendis: Fırlatılan Manyetik Vortex Bombası
-			_request_cast_spell.rpc_id(1, "thrown_vortex", throw_start, forward)
 		"Cryomancer":
 			# Buz Muhafızı: Fırlatılan Kriyojenik Dondurucu Bomba
 			_request_cast_spell.rpc_id(1, "thrown_frost", throw_start, forward)
@@ -105,8 +165,8 @@ func cast_ultimate() -> void:
 			# Buz Fırtınası / Glacial Blast: Hedef alana devasa buz sarkıtları patlatır
 			_request_cast_spell.rpc_id(1, "frost_storm", target_pos, Vector3.ZERO)
 		"Engineer":
-			# Graviton EMP Blast: Hedef alandaki tüm zombileri ezip patlatır
-			_request_cast_spell.rpc_id(1, "emp_blast", target_pos, Vector3.ZERO)
+			# Elektriksel Şok Dalgası: Zombileri fırlatır ve 1.2 sn sersemletir
+			_request_cast_spell.rpc_id(1, "shockwave", player.global_position, Vector3.ZERO)
 		_:
 			var meteor_start = target_pos + Vector3.UP * 22.0
 			_request_cast_spell.rpc_id(1, "meteor", meteor_start, Vector3.DOWN, target_pos.y)

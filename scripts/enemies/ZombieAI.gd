@@ -11,8 +11,10 @@ signal died(zombie_ref)
 
 var current_health: float
 var attack_timer: float = 0.0
-var target_player: CharacterBody3D = null
+var target_player: Node3D = null
 var is_frozen: bool = false
+var stun_timer: float = 0.0
+var is_stunned: bool = false
 var is_dead: bool = false
 var is_exploding: bool = false
 var slow_factor: float = 1.0
@@ -114,9 +116,13 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 		return
 
-	if is_frozen:
-		velocity.x = 0
-		velocity.z = 0
+	if is_frozen or stun_timer > 0:
+		if stun_timer > 0:
+			stun_timer -= delta
+			if stun_timer <= 0:
+				is_stunned = false
+		velocity.x = move_toward(velocity.x, 0, 10.0 * delta)
+		velocity.z = move_toward(velocity.z, 0, 10.0 * delta)
 		move_and_slide()
 		return
 
@@ -206,26 +212,34 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 func _find_closest_player() -> void:
+	var potential_targets: Array[Node3D] = []
 	var players = get_tree().get_nodes_in_group("players")
-	if players.is_empty():
+	for p in players:
+		if is_instance_valid(p) and not p.get("is_dead"):
+			potential_targets.append(p)
+	var turrets = get_tree().get_nodes_in_group("turrets")
+	for t in turrets:
+		if is_instance_valid(t) and not t.get("is_destroyed"):
+			potential_targets.append(t)
+
+	if potential_targets.is_empty():
 		target_player = null
 		return
 
 	var closest_dist = INF
-	var closest: CharacterBody3D = null
-	for p in players:
-		if is_instance_valid(p) and not p.get("is_dead"):
-			var d = global_position.distance_to(p.global_position)
-			if d < closest_dist:
-				closest_dist = d
-				closest = p
+	var closest: Node3D = null
+	for t in potential_targets:
+		var d = global_position.distance_to(t.global_position)
+		if d < closest_dist:
+			closest_dist = d
+			closest = t
 	target_player = closest
 
-func _attack_player(player: CharacterBody3D) -> void:
+func _attack_player(target: Node3D) -> void:
 	if is_dead:
 		return
-	if is_instance_valid(player) and player.has_method("take_damage") and not player.get("is_dead"):
-		player.take_damage(attack_damage)
+	if is_instance_valid(target) and target.has_method("take_damage") and not target.get("is_dead"):
+		target.take_damage(attack_damage)
 		_trigger_attack_anim.rpc()
 
 func _check_blocking_wall(dir: Vector3) -> Node:
@@ -434,6 +448,49 @@ func _apply_freeze(duration: float) -> void:
 func apply_slow(factor: float = 0.4, duration: float = 1.0) -> void:
 	slow_factor = min(slow_factor, factor)
 	slow_timer = max(slow_timer, duration)
+
+static var stun_mat: StandardMaterial3D = null
+
+static func _get_stun_mat() -> StandardMaterial3D:
+	if stun_mat == null:
+		stun_mat = StandardMaterial3D.new()
+		stun_mat.albedo_color = Color(1.0, 0.9, 0.25, 1.0)
+		stun_mat.emission_enabled = true
+		stun_mat.emission = Color(1.0, 0.85, 0.1, 1.0)
+		stun_mat.emission_energy_multiplier = 1.8
+	return stun_mat
+
+## Sersemletme Fonksiyonu (Mühendis Şok Dalgası: 1.2 sn Stun)
+func stun(duration: float = 1.2) -> void:
+	if not multiplayer.is_server():
+		return
+	_apply_stun.rpc(duration)
+
+@rpc("call_local", "reliable")
+func _apply_stun(duration: float) -> void:
+	stun_timer = max(stun_timer, duration)
+	is_stunned = true
+	var meshes = find_children("*", "MeshInstance3D")
+	var s_mat = _get_stun_mat()
+	for m in meshes:
+		m.material_override = s_mat
+	await get_tree().create_timer(duration).timeout
+	if is_instance_valid(self):
+		if stun_timer <= 0.05:
+			is_stunned = false
+			for m in meshes:
+				if is_instance_valid(m) and m.material_override == s_mat:
+					m.material_override = null
+
+## Geri İtme (Knockback) Fonksiyonu (Şok Dalgası)
+func apply_knockback(force: Vector3) -> void:
+	if not multiplayer.is_server():
+		return
+	_apply_knockback.rpc(force)
+
+@rpc("call_local", "reliable")
+func _apply_knockback(force: Vector3) -> void:
+	velocity += force
 
 # --- Zombi Türleri ve Boss Özelleştirme Mantığı ---
 

@@ -1,6 +1,6 @@
 {
-    "version":  "v1.3.14",
+    "version":  "v1.3.15",
     "download_url":  "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-    "pck_size":  754180,
-    "changelog":  "- Taktiksel Yetenek Ağacı (5 Sütunlu Matris): Silah, Hayat, Hareket, Kaos ve Taktik dallarından oluşan siber devre hatlı yeni yetenek arayüzü.\n- Oyun İçi Erişim: Yetenek ağacı artık oyun sırasında [K] tuşuyla, Duraklatma (ESC) menüsünden ve Asansör İkmal İstasyonu\u0027ndan anında açılabiliyor.\n- Biyo-Çekirdek Sistemi: Kat temizleme, sektör finalleri ve bölüm sonu boss avlarıyla yetenek puanı kazanımı entegre edildi.\n- Başlangıç ve Pencere İyileştirmeleri: Oyun penceresi ekranın tam ortasında açılacak şekilde optimize edildi, kamera ve lobi başlatma hataları giderildi."
+    "pck_size":  778832,
+    "changelog":  "- Mühendis (Engineer) Sınıfı Yetenek Revizyonu:\n  * [E] Taktiksel Yetenek: 25sn bekleme süreli, yalnızca düz zemine yerleşebilen kırılabilir Otomatik Taret (Sentry Turret).\n  * [Q] Nihai Yetenek (Ulti): 14m alandaki zombileri geriye fırlatan ve 1.2 saniye sersemleten (stun) Elektriksel Şok Dalgası.\n- Zombi Yapay Zekası: Sersemletme (stun) ve fiziksel geri savrulma (knockback) mekanikleri eklendi.\n- Skor Tablosu \u0026 Arayüz: Mühendis sınıfı için güncel bekleme sayaçları ve taktiksel bildirimler entegre edildi."
 }

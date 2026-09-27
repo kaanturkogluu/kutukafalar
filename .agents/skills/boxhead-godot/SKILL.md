@@ -211,7 +211,13 @@ res://
 - **Forward-Compatible Class Agnosticism:**
   - The 5 core branches apply universally to ALL classes.
   - Ability augments use a **Tag System** (`[AOE]`, `[ELEMENTAL]`, `[SUPPORT]`, `[PHYSICAL]`) on spells rather than hardcoded class names.
-  - Dedicated **Class Keystone Socket**: Classes dynamically plug in their unique apex traits into a standardized socket.
+- **Class Ability Profiles (`SpellManager.gd`):**
+  - **Mühendis (`Engineer`):**
+    - *Taktiksel Yetenek [E]:* **Otomatik Taret (Sentry Turret)** (25 sn Cooldown). Yalnızca normali yukarı bakan düz zemine yerleştirilebilir (`raycast normal.dot(UP) >= 0.70`). Kırılabilir yapıda (`220 HP`, `destructibles`), menzilindeki zombileri otomatik hedefler, dönerek mermi yağdırır ve zombi tehdidini üzerine çeker.
+    - *Nihai Yetenek (Ulti) [Q]:* **Elektriksel Şok Dalgası (Shockwave)**. Genişleyen enerji halkasıyla 14m alandaki zombileri geriye fırlatır (`dir * 22 + UP * 4.8`) ve **1.2 saniye sersemletme (stun)** uygular.
+  - **Ateş Uzmanı (`Pyromancer`):** Taktik: Alev Dalgası (Fire Wave). Ulti: Kıyamet Meteoru (Meteor).
+  - **Buz Muhafızı (`Cryomancer`):** Taktik: Kriyojenik Buz Bombası (Thrown Frost). Ulti: Buz Fırtınası (Frost Storm).
+  - **Sıhhiye (`Medic`):** Taktik: Şifa Şişesi (Thrown Heal). Ulti: Aşırı Yükleme / Toplu Diriltme (Medic Overdrive).
 - **Node ID & Respec Resilience:**
   - Nodes are saved as string IDs in an array (`unlocked_nodes = ["prec_01", "mob_dash"]`). Missing or new nodes never corrupt save files.
   - Full **Respec (Yetenek Sıfırlama)** refunds 100% of spent meta-currency to let players experiment with new builds freely.

@@ -7,6 +7,7 @@ const BOSS_SCENE_PATH: String = "res://scenes/enemies/boss_zombie.tscn"
 const BARREL_SCENE_PATH: String = "res://scenes/interactables/barrel_red.tscn"
 const PICKUP_SCENE_PATH: String = "res://scenes/interactables/pickup.tscn"
 const WALL_SCENE_PATH: String = "res://scenes/interactables/wall.tscn"
+const TURRET_SCENE_PATH: String = "res://scenes/interactables/sentry_turret.tscn"
 
 @onready var players_container: Node3D = $Players
 @onready var enemies_container: Node3D = $Enemies
@@ -31,6 +32,7 @@ var zombie_id_counter: int = 0
 var barrel_id_counter: int = 0
 var pickup_id_counter: int = 0
 var wall_id_counter: int = 0
+var turret_id_counter: int = 0
 var wave_loop_token: int = 0
 var initial_barrels_spawned: bool = false
 var peers_ready: Dictionary = {}
@@ -334,6 +336,26 @@ func sync_spawn_wall(w_name: String, pos: Vector3, rot_y: float) -> void:
 		wall.position = pos
 		wall.rotation.y = rot_y
 		container.add_child(wall, true)
+
+func spawn_turret(pos: Vector3, rot_y: float) -> void:
+	if not multiplayer.is_server():
+		return
+	turret_id_counter += 1
+	var t_name = "Turret_" + str(turret_id_counter)
+	sync_spawn_turret.rpc(t_name, pos, rot_y)
+
+@rpc("call_local", "reliable")
+func sync_spawn_turret(t_name: String, pos: Vector3, rot_y: float) -> void:
+	var container = _get_walls_container()
+	if container.has_node(t_name):
+		return
+	var turret_scene = load(TURRET_SCENE_PATH)
+	if turret_scene:
+		var turret = turret_scene.instantiate()
+		turret.name = t_name
+		turret.position = pos
+		turret.rotation.y = rot_y
+		container.add_child(turret, true)
 
 func spawn_pickup(p_type: String, p_amount: int, pos: Vector3) -> void:
 	if not multiplayer.is_server():
@@ -1068,6 +1090,11 @@ func sync_spawn_spell(spell_type: String, pos: Vector3, dir: Vector3, extra_y: f
 				spell_instance.position = pos
 		"frost_storm":
 			var scene = load("res://scenes/spells/frost_nova.tscn")
+			if scene:
+				spell_instance = scene.instantiate()
+				spell_instance.position = pos
+		"shockwave":
+			var scene = load("res://scenes/spells/shockwave.tscn")
 			if scene:
 				spell_instance = scene.instantiate()
 				spell_instance.position = pos

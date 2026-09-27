@@ -103,13 +103,13 @@ const CLASS_SKILLS: Dictionary = {
 		"ult_color": Color(1.0, 0.45, 0.35)
 	},
 	"Engineer": {
-		"title": "DUVARCI (MÜHENDİS)",
-		"role": "[SAVUNMA / ALAN KONTROLÜ]",
-		"tactical_title": "[E] TAKTİK: BARİKAT & VORTEX (14s Bekleme)",
-		"tactical_desc": "Zombi geçişlerini kesen taktik barikat kurar veya manyetik vortex bombasıyla düşmanları toplar.",
-		"ult_title": "[Q] NİHAİ: GRAVİTON EMP PATLAMASI",
-		"ult_desc": "Yerçekimsel şok dalgası yayarak hedef bölgedeki tüm zombi sürülerini ezer ve savurur.",
-		"ult_color": Color(0.35, 0.85, 1.0)
+		"title": "MÜHENDİS",
+		"role": "[SAVUNMA / TARET & ALAN KONTROLÜ]",
+		"tactical_title": "[E] TAKTİK: OTOMATİK TARET (25s Bekleme)",
+		"tactical_desc": "Düz zemine kırılabilir otomatik taret kurar. Menzilindeki zombilere otomatik mermi yağdırır.",
+		"ult_title": "[Q] NİHAİ: ELEKTRİKSEL ŞOK DALGASI",
+		"ult_desc": "Geniş bir alana şok dalgası yayarak zombileri geriye savurur ve 1.2 saniye sersemletir.",
+		"ult_color": Color(0.25, 0.85, 1.0)
 	},
 	"Cryomancer": {
 		"title": "BUZ MUHAFIZI",
@@ -250,7 +250,7 @@ func _input(event: InputEvent) -> void:
 func _setup_class_options() -> void:
 	var classes = [
 		{"name": "Ateş Uzmanı (Pyromancer)", "code": "Pyromancer", "id": 0},
-		{"name": "Duvarcı (Taktiksel Barikat)", "code": "Engineer", "id": 1},
+		{"name": "Mühendis (Otomatik Taret & Şok Dalgası)", "code": "Engineer", "id": 1},
 		{"name": "Buz Muhafızı (Kriyojenik)", "code": "Cryomancer", "id": 2},
 		{"name": "Sıhhiye (Şifa & Destek)", "code": "Medic", "id": 3}
 	]
@@ -301,7 +301,7 @@ func _get_index_from_class_code(code: String) -> int:
 func _get_class_display_title(class_code: String) -> String:
 	match class_code:
 		"Pyromancer": return "ATEŞ UZMANI"
-		"Engineer": return "DUVARCI"
+		"Engineer": return "MÜHENDİS"
 		"Cryomancer": return "BUZ MUHAFIZI"
 		"Medic": return "SIHHİYE"
 		_: return class_code.to_upper()

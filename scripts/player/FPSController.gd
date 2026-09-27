@@ -826,14 +826,33 @@ func _register_kill_streak() -> void:
 
 func _on_spell_updated(tac_pct: float, ult_pct: float) -> void:
 	if is_multiplayer_authority():
-		if player_class == "Engineer":
-			_update_wall_hud()
-		elif tactical_bar:
+		if tactical_bar:
 			tactical_bar.value = tac_pct * 100.0
+		var tac_label = hud.get_node_or_null("SpellContainer/TacticalBox/TacticalLabel")
+		if tac_label:
+			if player_class == "Engineer":
+				if tac_pct >= 1.0:
+					tac_label.text = "[E] TARET HAZIR"
+					tac_label.modulate = Color(0.4, 0.95, 1.0)
+				else:
+					var rem_cd = ceil(spell_manager.tactical_timer) if spell_manager else 0
+					tac_label.text = "[E] TARET (%ds)" % rem_cd
+					tac_label.modulate = Color(0.85, 0.65, 0.3)
+			else:
+				if tac_pct >= 1.0:
+					tac_label.text = "[E] TAKTİK HAZIR"
+					tac_label.modulate = Color(0.4, 0.95, 1.0)
+				else:
+					var rem_cd = ceil(spell_manager.tactical_timer) if spell_manager else 0
+					tac_label.text = "[E] TAKTİK (%ds)" % rem_cd
+					tac_label.modulate = Color(0.85, 0.65, 0.3)
 		if ult_bar and ult_label:
 			ult_bar.value = ult_pct
 			if ult_pct >= 100.0:
-				ult_label.text = "[Q] ULTİ HAZIR!"
+				if player_class == "Engineer":
+					ult_label.text = "[Q] ŞOK DALGASI HAZIR!"
+				else:
+					ult_label.text = "[Q] ULTİ HAZIR!"
 				ult_label.modulate = Color(1.0, 0.9, 0.2)
 			else:
 				ult_label.text = "[Q] ULTİ: %" + str(int(ult_pct))
@@ -1857,7 +1876,7 @@ func _refresh_scoreboard() -> void:
 		lbl_cls.custom_minimum_size = Vector2(110, 0)
 		match p.player_class:
 			"Pyromancer": lbl_cls.text = "BÜYÜCÜ"
-			"Engineer": lbl_cls.text = "DUVARCI"
+			"Engineer": lbl_cls.text = "MÜHENDİS"
 			"Cryomancer": lbl_cls.text = "BUZCU"
 			"Medic": lbl_cls.text = "SIHHİYE"
 			_: lbl_cls.text = p.player_class.to_upper()

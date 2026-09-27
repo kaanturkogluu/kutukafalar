@@ -1,0 +1,107 @@
+[gd_scene load_steps=12 format=3 uid="uid://sentry_turret_01"]
+
+[ext_resource type="Script" path="res://scripts/interactables/SentryTurret.gd" id="1_turret"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_turret"]
+size = Vector3(0.85, 1.05, 0.85)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_metal"]
+albedo_color = Color(0.22, 0.24, 0.26, 1)
+metallic = 0.8
+roughness = 0.4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_base"]
+material = SubResource("StandardMaterial3D_metal")
+top_radius = 0.38
+bottom_radius = 0.46
+height = 0.18
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_pole"]
+material = SubResource("StandardMaterial3D_metal")
+top_radius = 0.10
+bottom_radius = 0.12
+height = 0.45
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_head"]
+albedo_color = Color(0.32, 0.35, 0.40, 1)
+metallic = 0.6
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_head"]
+material = SubResource("StandardMaterial3D_head")
+size = Vector3(0.44, 0.32, 0.54)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sensor"]
+albedo_color = Color(0.2, 0.9, 0.4, 1)
+emission_enabled = true
+emission = Color(0.15, 0.85, 0.35, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_sensor"]
+material = SubResource("StandardMaterial3D_sensor")
+size = Vector3(0.28, 0.08, 0.05)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_barrel"]
+material = SubResource("StandardMaterial3D_metal")
+top_radius = 0.035
+bottom_radius = 0.035
+height = 0.45
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_turret"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath("Head:rotation")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+
+[node name="SentryTurret" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 7
+script = ExtResource("1_turret")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.525, 0)
+shape = SubResource("BoxShape3D_turret")
+
+[node name="BasePlate" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.09, 0)
+mesh = SubResource("CylinderMesh_base")
+
+[node name="Pillar" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+mesh = SubResource("CylinderMesh_pole")
+
+[node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+
+[node name="HeadMesh" type="MeshInstance3D" parent="Head"]
+mesh = SubResource("BoxMesh_head")
+
+[node name="Sensor" type="MeshInstance3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -0.27)
+mesh = SubResource("BoxMesh_sensor")
+
+[node name="Muzzle" type="Node3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.04, -0.27)
+
+[node name="BarrelL" type="MeshInstance3D" parent="Head/Muzzle"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -0.12, 0, -0.22)
+mesh = SubResource("CylinderMesh_barrel")
+
+[node name="BarrelR" type="MeshInstance3D" parent="Head/Muzzle"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0.12, 0, -0.22)
+mesh = SubResource("CylinderMesh_barrel")
+
+[node name="Flash" type="OmniLight3D" parent="Head/Muzzle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.48)
+visible = false
+light_color = Color(1, 0.85, 0.3, 1)
+light_energy = 3.5
+omni_range = 3.0
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_turret")
