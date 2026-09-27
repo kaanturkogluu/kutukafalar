@@ -186,15 +186,45 @@ res://
 ## 13. Skill Tree, Meta-Progression & Class Socket Architecture
 - **Dual-Economy Separation (Roguelite Core Rule):**
   - *In-Run Gold (Askeri Kredi):* Earned and spent strictly within the run/floor at the elevator shop (`Shop.gd`). Resets on death/run restart. Never conflicts with permanent meta-progression.
-  - *Meta-Currency (Biyo-Çekirdek / Bio-Cores):* Earned from Sector Boss kills, milestones, and clearing new floors. Persisted via `SaveManager.gd`. Spent in the Skill Tree (Main Menu / Lobby / Station).
+  - *Meta-Currency (Biyo-Çekirdek / Bio-Cores):* Earned from clearing new floors (+1), Sector Milestones (+3 on every 9th floor), and Sector Boss eliminations (+5). Persisted via `SaveManager.gd`. Spent in the Skill Tree (Main Menu / In-Game [K] / Elevator Station).
 - **Decoupled Architecture (`ProgressionManager.gd` Autoload):**
   - Do NOT bloat `FPSController.gd` with skill tree evaluation code.
   - `ProgressionManager` acts as the single source of truth: stores node catalog, prerequisites, unlocked state, and calculates final aggregated `PlayerStats`.
-  - When a player spawns: `ProgressionManager.apply_to_player(player)` applies multipliers (`crit_chance`, `headshot_mult`, `dash_unlocked`, `chain_reaction`, etc.).
+  - When a player spawns or updates skills: `ProgressionManager.apply_to_player(player)` applies multipliers (`crit_chance`, `headshot_mult`, `dash_unlocked`, `chain_reaction`, etc.) live.
+- **5-Branch Tactical Cyber Matrix UI (`SkillTree.gd` & `skill_tree.tscn`):**
+  - **Top Operational Core:** `[ ❖ OPERASYONEL ÇEKİRDEK ❖ ]` serves as the root hub.
+  - **5 Distinct Branch Columns:**
+    - `SİLAH` (Weapon Master - Crimson/Red)
+    - `HAYAT` (Survival/Bio-Armor - Emerald Green)
+    - `HAREKET` (Mobility/Dash - Cyan/Amber)
+    - `KAOS` (Demolition/Explosives - Molten Orange)
+    - `TAKTİK` (Utility/Spells - Cyber Violet/Blue)
+  - **Dynamic Circuit Lines (`LinesOverlay`):** Uses custom `_draw()` on `LinesOverlay` with orthogonal (90-degree) cyber bus lines connecting core -> column headers -> child nodes. Color coded by unlock and availability state.
+  - **Node Chip States:**
+    - `Unlocked`: Silver cyber icon with neon cyan/green accent outline.
+    - `Available`: Glowing amber border and cost badge; ready to unlock.
+    - `Locked`: Dimmed with 🔒 padlock; prerequisites not met.
+    - `Selected`: High-contrast neon cyan selection box; details loaded into inspection card.
+  - **Multi-Access & Input Guard:**
+    - Accessible via Main Menu, In-Game `[K]` shortcut, Pause (ESC) menu button, and Elevator Station button.
+    - Safely unlocks mouse (`MOUSE_MODE_VISIBLE`), blocks shooting/kicking/spells while open, and recalculates active player stats instantly.
 - **Forward-Compatible Class Agnosticism:**
-  - The 5 core branches (Weapon, Survival, Mobility, Demolition, Utility) apply universally to ALL classes (past, present, and future).
+  - The 5 core branches apply universally to ALL classes.
   - Ability augments use a **Tag System** (`[AOE]`, `[ELEMENTAL]`, `[SUPPORT]`, `[PHYSICAL]`) on spells rather than hardcoded class names.
-  - Dedicated **Class Keystone Socket**: Classes dynamically plug in their unique apex traits into a standardized socket, ensuring new classes can be added without altering the master tree structure.
+  - Dedicated **Class Keystone Socket**: Classes dynamically plug in their unique apex traits into a standardized socket.
 - **Node ID & Respec Resilience:**
   - Nodes are saved as string IDs in an array (`unlocked_nodes = ["prec_01", "mob_dash"]`). Missing or new nodes never corrupt save files.
   - Full **Respec (Yetenek Sıfırlama)** refunds 100% of spent meta-currency to let players experiment with new builds freely.
+
+## 14. Window Management, Camera & Singleplayer Fallback Standards
+- **Window Centering & Responsive Sizing (`SettingsManager.gd`):**
+  - Always enforce `initial_position_type=2` (`CENTER_MAIN_WINDOW_SCREEN`) in `project.godot`.
+  - `SettingsManager.center_window()` verifies current display resolution: if window dimensions exceed 85% of screen size, it automatically clamps down to standard safe 16:9 bounds (e.g. 1280x720) and centers on the primary display.
+- **Player Camera Hierarchy Convention:**
+  - The active player camera node path is `$Head/Camera3D` (NOT `$Camera3D`).
+  - In `main_level.tscn`, ensure `DefaultCamera.current = false` so the newly spawned player's camera immediately takes precedence.
+- **Singleplayer / Standalone F6 Fallback (`MainLevel.gd`):**
+  - If started without an active multiplayer peer, `MainLevel.gd` initializes an `OfflineMultiplayerPeer` and notifies peer 1 ready immediately. This guarantees standalone testing (F6) works instantly without freezing or waiting for server handshakes.
+
+## 15. Release & Deployment Strict Rule
+- **CRITICAL RESTRICTION:** Never run `build_release.ps1` and never push to Git (`git push origin main`) without the user's explicit command ("güncellemeyi at" or "build al"). Always test locally first.
