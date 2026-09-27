@@ -139,11 +139,13 @@ res://
   - Only the host (lobby owner / peer 1) can trigger next level start (`_request_start_level`). Client requests must be ignored and Shop `next_floor_btn` must be disabled for non-hosts.
   - When starting a new level, NEVER assign `players[i].position` directly on the server; always call `@rpc func teleport_to(spawn_pos)` on each player so client authorities receive and apply the position change.
   - Do not immediately lock elevator doors upon level start; keep doors open for 2-3 seconds to prevent trapping players behind closed doors.
-- **AutoUpdater & Windows File Locks:**
+- **AutoUpdater, TLS & Windows File Locks:**
+  - `project.godot` must include `[network]` section with `tls/certificate_bundle_override=""` to enforce Godot's built-in root certificates. Otherwise, HTTPS requests to GitHub will fail silently with `TLS_HANDSHAKE_ERROR` on some Windows machines.
+  - `HTTPRequest` nodes must set `use_threads = true` to prevent blocking the main thread during downloads or version checks.
   - Always download update PCK files to `user://update_download.pck` (`OS.get_user_data_dir()`) to avoid permission errors.
   - Single source of truth for version is `res://version.json`, packed into PCK via `include_filter="*.json"`.
   - Windows update applier script (`apply_update.cmd`) uses `tasklist /fi "PID eq %PID%"` to wait for the Godot process to exit completely, followed by `ping 127.0.0.1 -n 2 >nul` retry loop for atomic file swapping without stdin crashes.
-  - Surcharged GitHub CDN queries must append `?t=<timestamp>` to prevent caching stale version.json.
+  - Surcharged GitHub CDN queries must append `?t=<timestamp>` and `no-cache` to prevent caching stale version.json.
 
 ## 11. Level Progression, 99 Floors & Thematic Sector Architecture
 - **11 Sectors & 99 Floors Data Model (`LevelData.gd`):**
@@ -185,7 +187,8 @@ res://
 
 ## 13. Skill Tree, Meta-Progression & Class Socket Architecture
 - **Dual-Economy Separation (Roguelite Core Rule):**
-  - *In-Run Gold (Askeri Kredi):* Earned and spent strictly within the run/floor at the elevator shop (`Shop.gd`). Resets on death/run restart. Never conflicts with permanent meta-progression.
+  - *In-Run Gold (Askeri Kredi):* Earned and spent strictly within the run/floor at the elevator shop (`Shop.gd`). Resets on death/run restart.
+    - **Weapon-Specific Upgrades:** Avoid flat global damage perks. Use per-weapon upgrade stacks (`weapon_upgrade_stacks[weapon_name]`) with low increments (e.g. +2% damage/firerate, max 10 stacks) to scale infinitely without breaking early game TTK.
   - *Meta-Currency (Biyo-Çekirdek / Bio-Cores):* Earned from clearing new floors (+1), Sector Milestones (+3 on every 9th floor), and Sector Boss eliminations (+5). Persisted via `SaveManager.gd`. Spent in the Skill Tree (Main Menu / In-Game [K] / Elevator Station).
 - **Decoupled Architecture (`ProgressionManager.gd` Autoload):**
   - Do NOT bloat `FPSController.gd` with skill tree evaluation code.

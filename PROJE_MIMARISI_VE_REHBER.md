@@ -186,5 +186,10 @@ Projeyi geliştirirken token tüketimini minimumda tutmak ve hızlı ilerlemek i
     * Oyuncunun ulaştığı en yüksek kat (`highest_unlocked_floor`), toplam öldürme, boss öldürme, toplanan altın ve tamamlanan kat sayıları diske JSON olarak kaydedilir.
     * Kat temizlendiğinde bir sonraki kat kilidi otomatik açılır ve `LevelSelect.gd` arayüzünde 11 sektör arasında (◀ Önceki Sektör / Sonraki Sektör ▶) gezinilerek açılmış tüm katlara anında girilebilir.
 
-
-
+* [x] **Faz 15: Silah Yükseltme Sistemi ve Güçlü Güncelleme Altyapısı:**
+  * **Silaha Özgü Yükseltmeler (Weapon Upgrades):**
+    * Oyunu kıran genel "Hasar +%25" perk'i tamamen kaldırıldı. Bunun yerine mağazaya "SİLAH YÜKSELTMELERİ" sekmesi eklendi. Oyuncunun sahip olduğu her silaha özel (Tabanca, Pompalı, Uzi, Roket) **Hasar (+%2)**, **Atış Hızı (+%2)** ve **Şarjör (+%3)** yükseltmeleri eklendi.
+  * **Perk Dengelemesi:** Hız perki artışı %18'den %6'ya düşürüldü, maksimum sınır getirildi (max 4). Mağaza fiyatları 99 kat boyunca ölçeklenebilir hale getirildi.
+  * **Kararlı Güncelleyici (AutoUpdater v2.1):**
+    * `project.godot` içerisine `[network]` ayarları eklenerek TLS/SSL sertifika onayı aktif edildi; "GitHub TLS El Sıkışma" hataları giderildi.
+    * İndirme ve kontrol işlemleri `use_threads = true` yapılarak arka plana alındı, ana thread bloklanmaları çözüldü. Arayüzde anlamlı Türkçe hata bildirimleri eklendi.
