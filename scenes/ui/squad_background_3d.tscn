@@ -519,21 +519,25 @@ mesh = SubResource("CylinderMesh_casing")
 
 [node name="Characters" type="Node3D" parent="."]
 
+[node name="Cryomancer" parent="Characters" instance=ExtResource("2_char")]
+transform = Transform3D(0.9659, 0, 0.2588, 0, 1, 0, -0.2588, 0, 0.9659, -0.55, 0, -0.3)
+character_class = "Cryomancer"
+
 [node name="Pyromancer" parent="Characters" instance=ExtResource("2_char")]
-transform = Transform3D(0.9962, 0, 0.0872, 0, 1, 0, -0.0872, 0, 0.9962, 1.0, 0, 0.2)
+transform = Transform3D(0.9962, 0, 0.0872, 0, 1, 0, -0.0872, 0, 0.9962, 0.55, 0, 0.1)
 character_class = "Pyromancer"
 is_selected = true
 
+[node name="Builder" parent="Characters" instance=ExtResource("2_char")]
+transform = Transform3D(0.9962, 0, -0.0872, 0, 1, 0, 0.0872, 0, 0.9962, 1.55, 0, 0.15)
+character_class = "Builder"
+
 [node name="Engineer" parent="Characters" instance=ExtResource("2_char")]
-transform = Transform3D(0.9962, 0, -0.0872, 0, 1, 0, 0.0872, 0, 0.9962, 2.15, 0, -0.15)
+transform = Transform3D(0.9962, 0, -0.0872, 0, 1, 0, 0.0872, 0, 0.9962, 2.45, 0, -0.15)
 character_class = "Engineer"
 
-[node name="Cryomancer" parent="Characters" instance=ExtResource("2_char")]
-transform = Transform3D(0.9659, 0, 0.2588, 0, 1, 0, -0.2588, 0, 0.9659, -0.15, 0, -0.3)
-character_class = "Cryomancer"
-
 [node name="Medic" parent="Characters" instance=ExtResource("2_char")]
-transform = Transform3D(0.9659, 0, -0.2588, 0, 1, 0, 0.2588, 0, 0.9659, 3.15, 0, -0.5)
+transform = Transform3D(0.9659, 0, -0.2588, 0, 1, 0, 0.2588, 0, 0.9659, 3.35, 0, -0.45)
 character_class = "Medic"
 
 [node name="CagedZombie" parent="." instance=ExtResource("8_cage")]

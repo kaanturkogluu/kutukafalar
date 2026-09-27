@@ -492,7 +492,7 @@ func _physics_process(delta: float) -> void:
 	_update_combo_hud()
 
 	# Duvarcı için 5 saniyede bir duvar stack yenileme
-	if player_class == "Engineer":
+	if player_class == "Builder":
 		if wall_count < max_wall_count:
 			wall_regen_timer += delta
 			if wall_regen_timer >= WALL_REGEN_INTERVAL:
@@ -826,10 +826,13 @@ func _register_kill_streak() -> void:
 
 func _on_spell_updated(tac_pct: float, ult_pct: float) -> void:
 	if is_multiplayer_authority():
-		if tactical_bar:
+		if player_class == "Builder":
+			_update_wall_hud()
+		elif tactical_bar:
 			tactical_bar.value = tac_pct * 100.0
+		
 		var tac_label = hud.get_node_or_null("SpellContainer/TacticalBox/TacticalLabel")
-		if tac_label:
+		if tac_label and player_class != "Builder":
 			if player_class == "Engineer":
 				if tac_pct >= 1.0:
 					tac_label.text = "[E] TARET HAZIR"
@@ -846,11 +849,14 @@ func _on_spell_updated(tac_pct: float, ult_pct: float) -> void:
 					var rem_cd = ceil(spell_manager.tactical_timer) if spell_manager else 0
 					tac_label.text = "[E] TAKTİK (%ds)" % rem_cd
 					tac_label.modulate = Color(0.85, 0.65, 0.3)
+		
 		if ult_bar and ult_label:
 			ult_bar.value = ult_pct
 			if ult_pct >= 100.0:
 				if player_class == "Engineer":
 					ult_label.text = "[Q] ŞOK DALGASI HAZIR!"
+				elif player_class == "Builder":
+					ult_label.text = "[Q] VORTEX HAZIR!"
 				else:
 					ult_label.text = "[Q] ULTİ HAZIR!"
 				ult_label.modulate = Color(1.0, 0.9, 0.2)
@@ -861,7 +867,7 @@ func _on_spell_updated(tac_pct: float, ult_pct: float) -> void:
 func _update_wall_hud() -> void:
 	if not is_multiplayer_authority():
 		return
-	if player_class == "Engineer":
+	if player_class == "Builder":
 		if tactical_bar:
 			tactical_bar.value = (float(wall_count) / float(max_wall_count)) * 100.0
 		var tac_label = hud.get_node_or_null("SpellContainer/TacticalBox/TacticalLabel")
@@ -870,7 +876,7 @@ func _update_wall_hud() -> void:
 			if wall_count <= 0:
 				tac_label.modulate = Color(1.0, 0.35, 0.35)
 			else:
-				tac_label.modulate = Color(0.4, 0.9, 1.0)
+				tac_label.modulate = Color(1.0, 0.75, 0.35)
 
 ## Duvar Yerleştirme (Duvarcı Sınıfı - E Tuşu)
 func try_place_wall() -> void:
@@ -1754,6 +1760,9 @@ func _on_restart_pressed() -> void:
 func _on_lobby_pressed() -> void:
 	if not is_multiplayer_authority():
 		return
+	if multiplayer.multiplayer_peer != null and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
+		NetworkManager.return_to_lobby()
+		return
 	NetworkManager.disconnect_game()
 	get_tree().change_scene_to_file("res://scenes/ui/lobby.tscn")
 
@@ -1876,6 +1885,7 @@ func _refresh_scoreboard() -> void:
 		lbl_cls.custom_minimum_size = Vector2(110, 0)
 		match p.player_class:
 			"Pyromancer": lbl_cls.text = "BÜYÜCÜ"
+			"Builder": lbl_cls.text = "DUVARCI"
 			"Engineer": lbl_cls.text = "MÜHENDİS"
 			"Cryomancer": lbl_cls.text = "BUZCU"
 			"Medic": lbl_cls.text = "SIHHİYE"

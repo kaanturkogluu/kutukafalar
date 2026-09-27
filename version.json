@@ -1,6 +1,6 @@
 {
-    "version":  "v1.3.15",
+    "version":  "v1.3.16",
     "download_url":  "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-    "pck_size":  778832,
-    "changelog":  "- Mühendis (Engineer) Sınıfı Yetenek Revizyonu:\n  * [E] Taktiksel Yetenek: 25sn bekleme süreli, yalnızca düz zemine yerleşebilen kırılabilir Otomatik Taret (Sentry Turret).\n  * [Q] Nihai Yetenek (Ulti): 14m alandaki zombileri geriye fırlatan ve 1.2 saniye sersemleten (stun) Elektriksel Şok Dalgası.\n- Zombi Yapay Zekası: Sersemletme (stun) ve fiziksel geri savrulma (knockback) mekanikleri eklendi.\n- Skor Tablosu \u0026 Arayüz: Mühendis sınıfı için güncel bekleme sayaçları ve taktiksel bildirimler entegre edildi."
+    "pck_size":  785360,
+    "changelog":  "- Lobi \u0026 Bekleme Odası Revizyonu:\n  * Lobiye Dönüldüğünde Odanın Korunması: Maçtan veya oyun sonundan lobiye dönüldüğünde oda düşmez, tüm takım bekleme odasında kalır.\n  * Çok Oyunculu Kat Seçimi: Oda kurucusu bekleme odasından başlangıç katını dilediği gibi seçebilir, tüm takıma anlık senkronize edilir.\n  * 6 Haneli Davet Kodu: Lobiye katılmak için 6 haneli kompakt davet kodu oluşturuldu.\n  * Tek Tıkla Kopyala: Davet kodunu panoya kopyalayan buton ve görsel geri bildirim eklendi.\n- 5 Taktik Sınıf: Duvarcı ve Mühendis dahil tüm 5 sınıf lobi, 3D önizleme ve oyun içi yetenekleriyle devrede."
 }

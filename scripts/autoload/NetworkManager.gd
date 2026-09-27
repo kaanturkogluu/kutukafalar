@@ -186,6 +186,27 @@ func _start_game_rpc() -> void:
 	game_started.emit()
 	get_tree().change_scene_to_file("res://scenes/levels/main_level.tscn")
 
+## Odaya Geri Dön (Bağlantıyı koparmadan tüm takımı lobi bekleme odasına çeker)
+func return_to_lobby() -> void:
+	if multiplayer.is_server():
+		is_game_in_progress = false
+		_return_to_lobby_rpc.rpc()
+	else:
+		_request_return_to_lobby.rpc_id(1)
+
+@rpc("any_peer", "reliable")
+func _request_return_to_lobby() -> void:
+	if multiplayer.is_server():
+		return_to_lobby()
+
+@rpc("call_local", "reliable")
+func _return_to_lobby_rpc() -> void:
+	is_game_in_progress = false
+	for pid in players:
+		players[pid]["is_ready"] = (pid == 1)
+	local_player_info["is_ready"] = (multiplayer.get_unique_id() == 1)
+	get_tree().change_scene_to_file("res://scenes/ui/lobby.tscn")
+
 @rpc("reliable")
 func _reject_connection(reason: String) -> void:
 	print("[NetworkManager] Bağlantı reddedildi: ", reason)

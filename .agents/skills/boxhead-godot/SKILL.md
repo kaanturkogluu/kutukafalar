@@ -212,6 +212,9 @@ res://
   - The 5 core branches apply universally to ALL classes.
   - Ability augments use a **Tag System** (`[AOE]`, `[ELEMENTAL]`, `[SUPPORT]`, `[PHYSICAL]`) on spells rather than hardcoded class names.
 - **Class Ability Profiles (`SpellManager.gd`):**
+  - **Duvarcı (`Builder`):**
+    - *Taktiksel Yetenek [E]:* **Taktiksel Barikat Duvarı (Brick Wall)** (5 sn içinde yenilenen duvar yükü). Zombilerin geçişini engelleyen, dar boğaz oluşturan ve zombilerin vurarak oyalandığı kırılabilir tuğla duvar kurar.
+    - *Nihai Yetenek (Ulti) [Q]:* **Graviton Manyetik Vortex (EMP Blast)**. Geniş bir alandaki tüm zombi sürülerini merkeze vakumlayıp çeker ve büyük hasarla patlatır.
   - **Mühendis (`Engineer`):**
     - *Taktiksel Yetenek [E]:* **Otomatik Taret (Sentry Turret)** (25 sn Cooldown). Yalnızca normali yukarı bakan düz zemine yerleştirilebilir (`raycast normal.dot(UP) >= 0.70`). Kırılabilir yapıda (`220 HP`, `destructibles`), menzilindeki zombileri otomatik hedefler, dönerek mermi yağdırır ve zombi tehdidini üzerine çeker.
     - *Nihai Yetenek (Ulti) [Q]:* **Elektriksel Şok Dalgası (Shockwave)**. Genişleyen enerji halkasıyla 14m alandaki zombileri geriye fırlatır (`dir * 22 + UP * 4.8`) ve **1.2 saniye sersemletme (stun)** uygular.

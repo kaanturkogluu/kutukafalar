@@ -4,7 +4,7 @@ class_name MenuCharacter
 # --- 3D Menü Karakteri (MenuCharacter) ---
 # Taktik tim kadrosundaki Kutu Kafa karakterini, sınıf renklerini, silahını ve öne çıkma animasyonunu yönetir.
 
-@export_enum("Pyromancer", "Engineer", "Cryomancer", "Medic") var character_class: String = "Pyromancer"
+@export_enum("Pyromancer", "Builder", "Engineer", "Cryomancer", "Medic") var character_class: String = "Pyromancer"
 @export var is_selected: bool = false
 
 var base_position: Vector3 = Vector3.ZERO
@@ -33,6 +33,16 @@ const CLASS_CONFIG: Dictionary = {
 		"weapon_scale": Vector3(0.72, 0.72, 0.72),
 		"weapon_pos": Vector3(0.24, 0.55, 0.28),
 		"weapon_rot": Vector3(deg_to_rad(-10), deg_to_rad(-15), deg_to_rad(10))
+	},
+	"Builder": {
+		"title": "DUVARCI",
+		"body_color": Color(0.65, 0.32, 0.20),
+		"accent_color": Color(1.0, 0.75, 0.35),
+		"vest_color": Color(0.25, 0.22, 0.20),
+		"weapon_scene": "res://scenes/weapons/shotgun_model.tscn",
+		"weapon_scale": Vector3(0.70, 0.70, 0.70),
+		"weapon_pos": Vector3(0.22, 0.53, 0.26),
+		"weapon_rot": Vector3(deg_to_rad(-8), deg_to_rad(-15), deg_to_rad(8))
 	},
 	"Engineer": {
 		"title": "MÜHENDİS",

@@ -39,6 +39,9 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("spell_tactical"):
 		if player and player.has_method("is_targeting_downed_teammate") and player.is_targeting_downed_teammate():
 			pass
+		elif player_class == "Builder":
+			if player and player.has_method("try_place_wall"):
+				player.try_place_wall()
 		elif player_class == "Engineer":
 			cast_engineer_turret()
 		else:
@@ -158,6 +161,9 @@ func cast_ultimate() -> void:
 			# Meteor: Hedefin gökyüzünden dev alevli küp düşer
 			var meteor_start = target_pos + Vector3.UP * 22.0
 			_request_cast_spell.rpc_id(1, "meteor", meteor_start, Vector3.DOWN, target_pos.y)
+		"Builder":
+			# Graviton EMP / Manyetik Vortex Blast: Hedef alandaki zombileri çeker ve patlatır
+			_request_cast_spell.rpc_id(1, "emp_blast", target_pos, Vector3.ZERO)
 		"Medic":
 			# Adrenalin ve Toplu Şifa: Tüm takımı %100 cana getirir
 			_request_cast_spell.rpc_id(1, "medic_overdrive", player.global_position, Vector3.ZERO)

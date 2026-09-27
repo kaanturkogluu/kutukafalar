@@ -43,6 +43,10 @@ const GAME_SCENE_PATH: String = "res://scenes/levels/main_level.tscn"
 # 4. Bekleme Odası (Room Panel)
 @onready var room_panel: PanelContainer = %RoomPanel
 @onready var room_info_label: Label = %RoomInfoLabel
+@onready var room_code_label: Label = %RoomCodeLabel
+@onready var copy_code_btn: Button = %CopyCodeBtn
+@onready var room_map_label: Label = %RoomMapLabel
+@onready var room_select_map_btn: Button = %RoomSelectMapBtn
 @onready var room_class_option: OptionButton = %RoomClassOption
 @onready var player_list_box: VBoxContainer = %PlayerListBox
 @onready var room_status_label: Label = %RoomStatusLabel
@@ -102,6 +106,15 @@ const CLASS_SKILLS: Dictionary = {
 		"ult_desc": "Hedef noktaya gökyüzünden alevli meteor düşürür. Etki alanındaki tüm zombileri anında yok eder.",
 		"ult_color": Color(1.0, 0.45, 0.35)
 	},
+	"Builder": {
+		"title": "DUVARCI",
+		"role": "[SAVUNMA / BARİKAT KURUCU]",
+		"tactical_title": "[E] TAKTİK: TAKTİKSEL BARİKAT (5s Yenilenir)",
+		"tactical_desc": "Zombi geçişlerini kesen taktik barikat kurar. Zombiler duvara vurarak oyalanır.",
+		"ult_title": "[Q] NİHAİ: GRAVİTON MANYETİK VORTEX",
+		"ult_desc": "Manyetik vortex oluşturarak tüm zombileri merkeze çeker, sıkıştırıp havaya uçurur.",
+		"ult_color": Color(1.0, 0.70, 0.30)
+	},
 	"Engineer": {
 		"title": "MÜHENDİS",
 		"role": "[SAVUNMA / TARET & ALAN KONTROLÜ]",
@@ -133,6 +146,8 @@ const CLASS_SKILLS: Dictionary = {
 
 var is_local_ready: bool = false
 var active_join_mode: String = "ip" # "ip" veya "code"
+var current_room_code: String = ""
+const BASE62_CHARS: String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -185,6 +200,10 @@ func _ready() -> void:
 	ready_btn.pressed.connect(_on_ready_pressed)
 	start_game_btn.pressed.connect(_on_start_game_pressed)
 	leave_room_btn.pressed.connect(_on_leave_room_pressed)
+	if copy_code_btn:
+		copy_code_btn.pressed.connect(_on_copy_code_pressed)
+	if room_select_map_btn:
+		room_select_map_btn.pressed.connect(_on_room_select_map_pressed)
 	
 	# Ağ Yöneticisi Sinyalleri
 	NetworkManager.connection_succeeded.connect(_on_connection_succeeded)
@@ -199,8 +218,21 @@ func _ready() -> void:
 	# Otomatik Güncelleyici Sinyalleri
 	_setup_autoupdater()
 	
-	# Varsayılan panel görünümü
-	_show_main_nav()
+	# Panel görünümü: Eğer önceden aktif bir oda varsa odaya dön, yoksa ana menüyü aç
+	if multiplayer.multiplayer_peer != null and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED and NetworkManager.players.size() > 0:
+		_show_room_panel()
+		_refresh_player_list()
+		_update_room_buttons()
+		_update_room_map_display()
+		if multiplayer.is_server():
+			var local_ip = _get_local_ip()
+			current_room_code = _ip_to_code(local_ip)
+			if room_code_label:
+				room_code_label.text = current_room_code
+			if room_info_label:
+				room_info_label.text = "Oda Sahibi (Host)  |  Yerel IP: " + local_ip
+	else:
+		_show_main_nav()
 	_set_join_mode("ip")
 	
 	# 3D Sahneyi varsayılan sınıfla başlat ve yetenek kartını senkronize et
@@ -250,9 +282,10 @@ func _input(event: InputEvent) -> void:
 func _setup_class_options() -> void:
 	var classes = [
 		{"name": "Ateş Uzmanı (Pyromancer)", "code": "Pyromancer", "id": 0},
-		{"name": "Mühendis (Otomatik Taret & Şok Dalgası)", "code": "Engineer", "id": 1},
-		{"name": "Buz Muhafızı (Kriyojenik)", "code": "Cryomancer", "id": 2},
-		{"name": "Sıhhiye (Şifa & Destek)", "code": "Medic", "id": 3}
+		{"name": "Duvarcı (Taktiksel Barikat)", "code": "Builder", "id": 1},
+		{"name": "Mühendis (Otomatik Taret & Şok Dalgası)", "code": "Engineer", "id": 2},
+		{"name": "Buz Muhafızı (Kriyojenik)", "code": "Cryomancer", "id": 3},
+		{"name": "Sıhhiye (Şifa & Destek)", "code": "Medic", "id": 4}
 	]
 	
 	for opt in [single_class_option, multi_class_option, room_class_option]:
@@ -285,22 +318,25 @@ func _on_class_selected(index: int) -> void:
 func _get_class_code_from_index(index: int) -> String:
 	match index:
 		0: return "Pyromancer"
-		1: return "Engineer"
-		2: return "Cryomancer"
-		3: return "Medic"
+		1: return "Builder"
+		2: return "Engineer"
+		3: return "Cryomancer"
+		4: return "Medic"
 	return "Pyromancer"
 
 func _get_index_from_class_code(code: String) -> int:
 	match code:
 		"Pyromancer": return 0
-		"Engineer": return 1
-		"Cryomancer": return 2
-		"Medic": return 3
+		"Builder": return 1
+		"Engineer": return 2
+		"Cryomancer": return 3
+		"Medic": return 4
 	return 0
 
 func _get_class_display_title(class_code: String) -> String:
 	match class_code:
 		"Pyromancer": return "ATEŞ UZMANI"
+		"Builder": return "DUVARCI"
 		"Engineer": return "MÜHENDİS"
 		"Cryomancer": return "BUZ MUHAFIZI"
 		"Medic": return "SIHHİYE"
@@ -316,7 +352,8 @@ func _update_class_skill_card(class_code: String) -> void:
 		var title_color = Color(1.0, 0.85, 0.35)
 		match class_code:
 			"Pyromancer": title_color = Color(1.0, 0.82, 0.30)
-			"Engineer": title_color = Color(1.0, 0.95, 0.25)
+			"Builder": title_color = Color(1.0, 0.72, 0.30)
+			"Engineer": title_color = Color(0.35, 0.90, 1.0)
 			"Cryomancer": title_color = Color(0.40, 0.95, 1.0)
 			"Medic": title_color = Color(0.35, 1.0, 0.65)
 		skill_class_title.add_theme_color_override("font_color", title_color)
@@ -439,6 +476,10 @@ func _on_select_map_pressed() -> void:
 func _on_map_chosen_from_level_select(floor_num: int) -> void:
 	SaveManager.set_starting_floor(floor_num)
 	_update_selected_map_display()
+	if multiplayer.multiplayer_peer != null and multiplayer.is_server():
+		_sync_room_floor.rpc(floor_num)
+	else:
+		_update_room_map_display()
 
 func _on_single_resume_pressed() -> void:
 	var last_floor = SaveManager.get_last_played_floor()
@@ -487,8 +528,12 @@ func _on_host_pressed() -> void:
 	if error == OK:
 		_show_room_panel()
 		var local_ip = _get_local_ip()
-		var room_code = _ip_to_code(local_ip)
-		room_info_label.text = "Oda Kodu: " + room_code + "  |  Yerel IP: " + local_ip
+		current_room_code = _ip_to_code(local_ip)
+		if room_code_label:
+			room_code_label.text = current_room_code
+		if room_info_label:
+			room_info_label.text = "Oda Sahibi (Host)  |  Yerel IP: " + local_ip
+		_update_room_map_display()
 		_refresh_player_list()
 	else:
 		status_label.text = "Hata: Oda oluşturulamadı! (Port 7000 meşgul olabilir)"
@@ -497,14 +542,16 @@ func _on_join_ip_pressed() -> void:
 	var ip = ip_input.text.strip_edges()
 	if ip.is_empty():
 		ip = "127.0.0.1"
+	current_room_code = _ip_to_code(ip)
 	_attempt_join(ip)
 
 func _on_join_code_pressed() -> void:
 	var raw_code = code_input.text.strip_edges()
 	if raw_code.is_empty():
-		status_label.text = "Lütfen 8 haneli oda kodunu girin."
+		status_label.text = "Lütfen 6 haneli davet kodunu girin."
 		return
 	
+	current_room_code = raw_code
 	var target_ip = _code_to_ip(raw_code)
 	_attempt_join(target_ip)
 
@@ -526,7 +573,7 @@ func _attempt_join(target_ip: String) -> void:
 		join_ip_btn.disabled = false
 		join_code_btn.disabled = false
 
-# --- IP ve Oda Kodu Çevrim Fonksiyonları ---
+# --- IP ve 6 Haneli Davet Kodu Çevrim Fonksiyonları (Base62) ---
 
 func _get_local_ip() -> String:
 	for ip in IP.get_local_addresses():
@@ -538,25 +585,87 @@ func _ip_to_code(ip_str: String) -> String:
 	var parts = ip_str.split(".")
 	if parts.size() != 4:
 		return ip_str
+	var n: int = (clampi(parts[0].to_int(), 0, 255) << 24) | (clampi(parts[1].to_int(), 0, 255) << 16) | (clampi(parts[2].to_int(), 0, 255) << 8) | clampi(parts[3].to_int(), 0, 255)
+	n = n & 0xFFFFFFFF
 	var code = ""
-	for p in parts:
-		code += "%02X" % clampi(p.to_int(), 0, 255)
+	for i in range(6):
+		var rem = n % 62
+		code = BASE62_CHARS[rem] + code
+		n = int(n / 62)
 	return code
 
 func _code_to_ip(code_str: String) -> String:
-	var s = code_str.strip_edges().to_upper()
+	var s = code_str.strip_edges()
 	if s.contains("."):
 		return s
-	if s.length() == 8:
+	# 6 haneli Base62 davet kodu
+	if s.length() == 6:
+		var n: int = 0
+		var valid = true
+		for c in s:
+			var idx = BASE62_CHARS.find(c)
+			if idx == -1:
+				valid = false
+				break
+			n = n * 62 + idx
+		if valid and n >= 0 and n <= 0xFFFFFFFF:
+			var b0 = (n >> 24) & 0xFF
+			var b1 = (n >> 16) & 0xFF
+			var b2 = (n >> 8) & 0xFF
+			var b3 = n & 0xFF
+			return "%d.%d.%d.%d" % [b0, b1, b2, b3]
+	# Geriye uyumluluk: 8 haneli HEX kodu
+	var hex_s = s.to_upper()
+	if hex_s.length() == 8:
 		var parts: Array[String] = []
 		for i in range(4):
-			var sub = s.substr(i * 2, 2)
+			var sub = hex_s.substr(i * 2, 2)
 			var b = sub.hex_to_int()
 			parts.append(str(b))
 		return ".".join(parts)
-	return code_str
+	return s
 
-# --- Bekleme Odası Yönetimi ---
+# --- Bekleme Odası Yönetimi ve Davet Kodu Kopyalama ---
+
+func _on_copy_code_pressed() -> void:
+	if current_room_code.is_empty():
+		return
+	DisplayServer.clipboard_set(current_room_code)
+	if copy_code_btn:
+		var orig_text = copy_code_btn.text
+		copy_code_btn.text = "✓ KOPYALANDI!"
+		copy_code_btn.modulate = Color(0.3, 1.0, 0.4)
+		get_tree().create_timer(1.8).timeout.connect(func():
+			if is_instance_valid(copy_code_btn):
+				copy_code_btn.text = orig_text
+				copy_code_btn.modulate = Color(1.0, 1.0, 1.0)
+		)
+
+func _on_room_select_map_pressed() -> void:
+	if not multiplayer.is_server():
+		return
+	if level_select_ui:
+		var current_start = SaveManager.get_starting_floor()
+		var max_unlocked = SaveManager.get_highest_unlocked_floor()
+		level_select_ui.open_for_lobby(current_start, max_unlocked)
+
+@rpc("call_local", "reliable")
+func _sync_room_floor(floor_num: int) -> void:
+	SaveManager.set_starting_floor(floor_num)
+	_update_room_map_display()
+
+func _update_room_map_display() -> void:
+	if not room_map_label:
+		return
+	var floor_num = SaveManager.get_starting_floor()
+	var fname = LevelData.FLOOR_NAMES.get(floor_num, "Kat " + str(floor_num))
+	var is_boss = LevelData.is_boss_level(floor_num)
+	var ch = LevelData.get_chapter_for_level(floor_num)
+	room_map_label.text = "KAT %02d: %s%s (SEKTÖR %d)" % [floor_num, fname.to_upper(), " [BOSS!]" if is_boss else "", ch.get("sector", 1)]
+	if is_boss:
+		room_map_label.add_theme_color_override("font_color", Color(1.0, 0.45, 0.45))
+	else:
+		room_map_label.add_theme_color_override("font_color", Color(0.85, 0.95, 1.0))
 
 func _on_ready_pressed() -> void:
 	is_local_ready = not is_local_ready
@@ -574,6 +683,8 @@ func _on_leave_room_pressed() -> void:
 	_show_main_nav()
 
 func _update_room_buttons() -> void:
+	if room_select_map_btn:
+		room_select_map_btn.visible = multiplayer.is_server()
 	if multiplayer.is_server():
 		ready_btn.visible = false
 		start_game_btn.visible = true
@@ -665,8 +776,12 @@ func _on_connection_succeeded() -> void:
 	join_code_btn.disabled = false
 	_show_room_panel()
 	var entered_target = ip_input.text.strip_edges() if active_join_mode == "ip" else code_input.text.strip_edges()
-	room_info_label.text = "Bağlanıldı: " + entered_target
+	if room_info_label:
+		room_info_label.text = "Bağlanıldı: " + entered_target
+	if room_code_label:
+		room_code_label.text = current_room_code if not current_room_code.is_empty() else entered_target
 	_update_room_buttons()
+	_update_room_map_display()
 
 func _on_connection_failed() -> void:
 	join_ip_btn.disabled = false
@@ -688,6 +803,9 @@ func _on_game_rejected(reason: String) -> void:
 func _on_lobby_updated(_players_dict: Dictionary) -> void:
 	_refresh_player_list()
 	_update_room_buttons()
+	_update_room_map_display()
+	if multiplayer.is_server():
+		_sync_room_floor.rpc(SaveManager.get_starting_floor())
 
 # --- Ayarlar Paneli ---
 

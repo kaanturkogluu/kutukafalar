@@ -5,6 +5,7 @@ class_name SquadBackground3D
 # Ana menüde 4 kişilik taktik ekibi sergiler, sınıf seçiminde öne çıkma ve fare takip animasyonunu yönetir.
 
 @onready var char_pyro: MenuCharacter = $Characters/Pyromancer
+@onready var char_builder: MenuCharacter = $Characters.get_node_or_null("Builder")
 @onready var char_eng: MenuCharacter = $Characters/Engineer
 @onready var char_cryo: MenuCharacter = $Characters/Cryomancer
 @onready var char_medic: MenuCharacter = $Characters/Medic
@@ -17,6 +18,7 @@ var camera_base_pos: Vector3 = Vector3(0, 1.15, 3.8)
 func _ready() -> void:
 	characters = {
 		"Pyromancer": char_pyro,
+		"Builder": char_builder,
 		"Engineer": char_eng,
 		"Cryomancer": char_cryo,
 		"Medic": char_medic
