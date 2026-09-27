@@ -1,0 +1,308 @@
+[gd_scene load_steps=28 format=3 uid="uid://floor_07_vip_elevator_scene"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_outer_ground"]
+albedo_color = Color(0.08, 0.09, 0.11, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="BoxMesh_outer_ground"]
+material = SubResource("StandardMaterial3D_outer_ground")
+size = Vector3(280, 1, 280)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_outer_ground"]
+size = Vector3(280, 1, 280)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vip_red"]
+albedo_color = Color(0.35, 0.08, 0.1, 1)
+roughness = 0.85
+
+[sub_resource type="BoxMesh" id="BoxMesh_vip_floor"]
+material = SubResource("StandardMaterial3D_vip_red")
+size = Vector3(52, 1, 52)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vip_floor"]
+size = Vector3(52, 1, 52)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_brass"]
+albedo_color = Color(0.85, 0.7, 0.28, 1)
+metallic = 0.95
+roughness = 0.2
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_stanchion"]
+material = SubResource("StandardMaterial3D_brass")
+top_radius = 0.06
+bottom_radius = 0.18
+height = 1.1
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_stanchion"]
+size = Vector3(0.4, 1.1, 0.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_velvet_rope"]
+albedo_color = Color(0.65, 0.05, 0.08, 1)
+roughness = 0.7
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_rope"]
+material = SubResource("StandardMaterial3D_velvet_rope")
+top_radius = 0.04
+bottom_radius = 0.04
+height = 3.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wood_panel"]
+albedo_color = Color(0.24, 0.14, 0.09, 1)
+roughness = 0.45
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_long"]
+material = SubResource("StandardMaterial3D_wood_panel")
+size = Vector3(52, 5.0, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_long"]
+size = Vector3(52, 9, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_half"]
+material = SubResource("StandardMaterial3D_wood_panel")
+size = Vector3(24.5, 5.0, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_half"]
+size = Vector3(24.5, 9, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_alcove_pillar"]
+material = SubResource("StandardMaterial3D_wood_panel")
+size = Vector3(2.5, 5.0, 2.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_alcove_pillar"]
+size = Vector3(2.5, 5.0, 2.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_statue"]
+albedo_color = Color(0.9, 0.88, 0.85, 1)
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_statue"]
+material = SubResource("StandardMaterial3D_statue")
+size = Vector3(1.0, 2.2, 1.0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tower_facade"]
+albedo_color = Color(0.08, 0.1, 0.13, 1)
+metallic = 0.6
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_tower_facade"]
+material = SubResource("StandardMaterial3D_tower_facade")
+size = Vector3(56, 32, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tower_facade"]
+size = Vector3(56, 32, 8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_entrance_canopy"]
+albedo_color = Color(0.14, 0.16, 0.2, 1)
+metallic = 0.7
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_entrance_canopy"]
+material = SubResource("StandardMaterial3D_entrance_canopy")
+size = Vector3(9, 0.7, 5.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_entrance_pillar"]
+material = SubResource("StandardMaterial3D_entrance_canopy")
+size = Vector3(1.3, 4.4, 1.3)
+
+[node name="Floor07_VIPHall" type="Node3D"]
+
+[node name="OuterTerrain" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.7, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="OuterTerrain"]
+mesh = SubResource("BoxMesh_outer_ground")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="OuterTerrain"]
+shape = SubResource("BoxShape3D_outer_ground")
+
+[node name="VIPFloor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="VIPFloor"]
+mesh = SubResource("BoxMesh_vip_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="VIPFloor"]
+shape = SubResource("BoxShape3D_vip_floor")
+
+[node name="PerimeterWalls" type="Node3D" parent="."]
+
+[node name="Wall_North" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -25.8)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_North"]
+mesh = SubResource("BoxMesh_wall_long")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_North"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_long")
+
+[node name="Wall_West" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -25.8, 2.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_West"]
+mesh = SubResource("BoxMesh_wall_long")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_long")
+
+[node name="Wall_East" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 25.8, 2.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_East"]
+mesh = SubResource("BoxMesh_wall_long")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_long")
+
+[node name="Wall_South_Left" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.25, 2.5, 25.8)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_South_Left"]
+mesh = SubResource("BoxMesh_wall_half")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_South_Left"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_half")
+
+[node name="Wall_South_Right" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.25, 2.5, 25.8)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_South_Right"]
+mesh = SubResource("BoxMesh_wall_half")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_South_Right"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_half")
+
+[node name="AlcovePillar_NW" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.0, 2.5, -10.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="AlcovePillar_NW"]
+mesh = SubResource("BoxMesh_alcove_pillar")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="AlcovePillar_NW"]
+shape = SubResource("BoxShape3D_alcove_pillar")
+
+[node name="Statue" type="MeshInstance3D" parent="AlcovePillar_NW"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.8)
+mesh = SubResource("BoxMesh_statue")
+
+[node name="AlcovePillar_NE" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.0, 2.5, -10.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="AlcovePillar_NE"]
+mesh = SubResource("BoxMesh_alcove_pillar")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="AlcovePillar_NE"]
+shape = SubResource("BoxShape3D_alcove_pillar")
+
+[node name="Statue" type="MeshInstance3D" parent="AlcovePillar_NE"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.8)
+mesh = SubResource("BoxMesh_statue")
+
+[node name="AlcovePillar_SW" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.0, 2.5, 10.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="AlcovePillar_SW"]
+mesh = SubResource("BoxMesh_alcove_pillar")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="AlcovePillar_SW"]
+shape = SubResource("BoxShape3D_alcove_pillar")
+
+[node name="AlcovePillar_SE" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.0, 2.5, 10.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="AlcovePillar_SE"]
+mesh = SubResource("BoxMesh_alcove_pillar")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="AlcovePillar_SE"]
+shape = SubResource("BoxShape3D_alcove_pillar")
+
+[node name="RopeCorridor" type="Node3D" parent="."]
+
+[node name="Stanchion1" type="StaticBody3D" parent="RopeCorridor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0.55, -6.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RopeCorridor/Stanchion1"]
+mesh = SubResource("CylinderMesh_stanchion")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RopeCorridor/Stanchion1"]
+shape = SubResource("BoxShape3D_stanchion")
+
+[node name="Stanchion2" type="StaticBody3D" parent="RopeCorridor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0.55, -6.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RopeCorridor/Stanchion2"]
+mesh = SubResource("CylinderMesh_stanchion")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RopeCorridor/Stanchion2"]
+shape = SubResource("BoxShape3D_stanchion")
+
+[node name="Stanchion3" type="StaticBody3D" parent="RopeCorridor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0.55, 4.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RopeCorridor/Stanchion3"]
+mesh = SubResource("CylinderMesh_stanchion")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RopeCorridor/Stanchion3"]
+shape = SubResource("BoxShape3D_stanchion")
+
+[node name="Stanchion4" type="StaticBody3D" parent="RopeCorridor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0.55, 4.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RopeCorridor/Stanchion4"]
+mesh = SubResource("CylinderMesh_stanchion")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RopeCorridor/Stanchion4"]
+shape = SubResource("BoxShape3D_stanchion")
+
+[node name="MegaTowerEntrance" type="Node3D" parent="."]
+
+[node name="TowerFacade" type="StaticBody3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, 33.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MegaTowerEntrance/TowerFacade"]
+mesh = SubResource("BoxMesh_tower_facade")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MegaTowerEntrance/TowerFacade"]
+shape = SubResource("BoxShape3D_tower_facade")
+
+[node name="EntranceCanopy" type="StaticBody3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.4, 27.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MegaTowerEntrance/EntranceCanopy"]
+mesh = SubResource("BoxMesh_entrance_canopy")
+
+[node name="PillarLeft" type="MeshInstance3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 2.2, 26.5)
+mesh = SubResource("BoxMesh_entrance_pillar")
+
+[node name="PillarRight" type="MeshInstance3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 2.2, 26.5)
+mesh = SubResource("BoxMesh_entrance_pillar")
+
+[node name="TowerSign" type="Label3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5, 24.6)
+billboard = 1
+no_depth_test = true
+modulate = Color(1, 0.8, 0.3, 1)
+text = "👑 VIP ASANSÖR KORİDORU // ÖZEL GEÇİŞ
+[ KAT 07: VIP ASANSÖR GİRİŞİ ]"
+font_size = 32
+outline_size = 8
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="Chandelier1" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, -8.0)
+light_color = Color(1, 0.9, 0.65, 1)
+light_energy = 4.5
+omni_range = 16.0
+
+[node name="Chandelier2" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 8.0)
+light_color = Color(1, 0.9, 0.65, 1)
+light_energy = 4.5
+omni_range = 16.0

@@ -199,6 +199,63 @@ func _spawn_initial_barrels(floor_num: int = 1) -> void:
 				Vector3(0.0, 0.5, -12.0),
 				Vector3(0.0, 0.5, 6.0)
 			]
+		3:
+			initial_positions = [
+				Vector3(-9.0, 0.5, -3.0),
+				Vector3(9.0, 0.5, -3.0),
+				Vector3(-4.0, 0.5, -12.0),
+				Vector3(4.0, 0.5, -12.0),
+				Vector3(0.0, 0.5, 9.0)
+			]
+		4:
+			initial_positions = [
+				Vector3(-10.0, 0.5, -10.0),
+				Vector3(10.0, 0.5, -10.0),
+				Vector3(-10.0, 0.5, 10.0),
+				Vector3(10.0, 0.5, 10.0),
+				Vector3(0.0, 0.5, -18.0)
+			]
+		5:
+			initial_positions = [
+				Vector3(-8.0, 0.5, 5.0),
+				Vector3(8.0, 0.5, 5.0),
+				Vector3(-12.0, 0.5, -6.0),
+				Vector3(12.0, 0.5, -6.0),
+				Vector3(0.0, 0.5, -12.0)
+			]
+		6:
+			initial_positions = [
+				Vector3(-5.0, 0.5, -2.0),
+				Vector3(5.0, 0.5, -2.0),
+				Vector3(-12.0, 0.5, -10.0),
+				Vector3(12.0, 0.5, -10.0),
+				Vector3(0.0, 0.5, 8.0)
+			]
+		7:
+			initial_positions = [
+				Vector3(-8.0, 0.5, -8.0),
+				Vector3(8.0, 0.5, -8.0),
+				Vector3(-8.0, 0.5, 8.0),
+				Vector3(8.0, 0.5, 8.0),
+				Vector3(0.0, 0.5, -14.0)
+			]
+		8:
+			initial_positions = [
+				Vector3(-10.0, 0.5, 4.0),
+				Vector3(10.0, 0.5, 4.0),
+				Vector3(-7.0, 0.5, -10.0),
+				Vector3(7.0, 0.5, -10.0),
+				Vector3(0.0, 0.5, -18.0)
+			]
+		9:
+			initial_positions = [
+				Vector3(-10.5, 0.5, -10.5),
+				Vector3(10.5, 0.5, -10.5),
+				Vector3(-10.5, 0.5, 10.5),
+				Vector3(10.5, 0.5, 10.5),
+				Vector3(0.0, 0.5, -16.0),
+				Vector3(0.0, 0.5, 16.0)
+			]
 		_:
 			initial_positions = [
 				Vector3(-6.0, 0.5, -6.0),

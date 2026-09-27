@@ -1,0 +1,313 @@
+[gd_scene load_steps=29 format=3 uid="uid://floor_09_boss_elevator_hub_scene"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_outer_ground"]
+albedo_color = Color(0.08, 0.09, 0.11, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="BoxMesh_outer_ground"]
+material = SubResource("StandardMaterial3D_outer_ground")
+size = Vector3(280, 1, 280)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_outer_ground"]
+size = Vector3(280, 1, 280)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_arena_granite"]
+albedo_color = Color(0.12, 0.13, 0.15, 1)
+metallic = 0.4
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_arena_floor"]
+material = SubResource("StandardMaterial3D_arena_granite")
+size = Vector3(52, 1, 52)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_arena_floor"]
+size = Vector3(52, 1, 52)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_reinforced_concrete"]
+albedo_color = Color(0.24, 0.26, 0.3, 1)
+metallic = 0.5
+roughness = 0.6
+
+[sub_resource type="BoxMesh" id="BoxMesh_heavy_pillar"]
+material = SubResource("StandardMaterial3D_reinforced_concrete")
+size = Vector3(3.4, 7.5, 3.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_heavy_pillar"]
+size = Vector3(3.4, 7.5, 3.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_elevator_doors"]
+albedo_color = Color(0.55, 0.45, 0.22, 1)
+metallic = 0.85
+roughness = 0.25
+
+[sub_resource type="BoxMesh" id="BoxMesh_elevator_bank"]
+material = SubResource("StandardMaterial3D_elevator_doors")
+size = Vector3(5.5, 4.0, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_elevator_bank"]
+size = Vector3(5.5, 4.0, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_warning_stripe"]
+albedo_color = Color(0.85, 0.65, 0.15, 1)
+roughness = 0.5
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_arena_ring"]
+material = SubResource("StandardMaterial3D_warning_stripe")
+top_radius = 8.5
+bottom_radius = 8.7
+height = 0.04
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_siren_red"]
+albedo_color = Color(1, 0.1, 0.1, 1)
+emission_enabled = true
+emission = Color(1, 0.1, 0.05, 1)
+emission_energy_multiplier = 4.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_siren"]
+material = SubResource("StandardMaterial3D_siren_red")
+size = Vector3(0.5, 0.5, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wall_panel"]
+albedo_color = Color(0.18, 0.2, 0.22, 1)
+roughness = 0.75
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_long"]
+material = SubResource("StandardMaterial3D_wall_panel")
+size = Vector3(52, 6.5, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_long"]
+size = Vector3(52, 10, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_half"]
+material = SubResource("StandardMaterial3D_wall_panel")
+size = Vector3(24.5, 6.5, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_half"]
+size = Vector3(24.5, 10, 1.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tower_facade"]
+albedo_color = Color(0.08, 0.1, 0.13, 1)
+metallic = 0.6
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_tower_facade"]
+material = SubResource("StandardMaterial3D_tower_facade")
+size = Vector3(56, 32, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tower_facade"]
+size = Vector3(56, 32, 8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_entrance_canopy"]
+albedo_color = Color(0.14, 0.16, 0.2, 1)
+metallic = 0.7
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_entrance_canopy"]
+material = SubResource("StandardMaterial3D_entrance_canopy")
+size = Vector3(9, 0.7, 5.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_entrance_pillar"]
+material = SubResource("StandardMaterial3D_entrance_canopy")
+size = Vector3(1.3, 4.4, 1.3)
+
+[node name="Floor09_BossElevatorHub" type="Node3D"]
+
+[node name="OuterTerrain" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.7, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="OuterTerrain"]
+mesh = SubResource("BoxMesh_outer_ground")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="OuterTerrain"]
+shape = SubResource("BoxShape3D_outer_ground")
+
+[node name="ArenaFloor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ArenaFloor"]
+mesh = SubResource("BoxMesh_arena_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ArenaFloor"]
+shape = SubResource("BoxShape3D_arena_floor")
+
+[node name="CenterRing" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+mesh = SubResource("CylinderMesh_arena_ring")
+
+[node name="PerimeterWalls" type="Node3D" parent="."]
+
+[node name="Wall_North" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.25, -25.8)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_North"]
+mesh = SubResource("BoxMesh_wall_long")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_North"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_long")
+
+[node name="Wall_West" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -25.8, 3.25, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_West"]
+mesh = SubResource("BoxMesh_wall_long")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_long")
+
+[node name="Wall_East" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 25.8, 3.25, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_East"]
+mesh = SubResource("BoxMesh_wall_long")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_long")
+
+[node name="Wall_South_Left" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.25, 3.25, 25.8)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_South_Left"]
+mesh = SubResource("BoxMesh_wall_half")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_South_Left"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_half")
+
+[node name="Wall_South_Right" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.25, 3.25, 25.8)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_South_Right"]
+mesh = SubResource("BoxMesh_wall_half")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_South_Right"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_half")
+
+[node name="ElevatorBanks" type="Node3D" parent="."]
+
+[node name="ElevatorNorth1" type="StaticBody3D" parent="ElevatorBanks"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.0, 2.0, -25.2)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ElevatorBanks/ElevatorNorth1"]
+mesh = SubResource("BoxMesh_elevator_bank")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ElevatorBanks/ElevatorNorth1"]
+shape = SubResource("BoxShape3D_elevator_bank")
+
+[node name="ElevatorNorth2" type="StaticBody3D" parent="ElevatorBanks"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.0, 2.0, -25.2)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ElevatorBanks/ElevatorNorth2"]
+mesh = SubResource("BoxMesh_elevator_bank")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ElevatorBanks/ElevatorNorth2"]
+shape = SubResource("BoxShape3D_elevator_bank")
+
+[node name="HeavyColumns" type="Node3D" parent="."]
+
+[node name="Column_NW" type="StaticBody3D" parent="HeavyColumns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, 3.75, -12.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="HeavyColumns/Column_NW"]
+mesh = SubResource("BoxMesh_heavy_pillar")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HeavyColumns/Column_NW"]
+shape = SubResource("BoxShape3D_heavy_pillar")
+
+[node name="Column_NE" type="StaticBody3D" parent="HeavyColumns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 3.75, -12.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="HeavyColumns/Column_NE"]
+mesh = SubResource("BoxMesh_heavy_pillar")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HeavyColumns/Column_NE"]
+shape = SubResource("BoxShape3D_heavy_pillar")
+
+[node name="Column_SW" type="StaticBody3D" parent="HeavyColumns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, 3.75, 12.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="HeavyColumns/Column_SW"]
+mesh = SubResource("BoxMesh_heavy_pillar")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HeavyColumns/Column_SW"]
+shape = SubResource("BoxShape3D_heavy_pillar")
+
+[node name="Column_SE" type="StaticBody3D" parent="HeavyColumns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 3.75, 12.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="HeavyColumns/Column_SE"]
+mesh = SubResource("BoxMesh_heavy_pillar")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HeavyColumns/Column_SE"]
+shape = SubResource("BoxShape3D_heavy_pillar")
+
+[node name="MegaTowerEntrance" type="Node3D" parent="."]
+
+[node name="TowerFacade" type="StaticBody3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, 33.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MegaTowerEntrance/TowerFacade"]
+mesh = SubResource("BoxMesh_tower_facade")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MegaTowerEntrance/TowerFacade"]
+shape = SubResource("BoxShape3D_tower_facade")
+
+[node name="EntranceCanopy" type="StaticBody3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.4, 27.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MegaTowerEntrance/EntranceCanopy"]
+mesh = SubResource("BoxMesh_entrance_canopy")
+
+[node name="PillarLeft" type="MeshInstance3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 2.2, 26.5)
+mesh = SubResource("BoxMesh_entrance_pillar")
+
+[node name="PillarRight" type="MeshInstance3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 2.2, 26.5)
+mesh = SubResource("BoxMesh_entrance_pillar")
+
+[node name="TowerSign" type="Label3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5, 24.6)
+billboard = 1
+no_depth_test = true
+modulate = Color(1, 0.2, 0.2, 1)
+text = "💀 SEKTÖR 1 ŞEFİ ALANI // BOSS SAVAŞI
+[ KAT 09: ANA ASANSÖR HOLÜ (ANAHTAR #1) ]"
+font_size = 32
+outline_size = 8
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="BossAlarmRed1" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 5.0, -12)
+light_color = Color(1, 0.15, 0.1, 1)
+light_energy = 5.5
+omni_range = 18.0
+
+[node name="BossAlarmRed2" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 5.0, -12)
+light_color = Color(1, 0.15, 0.1, 1)
+light_energy = 5.5
+omni_range = 18.0
+
+[node name="BossAlarmRed3" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 5.0, 12)
+light_color = Color(1, 0.15, 0.1, 1)
+light_energy = 5.5
+omni_range = 18.0
+
+[node name="BossAlarmRed4" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 5.0, 12)
+light_color = Color(1, 0.15, 0.1, 1)
+light_energy = 5.5
+omni_range = 18.0
+
+[node name="CenterArenaLight" type="SpotLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 10.0, 0)
+light_color = Color(1, 0.9, 0.8, 1)
+light_energy = 6.0
+spot_range = 20.0
+spot_angle = 55.0

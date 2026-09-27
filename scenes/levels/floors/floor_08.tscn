@@ -1,0 +1,300 @@
+[gd_scene load_steps=29 format=3 uid="uid://floor_08_control_room_scene"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_outer_ground"]
+albedo_color = Color(0.08, 0.09, 0.11, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="BoxMesh_outer_ground"]
+material = SubResource("StandardMaterial3D_outer_ground")
+size = Vector3(280, 1, 280)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_outer_ground"]
+size = Vector3(280, 1, 280)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tech_floor"]
+albedo_color = Color(0.14, 0.16, 0.19, 1)
+metallic = 0.5
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_tech_floor"]
+material = SubResource("StandardMaterial3D_tech_floor")
+size = Vector3(52, 1, 52)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tech_floor"]
+size = Vector3(52, 1, 52)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cctv_screens"]
+albedo_color = Color(0.15, 0.45, 0.35, 1)
+emission_enabled = true
+emission = Color(0.1, 0.55, 0.4, 1)
+emission_energy_multiplier = 2.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_cctv_wall"]
+material = SubResource("StandardMaterial3D_cctv_screens")
+size = Vector3(18.0, 3.8, 0.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_server_rack"]
+albedo_color = Color(0.1, 0.11, 0.13, 1)
+metallic = 0.7
+roughness = 0.35
+
+[sub_resource type="BoxMesh" id="BoxMesh_server_unit"]
+material = SubResource("StandardMaterial3D_server_rack")
+size = Vector3(1.8, 3.6, 1.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_server_unit"]
+size = Vector3(1.8, 3.6, 1.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_console_desk"]
+albedo_color = Color(0.2, 0.22, 0.26, 1)
+roughness = 0.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_console"]
+material = SubResource("StandardMaterial3D_console_desk")
+size = Vector3(6.5, 1.1, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_console"]
+size = Vector3(6.5, 1.1, 2.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wall_panel"]
+albedo_color = Color(0.16, 0.18, 0.2, 1)
+roughness = 0.75
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_long"]
+material = SubResource("StandardMaterial3D_wall_panel")
+size = Vector3(52, 5.0, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_long"]
+size = Vector3(52, 9, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_half"]
+material = SubResource("StandardMaterial3D_wall_panel")
+size = Vector3(24.5, 5.0, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_half"]
+size = Vector3(24.5, 9, 1.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tower_facade"]
+albedo_color = Color(0.08, 0.1, 0.13, 1)
+metallic = 0.6
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_tower_facade"]
+material = SubResource("StandardMaterial3D_tower_facade")
+size = Vector3(56, 32, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tower_facade"]
+size = Vector3(56, 32, 8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_entrance_canopy"]
+albedo_color = Color(0.14, 0.16, 0.2, 1)
+metallic = 0.7
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_entrance_canopy"]
+material = SubResource("StandardMaterial3D_entrance_canopy")
+size = Vector3(9, 0.7, 5.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_entrance_pillar"]
+material = SubResource("StandardMaterial3D_entrance_canopy")
+size = Vector3(1.3, 4.4, 1.3)
+
+[node name="Floor08_ControlRoom" type="Node3D"]
+
+[node name="OuterTerrain" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.7, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="OuterTerrain"]
+mesh = SubResource("BoxMesh_outer_ground")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="OuterTerrain"]
+shape = SubResource("BoxShape3D_outer_ground")
+
+[node name="TechFloor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="TechFloor"]
+mesh = SubResource("BoxMesh_tech_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TechFloor"]
+shape = SubResource("BoxShape3D_tech_floor")
+
+[node name="PerimeterWalls" type="Node3D" parent="."]
+
+[node name="Wall_North" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -25.8)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_North"]
+mesh = SubResource("BoxMesh_wall_long")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_North"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_long")
+
+[node name="Wall_West" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -25.8, 2.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_West"]
+mesh = SubResource("BoxMesh_wall_long")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_long")
+
+[node name="Wall_East" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 25.8, 2.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_East"]
+mesh = SubResource("BoxMesh_wall_long")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_long")
+
+[node name="Wall_South_Left" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.25, 2.5, 25.8)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_South_Left"]
+mesh = SubResource("BoxMesh_wall_half")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_South_Left"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_half")
+
+[node name="Wall_South_Right" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.25, 2.5, 25.8)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_South_Right"]
+mesh = SubResource("BoxMesh_wall_half")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_South_Right"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_half")
+
+[node name="CCTVWall" type="Node3D" parent="."]
+
+[node name="Monitors" type="MeshInstance3D" parent="CCTVWall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, -25.0)
+mesh = SubResource("BoxMesh_cctv_wall")
+
+[node name="ScreenGlow" type="OmniLight3D" parent="CCTVWall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, -23.5)
+light_color = Color(0.15, 0.75, 0.5, 1)
+light_energy = 4.0
+omni_range = 14.0
+
+[node name="Consoles" type="Node3D" parent="."]
+
+[node name="Desk_Center" type="StaticBody3D" parent="Consoles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, -16.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Consoles/Desk_Center"]
+mesh = SubResource("BoxMesh_console")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Consoles/Desk_Center"]
+shape = SubResource("BoxShape3D_console")
+
+[node name="Desk_West" type="StaticBody3D" parent="Consoles"]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, -9.5, 0.55, -12.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Consoles/Desk_West"]
+mesh = SubResource("BoxMesh_console")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Consoles/Desk_West"]
+shape = SubResource("BoxShape3D_console")
+
+[node name="Desk_East" type="StaticBody3D" parent="Consoles"]
+transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 9.5, 0.55, -12.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Consoles/Desk_East"]
+mesh = SubResource("BoxMesh_console")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Consoles/Desk_East"]
+shape = SubResource("BoxShape3D_console")
+
+[node name="ServerBank" type="Node3D" parent="."]
+
+[node name="Rack_W1" type="StaticBody3D" parent="ServerBank"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.0, 1.8, 2.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ServerBank/Rack_W1"]
+mesh = SubResource("BoxMesh_server_unit")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ServerBank/Rack_W1"]
+shape = SubResource("BoxShape3D_server_unit")
+
+[node name="Rack_W2" type="StaticBody3D" parent="ServerBank"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.0, 1.8, 6.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ServerBank/Rack_W2"]
+mesh = SubResource("BoxMesh_server_unit")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ServerBank/Rack_W2"]
+shape = SubResource("BoxShape3D_server_unit")
+
+[node name="Rack_E1" type="StaticBody3D" parent="ServerBank"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.0, 1.8, 2.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ServerBank/Rack_E1"]
+mesh = SubResource("BoxMesh_server_unit")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ServerBank/Rack_E1"]
+shape = SubResource("BoxShape3D_server_unit")
+
+[node name="Rack_E2" type="StaticBody3D" parent="ServerBank"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.0, 1.8, 6.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ServerBank/Rack_E2"]
+mesh = SubResource("BoxMesh_server_unit")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ServerBank/Rack_E2"]
+shape = SubResource("BoxShape3D_server_unit")
+
+[node name="MegaTowerEntrance" type="Node3D" parent="."]
+
+[node name="TowerFacade" type="StaticBody3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, 33.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MegaTowerEntrance/TowerFacade"]
+mesh = SubResource("BoxMesh_tower_facade")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MegaTowerEntrance/TowerFacade"]
+shape = SubResource("BoxShape3D_tower_facade")
+
+[node name="EntranceCanopy" type="StaticBody3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.4, 27.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MegaTowerEntrance/EntranceCanopy"]
+mesh = SubResource("BoxMesh_entrance_canopy")
+
+[node name="PillarLeft" type="MeshInstance3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 2.2, 26.5)
+mesh = SubResource("BoxMesh_entrance_pillar")
+
+[node name="PillarRight" type="MeshInstance3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 2.2, 26.5)
+mesh = SubResource("BoxMesh_entrance_pillar")
+
+[node name="TowerSign" type="Label3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5, 24.6)
+billboard = 1
+no_depth_test = true
+modulate = Color(0.2, 0.9, 0.6, 1)
+text = "🖥️ SİSTEM & KONTROL MERKEZİ // SEKTÖR 1
+[ KAT 08: LOBİ KONTROL ODASI ]"
+font_size = 32
+outline_size = 8
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="TechLight1" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3.8, 0)
+light_color = Color(0.2, 0.7, 0.9, 1)
+light_energy = 3.5
+omni_range = 14.0
+
+[node name="TechLight2" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3.8, 0)
+light_color = Color(0.2, 0.7, 0.9, 1)
+light_energy = 3.5
+omni_range = 14.0
