@@ -1387,6 +1387,23 @@ func revive(health_amount: float = 50.0, spawn_pos: Vector3 = Vector3.ZERO) -> v
 		_update_hud()
 
 @rpc("any_peer", "call_local", "reliable")
+func teleport_to(target_pos: Vector3) -> void:
+	global_position = target_pos
+	velocity = Vector3.ZERO
+	if is_multiplayer_authority():
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		if camera:
+			camera.top_level = false
+			camera.position = Vector3.ZERO
+			camera.rotation = Vector3.ZERO
+			camera.current = true
+		if pause_menu:
+			pause_menu.visible = false
+		if death_screen:
+			death_screen.visible = false
+		_update_hud()
+
+@rpc("any_peer", "call_local", "reliable")
 func reset_to_default_loadout(spawn_pos: Vector3 = Vector3.ZERO) -> void:
 	is_dead = false
 	all_players_dead = false

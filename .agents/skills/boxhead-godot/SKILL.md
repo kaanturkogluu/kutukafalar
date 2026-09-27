@@ -133,9 +133,12 @@ res://
   - In Godot 4 GDScript, `Object.get(property)` takes **AT MOST 1 argument**. Passing a second default argument (e.g. `p.get("prop", default)`) causes a fatal parse error on scene reload. Always check `if p.get("prop") != null and float(p.get("prop")) > 0`.
 - **Level Start Server Notify:**
   - At level `_ready()`, server must call `_notify_peer_level_ready(1)` directly rather than using loopback `rpc_id(1)`. This avoids dropped RPC frames and ensures the host immediately spawns and initial barrels/waves begin.
-- **Elevator Synchronization:**
+- **Elevator Synchronization & Host-Authoritative Level Transition:**
   - `set_elevator_state` must be `@rpc("call_local", "reliable")` so door openings and signs synchronize across all client screens even if the host dies.
-  - `_check_all_players_inside()` must filter only LIVING players (`p.current_health > 0 and not p.get("is_dead")`).
+  - `_check_all_players_inside()` must filter only LIVING players (`p.current_health > 0 and not p.get("is_dead")`) and debounce transition with `has_triggered_transition`.
+  - Only the host (lobby owner / peer 1) can trigger next level start (`_request_start_level`). Client requests must be ignored and Shop `next_floor_btn` must be disabled for non-hosts.
+  - When starting a new level, NEVER assign `players[i].position` directly on the server; always call `@rpc func teleport_to(spawn_pos)` on each player so client authorities receive and apply the position change.
+  - Do not immediately lock elevator doors upon level start; keep doors open for 2-3 seconds to prevent trapping players behind closed doors.
 - **AutoUpdater & Windows File Locks:**
   - Always download update PCK files to `user://update_download.pck` (`OS.get_user_data_dir()`) to avoid permission errors.
   - Single source of truth for version is `res://version.json`, packed into PCK via `include_filter="*.json"`.

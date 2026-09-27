@@ -1,6 +1,6 @@
 {
-    "version":  "v1.3.0",
+    "version":  "v1.3.1",
     "download_url":  "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-    "pck_size":  432176,
-    "changelog":  "- Taktiksel ESC Duraklatma Menüsü: Modern koyu cam panel, kehribar vurgulu düz butonlar, sıfır emoji ve tam taktiksel görünüm.\n- Oyun İçi Ayarlar (In-Game Settings): ESC menüsünden anında Ekran Modu (Tam Ekran/Kenarlıksız/Pencereli), VSync, Ana Ses ve Fare Hassasiyeti ayarlayabilme.\n- Asansör Görev \u0026 Seviye Terminali: Koyu cam zemin, kehribar ve zümrüt durum rozetleri, temiz grid yapısı.\n- Asansör İkmal \u0026 Geliştirme İstasyonu (Mağaza): Yenilenen taktik kartlar, Kredi sistemi, görev terminaline geri dönebilme ve emojilerden tamamen arındırılmış arayüz.\n- TAB Skor Tablosu \u0026 HUD İyileştirmeleri: Temiz askeri yazı dili ve optimize edilmiş kullanıcı deneyimi."
+    "pck_size":  433840,
+    "changelog":  "- Asansör Çok Oyunculu Senkronizasyonu: Yeni seviye başladığında tüm oyuncuların asansörden haritaya sorunsuz çıkabilmesi için istemci ışınlanma RPC\u0027si (teleport_to) eklendi.\n- Asansör Kapı Koruması: Kapıların oyuncuların yüzüne hemen kilitlenmesi engellendi, 2.5 saniyelik çıkış payı tanındı.\n- Oda Sahibi Yetkisi: Mağazada ve Seviye Seçim ekranında sonraki seviyeyi başlatma yetkisi yalnızca oda sahibine (Host) verildi."
 }

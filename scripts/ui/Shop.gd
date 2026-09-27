@@ -48,6 +48,17 @@ func open_shop(p_player: CharacterBody3D, floor_num: int) -> void:
 		local_player.set_in_shop(true)
 	if title_label:
 		title_label.text = "ASANSÖR İKMAL VE GELİŞTİRME İSTASYONU // KAT %02d" % current_floor
+	
+	if next_floor_btn:
+		if multiplayer.is_server():
+			next_floor_btn.text = "SONRAKİ SEVİYEYİ BAŞLAT"
+			next_floor_btn.disabled = false
+			next_floor_btn.tooltip_text = "Seviyeyi tüm takım için başlat"
+		else:
+			next_floor_btn.text = "ODA SAHİBİ BEKLENİYOR..."
+			next_floor_btn.disabled = true
+			next_floor_btn.tooltip_text = "Yalnızca oda sahibi sonraki seviyeyi başlatabilir"
+	
 	_generate_offers()
 	_update_ui()
 
@@ -140,5 +151,7 @@ func _on_back_to_levels_pressed() -> void:
 	back_to_levels_requested.emit()
 
 func _on_next_floor_pressed() -> void:
+	if not multiplayer.is_server():
+		return
 	close_shop()
 	next_floor_requested.emit()

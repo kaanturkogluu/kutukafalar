@@ -163,6 +163,11 @@ Projeyi geliştirirken token tüketimini minimumda tutmak ve hızlı ilerlemek i
   * **GitHub CDN Önbellek Koruması:** GitHub sunucularının eski sürüm yanıtı dönmesini engellemek için isteklere zaman damgası (`?t=timestamp`) ve `no-cache` başlıkları eklendi.
   * **PID Takipli Windows Dosya Değiştirici (`apply_update.cmd`):** Eski bat dosyasındaki çökme yaratan `timeout` komutu kaldırıldı. Yeni betik `tasklist /fi "PID eq %PID%"` ile oyunun kapandığını doğrular, `ping 127.0.0.1` ile güvenli bekleme döngüsü yapar ve yeni PCK dosyasını hatasız kopyalayarak oyunu yeniden başlatır.
   * **Otomatik Derleme & Yayınlama Senkronizasyonu (`build_release.ps1`):** Derleme esnasında üretilen PCK dosyasının boyutu anında hesaplanıp `version.json` içerisine yazılır, hem `builds/` klasörüne hem de ilk kurulum ZIP'ine otomatik eklenir. Geliştiricinin sadece `git add` ve `git push` yapması yeterlidir.
+* [x] **Faz 13: Asansör Çok Oyunculu Senkronizasyonu & Oda Sahibi Yetkili Seviye Geçişi:**
+  * **İstemci Işınlanma RPC'si (`teleport_to.rpc`):** Godot multiplayer mimarisinde her istemci kendi `position` yetkisine (multiplayer authority) sahip olduğu için sunucunun doğrudan `position` ataması istemcilerde geçersiz kalıyordu. `FPSController.gd` içine `@rpc func teleport_to(pos)` eklenerek yeni seviyede tüm oyuncuların haritaya güvenle taşınması sağlandı.
+  * **Asansör Kapısının Oyuncuların Yüzüne Kapanması Engellendi:** Seviye başlatıldığında kapının anında kilitlenmesi kaldırıldı; oyuncuların asansörden haritaya rahatça çıkması için 2.5 saniyelik güvenlik payı verildi.
+  * **Yalnızca Oda Sahibi Seviye Başlatabilir:** `Shop.gd` ve `LevelSelect.gd` arayüzlerinde sonraki seviyeye geçiş butonları istemciler için kilitlendi ("ODA SAHİBİ BEKLENİYOR..."). Sunucu tarafında `multiplayer.get_remote_sender_id()` kontrolü eklenerek sadece lobi sahibinin seviyeyi başlatabilmesi güvenceye alındı.
+  * **Asansör Tetikleyici Mükerrer Geçiş Önlemi (`has_triggered_transition`):** Asansör içi oyuncu sayımında debouncing eklenerek arayüzlerin peş peşe birden fazla açılması engellendi.
 
 
 

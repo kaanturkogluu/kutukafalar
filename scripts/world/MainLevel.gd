@@ -344,7 +344,10 @@ func _close_level_select_ui() -> void:
 		level_select_ui.close_level_window()
 
 func _on_level_start_requested(target_lvl: int) -> void:
-	_request_start_level.rpc_id(1, target_lvl)
+	if multiplayer.is_server():
+		_request_start_level(target_lvl)
+	else:
+		_request_start_level.rpc_id(1, target_lvl)
 
 func _on_level_select_shop_requested() -> void:
 	_close_level_select_ui.rpc()
@@ -359,22 +362,46 @@ func _request_start_level(target_lvl: int) -> void:
 	if not multiplayer.is_server():
 		return
 
+	# Güvenlik: Yalnızca oda sahibi (Host / peer 1) seviyeyi başlatabilir!
+	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id != 0 and sender_id != 1:
+		print("[MainLevel] Başlatma isteği reddedildi! Yalnızca lobi sahibi seviyeyi başlatabilir (Gönderen: ", sender_id, ")")
+		return
+
 	_close_level_select_ui.rpc()
 	_close_shop_ui.rpc()
 
 	current_floor = target_lvl
 	current_wave = 1
-	elevator.set_elevator_state.rpc(false)
 
-	# Oyuncuları asansörden doğuş noktalarına geri taşı
+	# Oyuncuları asansörden haritadaki spawn noktalarına taşı (RPC ile)
 	var players = get_tree().get_nodes_in_group("players")
 	for i in range(players.size()):
-		var spawn_pt = spawn_points[i % spawn_points.size()]
-		players[i].position = spawn_pt.global_position
+		var p = players[i]
+		if is_instance_valid(p):
+			var spawn_pt = spawn_points[i % spawn_points.size()]
+			if p.get("is_dead") or p.current_health <= 0:
+				if p.has_method("revive"):
+					p.revive.rpc(p.max_health * 0.5, spawn_pt.global_position)
+			elif p.has_method("teleport_to"):
+				p.teleport_to.rpc(spawn_pt.global_position)
+			else:
+				p.global_position = spawn_pt.global_position
+
+	# Asansörün durumunu ve oyuncu listesini sıfırla
+	if elevator and elevator.has_method("reset_elevator"):
+		elevator.reset_elevator.rpc()
 
 	_sync_floor_ui.rpc(current_floor, current_wave, 0)
-	print("[Yeni Seviye] Seviye ", current_floor, " başladı!")
-	await get_tree().create_timer(1.2).timeout
+	print("[Yeni Seviye] Seviye ", current_floor, " başladı! Oyuncular haritaya yerleştirildi.")
+
+	# Asansör kapısını HEMEN kilitlemeyip oyuncuların rahatça çıkması için 2.5 saniye sonra kapat
+	get_tree().create_timer(2.5).timeout.connect(func():
+		if elevator and is_instance_valid(elevator):
+			elevator.set_elevator_state.rpc(false)
+	)
+
+	await get_tree().create_timer(3.0).timeout
 	_start_next_wave()
 
 @rpc("call_local", "reliable")
@@ -390,7 +417,8 @@ func _close_shop_ui() -> void:
 		shop_ui.close_shop()
 
 func _on_next_floor_requested() -> void:
-	_request_start_level.rpc_id(1, current_floor + 1)
+	if multiplayer.is_server():
+		_request_start_level(current_floor + 1)
 
 @rpc("call_local", "reliable")
 func _sync_floor_ui(floor_num: int, wave_num: int, remaining: int) -> void:

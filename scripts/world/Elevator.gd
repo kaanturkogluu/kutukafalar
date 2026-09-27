@@ -5,6 +5,7 @@ signal players_entered_elevator
 
 @export var is_open: bool = false
 var players_inside: Array[CharacterBody3D] = []
+var has_triggered_transition: bool = false
 
 @onready var light: OmniLight3D = $BeaconLight
 @onready var sign_label: Label3D = $SignLabel
@@ -21,15 +22,22 @@ func _ready() -> void:
 func set_elevator_state(open: bool) -> void:
 	is_open = open
 	if is_open:
+		has_triggered_transition = false
 		light.light_color = Color(0.1, 1.0, 0.3) # Yeşil
 		sign_label.text = "🛗 ASANSÖR HAZIR!\n(İÇERİ GİRİN)"
 		sign_label.modulate = Color(0.2, 1.0, 0.4)
 		_open_doors()
 	else:
+		players_inside.clear()
 		light.light_color = Color(1.0, 0.2, 0.1) # Kırmızı
 		sign_label.text = "🔒 ASANSÖR KİLİTLİ\n(KAT TEMİZLİĞİ BEKLENİYOR)"
 		sign_label.modulate = Color(1.0, 0.4, 0.3)
 		_close_doors()
+
+@rpc("call_local", "reliable")
+func reset_elevator() -> void:
+	players_inside.clear()
+	has_triggered_transition = false
 
 func _open_doors() -> void:
 	var tween = create_tween().set_parallel(true)
@@ -80,7 +88,7 @@ func _notify_server_player_exited(p_id: int) -> void:
 	_check_all_players_inside()
 
 func _check_all_players_inside() -> void:
-	if not multiplayer.is_server() or not is_open:
+	if not multiplayer.is_server() or not is_open or has_triggered_transition:
 		return
 	
 	var all_players = get_tree().get_nodes_in_group("players")
@@ -96,5 +104,6 @@ func _check_all_players_inside() -> void:
 			living_inside += 1
 
 	if living_inside >= living_players and living_players > 0:
+		has_triggered_transition = true
 		print("[Asansör] Tüm yaşayan oyuncular (", living_inside, "/", living_players, ") bindi! Sonraki kata geçiliyor...")
 		players_entered_elevator.emit()
