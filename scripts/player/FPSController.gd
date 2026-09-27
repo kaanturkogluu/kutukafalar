@@ -1042,10 +1042,14 @@ func _apply_player_damage(amount: float) -> void:
 	_update_hud()
 	_play_damage_effect(amount)
 	if current_health <= 0 and not is_dead:
+		# Her makinede hemen öldür (lobi sahibi dahil)
+		# Önceden sadece die.rpc() -> call_local zinciri kullanılıyordu;
+		# bu zincir lobi sahibi için bazen tetiklenmiyordu.
+		die()
+		# Sunucu, tüm client'lara ölüm sinyalini iletir.
+		# die() içindeki "if is_dead: return" koruması çift çağrıyı önler.
 		if multiplayer.is_server():
 			die.rpc()
-		else:
-			die()
 
 func _play_damage_effect(amount: float) -> void:
 	_flash_mesh_red()
