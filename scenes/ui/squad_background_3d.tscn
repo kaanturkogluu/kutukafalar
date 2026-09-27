@@ -1,16 +1,21 @@
-[gd_scene load_steps=24 format=3 uid="uid://squad_bg_3d_01"]
+[gd_scene load_steps=38 format=3 uid="uid://squad_bg_3d_01"]
 
 [ext_resource type="Script" path="res://scripts/ui/SquadBackground3D.gd" id="1_squad"]
 [ext_resource type="PackedScene" uid="uid://menu_character_01" path="res://scenes/ui/menu_character.tscn" id="2_char"]
+[ext_resource type="PackedScene" uid="uid://shotgun_model_01" path="res://scenes/weapons/shotgun_model.tscn" id="3_shotgun"]
+[ext_resource type="PackedScene" uid="uid://rocket_model_01" path="res://scenes/weapons/rocket_model.tscn" id="4_rocket"]
+[ext_resource type="PackedScene" uid="uid://bixi_model_01" path="res://scenes/weapons/bixi_model.tscn" id="5_bixi"]
+[ext_resource type="PackedScene" uid="uid://uzi_model_01" path="res://scenes/weapons/uzi_model.tscn" id="6_uzi"]
+[ext_resource type="PackedScene" uid="uid://pistol_model_01" path="res://scenes/weapons/pistol_model.tscn" id="7_pistol"]
 
 [sub_resource type="Environment" id="Environment_menu"]
 background_mode = 1
 background_color = Color(0.035, 0.045, 0.065, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.15, 0.20, 0.26, 1)
-ambient_light_energy = 0.9
+ambient_light_color = Color(0.14, 0.18, 0.24, 1)
+ambient_light_energy = 0.75
 glow_enabled = true
-glow_bloom = 0.15
+glow_bloom = 0.08
 glow_blend_mode = 0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
@@ -110,6 +115,111 @@ roughness = 0.5
 material = SubResource("StandardMaterial3D_hazard")
 size = Vector3(8.0, 0.02, 0.12)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rack_panel"]
+albedo_color = Color(0.10, 0.11, 0.13, 1)
+metallic = 0.7
+roughness = 0.35
+
+[sub_resource type="BoxMesh" id="BoxMesh_rack_large"]
+material = SubResource("StandardMaterial3D_rack_panel")
+size = Vector3(3.6, 1.6, 0.08)
+
+[sub_resource type="BoxMesh" id="BoxMesh_rack_small"]
+material = SubResource("StandardMaterial3D_rack_panel")
+size = Vector3(1.6, 1.4, 0.08)
+
+[sub_resource type="BoxMesh" id="BoxMesh_rack_peg"]
+material = SubResource("StandardMaterial3D_steel")
+size = Vector3(0.04, 0.04, 0.16)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_brass"]
+albedo_color = Color(0.92, 0.78, 0.28, 1)
+metallic = 0.95
+roughness = 0.22
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_casing"]
+material = SubResource("StandardMaterial3D_brass")
+top_radius = 0.015
+bottom_radius = 0.015
+height = 0.075
+radial_segments = 12
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ammo_can"]
+albedo_color = Color(0.18, 0.26, 0.16, 1)
+metallic = 0.45
+roughness = 0.55
+
+[sub_resource type="BoxMesh" id="BoxMesh_ammo_can"]
+material = SubResource("StandardMaterial3D_ammo_can")
+size = Vector3(0.42, 0.26, 0.22)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_screen_radar"]
+albedo_color = Color(0.04, 0.22, 0.32, 1)
+emission_enabled = true
+emission = Color(0.15, 0.75, 0.95, 1)
+emission_energy_multiplier = 1.6
+
+[sub_resource type="BoxMesh" id="BoxMesh_screen_radar"]
+material = SubResource("StandardMaterial3D_screen_radar")
+size = Vector3(0.70, 0.44, 0.03)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_screen_green"]
+albedo_color = Color(0.04, 0.28, 0.12, 1)
+emission_enabled = true
+emission = Color(0.2, 0.9, 0.4, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_screen_green"]
+material = SubResource("StandardMaterial3D_screen_green")
+size = Vector3(0.60, 0.40, 0.03)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_server_led_green"]
+albedo_color = Color(0.1, 0.9, 0.3, 1)
+emission_enabled = true
+emission = Color(0.1, 0.9, 0.3, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_server_led"]
+material = SubResource("StandardMaterial3D_server_led_green")
+size = Vector3(0.03, 0.03, 0.02)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_server_led_amber"]
+albedo_color = Color(0.95, 0.65, 0.1, 1)
+emission_enabled = true
+emission = Color(0.95, 0.65, 0.1, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_server_led_amber"]
+material = SubResource("StandardMaterial3D_server_led_amber")
+size = Vector3(0.03, 0.03, 0.02)
+
+[sub_resource type="BoxMesh" id="BoxMesh_server_tower"]
+material = SubResource("StandardMaterial3D_steel")
+size = Vector3(0.75, 2.2, 0.65)
+
+[sub_resource type="BoxMesh" id="BoxMesh_console_desk"]
+material = SubResource("StandardMaterial3D_steel")
+size = Vector3(1.6, 0.85, 0.75)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sign_frame"]
+albedo_color = Color(0.08, 0.09, 0.11, 1)
+metallic = 0.8
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_sign_frame"]
+material = SubResource("StandardMaterial3D_sign_frame")
+size = Vector3(6.8, 0.75, 0.06)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sign_trim"]
+albedo_color = Color(0.2, 0.8, 1.0, 1)
+emission_enabled = true
+emission = Color(0.25, 0.85, 1.0, 1)
+emission_energy_multiplier = 1.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_sign_trim"]
+material = SubResource("StandardMaterial3D_sign_trim")
+size = Vector3(6.88, 0.82, 0.04)
+
 [node name="SquadBackground3D" type="Node3D"]
 script = ExtResource("1_squad")
 
@@ -123,27 +233,27 @@ fov = 60.0
 [node name="KeyLight" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.866, -0.25, 0.433, 0, 0.866, 0.5, -0.5, -0.433, 0.75, 0, 5, 4)
 light_color = Color(0.95, 0.95, 1, 1)
-light_energy = 0.85
+light_energy = 0.8
 shadow_enabled = true
 
 [node name="RimLight" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.7071, 0.3536, -0.6124, 0, 0.866, 0.5, 0.7071, 0.3536, -0.6124, 0, 4, -3)
 light_color = Color(0.35, 0.65, 1, 1)
-light_energy = 1.3
+light_energy = 1.1
 
 [node name="SquadSpotLight" type="SpotLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.7071, 0.7071, 0, -0.7071, 0.7071, 1.2, 4.5, 2.2)
 light_color = Color(1, 0.92, 0.82, 1)
-light_energy = 2.4
+light_energy = 1.8
 spot_range = 7.5
 spot_angle = 50.0
 
 [node name="ArmorySpotLight" type="SpotLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.6428, 0.766, 0, -0.766, 0.6428, 3.2, 3.8, -0.6)
+transform = Transform3D(1, 0, 0, 0, 0.6428, 0.766, 0, -0.766, 0.6428, 2.0, 3.8, -1.2)
 light_color = Color(0.3, 0.85, 1, 1)
 light_energy = 1.8
 spot_range = 5.0
-spot_angle = 45.0
+spot_angle = 55.0
 
 [node name="Floor" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
@@ -154,24 +264,139 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, -3.8)
 mesh = SubResource("BoxMesh_wall")
 
 [node name="PillarL" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 4.5, -3.4)
-mesh = SubResource("BoxMesh_beam")
-
-[node name="PillarMid" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 4.5, -3.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 4.5, -3.4)
 mesh = SubResource("BoxMesh_beam")
 
 [node name="PillarR" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 4.5, -3.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.8, 4.5, -3.4)
 mesh = SubResource("BoxMesh_beam")
 
 [node name="GirderH" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.2, -3.3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.4, -3.3)
 mesh = SubResource("BoxMesh_beam_h")
 
 [node name="AirDuct" type="MeshInstance3D" parent="."]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 4.7, -3.0)
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 4.85, -3.0)
 mesh = SubResource("CylinderMesh_duct")
+
+[node name="TacticalBase" type="Node3D" parent="."]
+
+[node name="SignTrim" type="MeshInstance3D" parent="TacticalBase"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 3.65, -3.76)
+mesh = SubResource("BoxMesh_sign_trim")
+
+[node name="SignBoard" type="MeshInstance3D" parent="TacticalBase"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 3.65, -3.74)
+mesh = SubResource("BoxMesh_sign_frame")
+
+[node name="BaseSign" type="Label3D" parent="TacticalBase"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 3.65, -3.68)
+text = "[ BÖLGE 01 // TAKTİK OPERASYON MERKEZİ ]"
+font_size = 24
+outline_size = 6
+modulate = Color(0.4, 0.9, 1, 1)
+
+[node name="MainGunRack" type="Node3D" parent="TacticalBase"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 2.2, -3.7)
+
+[node name="RackBoard" type="MeshInstance3D" parent="TacticalBase/MainGunRack"]
+mesh = SubResource("BoxMesh_rack_large")
+
+[node name="PegTopL" type="MeshInstance3D" parent="TacticalBase/MainGunRack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0.48, 0.08)
+mesh = SubResource("BoxMesh_rack_peg")
+
+[node name="PegTopR" type="MeshInstance3D" parent="TacticalBase/MainGunRack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0.48, 0.08)
+mesh = SubResource("BoxMesh_rack_peg")
+
+[node name="RackRocket" parent="TacticalBase/MainGunRack" instance=ExtResource("4_rocket")]
+transform = Transform3D(-3.27835e-08, 0, 0.75, 0, 0.75, 0, -0.75, 0, -3.27835e-08, 0.0, 0.52, 0.12)
+
+[node name="PegMidL" type="MeshInstance3D" parent="TacticalBase/MainGunRack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, -0.02, 0.08)
+mesh = SubResource("BoxMesh_rack_peg")
+
+[node name="PegMidR" type="MeshInstance3D" parent="TacticalBase/MainGunRack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, -0.02, 0.08)
+mesh = SubResource("BoxMesh_rack_peg")
+
+[node name="RackBixi" parent="TacticalBase/MainGunRack" instance=ExtResource("5_bixi")]
+transform = Transform3D(-3.27835e-08, 0, 0.75, 0, 0.75, 0, -0.75, 0, -3.27835e-08, 0.0, 0.02, 0.12)
+
+[node name="PegBotL" type="MeshInstance3D" parent="TacticalBase/MainGunRack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, -0.52, 0.08)
+mesh = SubResource("BoxMesh_rack_peg")
+
+[node name="PegBotR" type="MeshInstance3D" parent="TacticalBase/MainGunRack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, -0.52, 0.08)
+mesh = SubResource("BoxMesh_rack_peg")
+
+[node name="RackShotgun" parent="TacticalBase/MainGunRack" instance=ExtResource("3_shotgun")]
+transform = Transform3D(-3.71547e-08, 0, 0.85, 0, 0.85, 0, -0.85, 0, -3.71547e-08, 0.0, -0.48, 0.12)
+
+[node name="SideGunRack" type="Node3D" parent="TacticalBase"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.55, 2.3, -3.7)
+
+[node name="SideBoard" type="MeshInstance3D" parent="TacticalBase/SideGunRack"]
+mesh = SubResource("BoxMesh_rack_small")
+
+[node name="RackUzi1" parent="TacticalBase/SideGunRack" instance=ExtResource("6_uzi")]
+transform = Transform3D(-3.27835e-08, 0, 0.75, 0, 0.75, 0, -0.75, 0, -3.27835e-08, -0.4, 0.35, 0.12)
+
+[node name="RackUzi2" parent="TacticalBase/SideGunRack" instance=ExtResource("6_uzi")]
+transform = Transform3D(-3.27835e-08, 0, 0.75, 0, 0.75, 0, -0.75, 0, -3.27835e-08, 0.4, 0.35, 0.12)
+
+[node name="RackPistol1" parent="TacticalBase/SideGunRack" instance=ExtResource("7_pistol")]
+transform = Transform3D(-4.15258e-08, 0, 0.95, 0, 0.95, 0, -0.95, 0, -4.15258e-08, -0.4, -0.28, 0.12)
+
+[node name="RackPistol2" parent="TacticalBase/SideGunRack" instance=ExtResource("7_pistol")]
+transform = Transform3D(-4.15258e-08, 0, 0.95, 0, 0.95, 0, -0.95, 0, -4.15258e-08, 0.4, -0.28, 0.12)
+
+[node name="CommandStation" type="Node3D" parent="TacticalBase"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9, 0, -2.4)
+
+[node name="ServerTower" type="MeshInstance3D" parent="TacticalBase/CommandStation"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 1.1, -0.1)
+mesh = SubResource("BoxMesh_server_tower")
+
+[node name="LedG1" type="MeshInstance3D" parent="TacticalBase/CommandStation/ServerTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.7, 0.34)
+mesh = SubResource("BoxMesh_server_led")
+
+[node name="LedG2" type="MeshInstance3D" parent="TacticalBase/CommandStation/ServerTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0.7, 0.34)
+mesh = SubResource("BoxMesh_server_led")
+
+[node name="LedA1" type="MeshInstance3D" parent="TacticalBase/CommandStation/ServerTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.7, 0.34)
+mesh = SubResource("BoxMesh_server_led_amber")
+
+[node name="LedG3" type="MeshInstance3D" parent="TacticalBase/CommandStation/ServerTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.3, 0.34)
+mesh = SubResource("BoxMesh_server_led")
+
+[node name="LedA2" type="MeshInstance3D" parent="TacticalBase/CommandStation/ServerTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0.3, 0.34)
+mesh = SubResource("BoxMesh_server_led_amber")
+
+[node name="ConsoleDesk" type="MeshInstance3D" parent="TacticalBase/CommandStation"]
+transform = Transform3D(0.9659, 0, 0.2588, 0, 1, 0, -0.2588, 0, 0.9659, 0.15, 0.42, 0.1)
+mesh = SubResource("BoxMesh_console_desk")
+
+[node name="RadarMonitor" type="MeshInstance3D" parent="TacticalBase/CommandStation"]
+transform = Transform3D(0.9659, 0, 0.2588, 0, 0.9848, 0.1736, 0.2588, -0.1677, 0.9513, -0.15, 1.15, 0.08)
+mesh = SubResource("BoxMesh_screen_radar")
+
+[node name="TerminalMonitor" type="MeshInstance3D" parent="TacticalBase/CommandStation"]
+transform = Transform3D(0.866, 0, -0.5, 0, 0.9848, 0.1736, 0.5, 0.1504, 0.8529, 0.55, 1.12, 0.25)
+mesh = SubResource("BoxMesh_screen_green")
+
+[node name="TerminalOmni" type="OmniLight3D" parent="TacticalBase/CommandStation"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 1.25, 0.3)
+light_color = Color(0.25, 0.8, 1, 1)
+light_energy = 1.4
+omni_range = 2.4
 
 [node name="Props" type="Node3D" parent="."]
 
@@ -186,10 +411,6 @@ mesh = SubResource("BoxMesh_crate_big")
 [node name="CrateSmall1" type="MeshInstance3D" parent="Props"]
 transform = Transform3D(0.9397, 0, -0.342, 0, 1, 0, 0.342, 0, 0.9397, 4.1, 1.2, -1.9)
 mesh = SubResource("BoxMesh_crate_small")
-
-[node name="CrateBig2" type="MeshInstance3D" parent="Props"]
-transform = Transform3D(0.866, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866, -1.8, 0.45, -2.4)
-mesh = SubResource("BoxMesh_crate_big")
 
 [node name="RedBarrel1" type="MeshInstance3D" parent="Props"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0.48, -2.0)
@@ -207,12 +428,41 @@ mesh = SubResource("CylinderMesh_barrel")
 transform = Transform3D(0.9962, 0, -0.0872, 0, 1, 0, 0.0872, 0, 0.9962, 1.5, 0.01, 0.8)
 mesh = SubResource("BoxMesh_stripe")
 
-[node name="BaseSign" type="Label3D" parent="Props"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 3.4, -3.5)
-text = "[ BÖLGE 01 // TAKTİK OPERASYON MERKEZİ ]"
-font_size = 28
-outline_size = 8
-modulate = Color(0.35, 0.85, 1, 0.9)
+[node name="AmmoCanFloor1" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(0.9397, 0, 0.342, 0, 1, 0, -0.342, 0, 0.9397, 0.45, 0.13, 0.55)
+mesh = SubResource("BoxMesh_ammo_can")
+
+[node name="AmmoCanBench" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(0.866, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866, 2.9, 0.98, -2.1)
+mesh = SubResource("BoxMesh_ammo_can")
+
+[node name="BulletCasing1" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(0.7071, 0, 0.7071, 0.7071, 0, -0.7071, 0, 1, 0, 0.85, 0.04, 0.35)
+mesh = SubResource("CylinderMesh_casing")
+
+[node name="BulletCasing2" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(0.9659, 0, -0.2588, 0, 1, 0, 0.2588, 0, 0.9659, 1.05, 0.04, 0.48)
+mesh = SubResource("CylinderMesh_casing")
+
+[node name="BulletCasing3" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(0.5, 0.866, 0, -0.866, 0.5, 0, 0, 0, 1, 0.65, 0.04, 0.42)
+mesh = SubResource("CylinderMesh_casing")
+
+[node name="BulletCasing4" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866, 1.35, 0.04, 0.28)
+mesh = SubResource("CylinderMesh_casing")
+
+[node name="BulletCasing5" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(0.2588, 0, 0.9659, 0.9659, 0, -0.2588, 0, 1, 0, 1.85, 0.04, 0.15)
+mesh = SubResource("CylinderMesh_casing")
+
+[node name="BulletCasing6" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(0.7071, 0.7071, 0, -0.7071, 0.7071, 0, 0, 0, 1, 2.25, 0.93, -2.15)
+mesh = SubResource("CylinderMesh_casing")
+
+[node name="BulletCasing7" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(0.9659, 0, 0.2588, 0, 1, 0, -0.2588, 0, 0.9659, 2.38, 0.93, -2.05)
+mesh = SubResource("CylinderMesh_casing")
 
 [node name="Characters" type="Node3D" parent="."]
 

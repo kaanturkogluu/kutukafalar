@@ -25,7 +25,7 @@ var current_target_z: float = 0.0
 
 const CLASS_CONFIG: Dictionary = {
 	"Pyromancer": {
-		"title": "🔥 KUTU BÜYÜCÜSÜ",
+		"title": "ATEŞ UZMANI",
 		"body_color": Color(0.78, 0.22, 0.16),
 		"accent_color": Color(1.0, 0.40, 0.20),
 		"vest_color": Color(0.16, 0.14, 0.14),
@@ -35,7 +35,7 @@ const CLASS_CONFIG: Dictionary = {
 		"weapon_rot": Vector3(deg_to_rad(-10), deg_to_rad(-15), deg_to_rad(10))
 	},
 	"Engineer": {
-		"title": "⚙️ MÜHENDİS",
+		"title": "MÜHENDİS",
 		"body_color": Color(0.90, 0.54, 0.12),
 		"accent_color": Color(1.0, 0.75, 0.15),
 		"vest_color": Color(0.22, 0.20, 0.18),
@@ -45,7 +45,7 @@ const CLASS_CONFIG: Dictionary = {
 		"weapon_rot": Vector3(deg_to_rad(-5), deg_to_rad(-18), deg_to_rad(8))
 	},
 	"Cryomancer": {
-		"title": "❄️ BUZ MUHAFIZI",
+		"title": "BUZ MUHAFIZI",
 		"body_color": Color(0.18, 0.62, 0.85),
 		"accent_color": Color(0.45, 0.85, 1.0),
 		"vest_color": Color(0.14, 0.18, 0.24),
@@ -55,9 +55,9 @@ const CLASS_CONFIG: Dictionary = {
 		"weapon_rot": Vector3(deg_to_rad(-12), deg_to_rad(-12), deg_to_rad(6))
 	},
 	"Medic": {
-		"title": "💚 SAHRA SIHHIYESİ",
+		"title": "SIHHİYE",
 		"body_color": Color(0.18, 0.72, 0.38),
-		"accent_color": Color(0.95, 0.95, 0.95),
+		"accent_color": Color(0.28, 0.95, 0.65),
 		"vest_color": Color(0.14, 0.24, 0.16),
 		"weapon_scene": "res://scenes/weapons/shotgun_model.tscn",
 		"weapon_scale": Vector3(0.70, 0.70, 0.70),
@@ -136,7 +136,7 @@ func set_selected(selected: bool, instant: bool = false) -> void:
 	is_selected = selected
 	var target_z = base_position.z + (0.65 if is_selected else 0.0)
 	var target_scale = Vector3(1.06, 1.06, 1.06) if is_selected else Vector3(0.94, 0.94, 0.94)
-	var target_light_energy = 2.8 if is_selected else 0.4
+	var target_light_energy = 1.1 if is_selected else 0.35
 	var label_alpha = 1.0 if is_selected else 0.45
 	
 	if instant:

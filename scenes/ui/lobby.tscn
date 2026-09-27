@@ -113,45 +113,45 @@ expand_mode = 1
 [node name="HeaderContainer" type="MarginContainer" parent="."]
 layout_mode = 0
 offset_left = 48.0
-offset_top = 48.0
+offset_top = 28.0
 offset_right = 440.0
-offset_bottom = 130.0
+offset_bottom = 92.0
 
 [node name="VBox" type="VBoxContainer" parent="HeaderContainer"]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 2
 
 [node name="TitleLabel" type="Label" parent="HeaderContainer/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.96, 0.96, 0.98, 1)
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 28
 text = "KUTU KAFALAR"
 
 [node name="SubtitleLabel" type="Label" parent="HeaderContainer/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.65, 0.78, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 11
 text = "HORDE TACTICAL SURVIVAL"
 
 [node name="MenuContainer" type="MarginContainer" parent="."]
 layout_mode = 0
 offset_left = 48.0
-offset_top = 160.0
-offset_right = 480.0
-offset_bottom = 680.0
+offset_top = 104.0
+offset_right = 460.0
+offset_bottom = 530.0
 
 [node name="MainNavigation" type="VBoxContainer" parent="MenuContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 
 [node name="NavSingleBtn" type="Button" parent="MenuContainer/MainNavigation"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(320, 50)
+custom_minimum_size = Vector2(300, 46)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
@@ -160,11 +160,11 @@ text = "TEK OYUNCU"
 
 [node name="NavMultiBtn" type="Button" parent="MenuContainer/MainNavigation"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(320, 50)
+custom_minimum_size = Vector2(300, 46)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
@@ -173,11 +173,11 @@ text = "ÇOK OYUNCULU"
 
 [node name="NavSettingsBtn" type="Button" parent="MenuContainer/MainNavigation"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(320, 50)
+custom_minimum_size = Vector2(300, 46)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
@@ -186,11 +186,11 @@ text = "AYARLAR"
 
 [node name="NavQuitBtn" type="Button" parent="MenuContainer/MainNavigation"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(320, 50)
+custom_minimum_size = Vector2(300, 46)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.75, 0.82, 1)
 theme_override_colors/font_hover_color = Color(1, 0.35, 0.35, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
@@ -200,20 +200,20 @@ text = "ÇIKIŞ"
 [node name="SingleplayerPanel" type="PanelContainer" parent="MenuContainer"]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(400, 360)
+custom_minimum_size = Vector2(380, 310)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_glass")
 
 [node name="Margin" type="MarginContainer" parent="MenuContainer/SingleplayerPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 24
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
 
 [node name="VBox" type="VBoxContainer" parent="MenuContainer/SingleplayerPanel/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="MenuContainer/SingleplayerPanel/Margin/VBox"]
 layout_mode = 2
@@ -276,25 +276,25 @@ flat = true
 [node name="MultiplayerPanel" type="PanelContainer" parent="MenuContainer"]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(420, 460)
+custom_minimum_size = Vector2(390, 380)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_glass")
 
 [node name="Margin" type="MarginContainer" parent="MenuContainer/MultiplayerPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 22
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 22
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 14
 
 [node name="VBox" type="VBoxContainer" parent="MenuContainer/MultiplayerPanel/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
 [node name="Title" type="Label" parent="MenuContainer/MultiplayerPanel/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.92, 0.96, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 18
 text = "ÇOK OYUNCULU"
 
 [node name="HSeparator1" type="HSeparator" parent="MenuContainer/MultiplayerPanel/Margin/VBox"]
@@ -308,7 +308,7 @@ text = "OYUNCU ADI"
 
 [node name="MultiNameInput" type="LineEdit" parent="MenuContainer/MultiplayerPanel/Margin/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_input")
 text = "Kutu Asker"
@@ -322,14 +322,14 @@ text = "SINIF SEÇİMİ"
 
 [node name="MultiClassOption" type="OptionButton" parent="MenuContainer/MultiplayerPanel/Margin/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 
 [node name="HostBtn" type="Button" parent="MenuContainer/MultiplayerPanel/Margin/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
@@ -363,7 +363,7 @@ theme_override_constants/separation = 6
 
 [node name="IpInput" type="LineEdit" parent="MenuContainer/MultiplayerPanel/Margin/VBox/IpJoinBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_input")
 text = "127.0.0.1"
@@ -371,7 +371,7 @@ placeholder_text = "IP Adresi..."
 
 [node name="JoinIpBtn" type="Button" parent="MenuContainer/MultiplayerPanel/Margin/VBox/IpJoinBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
@@ -387,14 +387,14 @@ theme_override_constants/separation = 6
 
 [node name="CodeInput" type="LineEdit" parent="MenuContainer/MultiplayerPanel/Margin/VBox/CodeJoinBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_input")
-placeholder_text = "Oda Kodu (örn. 7F000001)..."
+placeholder_text = "Oda Kodu (örn. C0A80173)..."
 
 [node name="JoinCodeBtn" type="Button" parent="MenuContainer/MultiplayerPanel/Margin/VBox/CodeJoinBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
@@ -404,7 +404,7 @@ text = "KOD İLE BAĞLAN"
 
 [node name="StatusLabel" type="Label" parent="MenuContainer/MultiplayerPanel/Margin/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 28)
+custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.85, 0.6, 1)
 theme_override_font_sizes/font_size = 11
@@ -413,7 +413,7 @@ autowrap_mode = 2
 
 [node name="MultiBackBtn" type="Button" parent="MenuContainer/MultiplayerPanel/Margin/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 34)
+custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.65, 0.7, 0.8, 1)
 theme_override_font_sizes/font_size = 13
@@ -423,32 +423,32 @@ flat = true
 [node name="RoomPanel" type="PanelContainer" parent="MenuContainer"]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(430, 470)
+custom_minimum_size = Vector2(400, 365)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_glass")
 
 [node name="Margin" type="MarginContainer" parent="MenuContainer/RoomPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 22
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 22
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 14
 
 [node name="VBox" type="VBoxContainer" parent="MenuContainer/RoomPanel/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
 [node name="RoomTitle" type="Label" parent="MenuContainer/RoomPanel/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.92, 0.96, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 18
 text = "BEKLEME ODASI"
 
 [node name="RoomInfoLabel" type="Label" parent="MenuContainer/RoomPanel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 11
 text = "Oda Bilgisi Yükleniyor..."
 
 [node name="ClassSelectBox" type="HBoxContainer" parent="MenuContainer/RoomPanel/Margin/VBox"]
@@ -458,7 +458,7 @@ theme_override_constants/separation = 8
 [node name="Label" type="Label" parent="MenuContainer/RoomPanel/Margin/VBox/ClassSelectBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.65, 0.7, 0.8, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 11
 text = "SINIF:"
 
 [node name="RoomClassOption" type="OptionButton" parent="MenuContainer/RoomPanel/Margin/VBox/ClassSelectBox"]
@@ -470,7 +470,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 
 [node name="ScrollContainer" type="ScrollContainer" parent="MenuContainer/RoomPanel/Margin/VBox"]
-custom_minimum_size = Vector2(0, 160)
+custom_minimum_size = Vector2(0, 115)
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -478,10 +478,11 @@ size_flags_vertical = 3
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
 [node name="RoomStatusLabel" type="Label" parent="MenuContainer/RoomPanel/Margin/VBox"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.82, 0.55, 1)
 theme_override_font_sizes/font_size = 11
@@ -494,7 +495,7 @@ theme_override_constants/separation = 8
 
 [node name="ReadyBtn" type="Button" parent="MenuContainer/RoomPanel/Margin/VBox/RoomButtons"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(110, 38)
+custom_minimum_size = Vector2(100, 36)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 13
@@ -505,7 +506,7 @@ text = "HAZIR OL"
 
 [node name="StartGameBtn" type="Button" parent="MenuContainer/RoomPanel/Margin/VBox/RoomButtons"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(140, 38)
+custom_minimum_size = Vector2(130, 36)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.9, 1, 0.9, 1)
@@ -517,7 +518,7 @@ text = "OYUNU BAŞLAT"
 
 [node name="LeaveRoomBtn" type="Button" parent="MenuContainer/RoomPanel/Margin/VBox/RoomButtons"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(80, 38)
+custom_minimum_size = Vector2(70, 36)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "AYRIL"
@@ -530,12 +531,12 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -200.0
-offset_top = -48.0
+offset_left = -220.0
+offset_top = -44.0
 grow_horizontal = 0
 grow_vertical = 0
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 16
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 18
 
 [node name="VersionLabel" type="Label" parent="BottomRightInfo"]
 unique_name_in_owner = true

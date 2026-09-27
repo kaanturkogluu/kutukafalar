@@ -1,6 +1,6 @@
 {
   "version": "v1.2.0",
   "download_url": "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-  "pck_size": 406560,
-  "changelog": "- The Forest minimalist taktiksel arayüz mimarisi (Tek Oyuncu, Çok Oyunculu, Ayarlar, Çıkış).\n- İkon ve emojilerden arındırılmış, profesyonel oyun hissi veren tipografi ve butonlar.\n- Canlı 3D Taktik Tim & Cephanelik Arka Planı (Dinamik kafa takibi & sınıf öne çıkış animasyonu).\n- Çok Oyunculu: Lobi Kurma, IP ile Katıl ve 8 Haneli Hızlı Oda Kodu ile Katılma desteği.\n- Otomatik arka plan güncelleme kontrolü ve sağ alt köşede zarif sürüm bilgisi."
+  "pck_size": 414512,
+  "changelog": "- Taktiksel Askeri Üs & Cephanelik: Arka duvar raflarında dizili silahlar (Roketatar, Bixi, Pompalı, Uzi, Tabancalar).\n- Komuta Konsolları & Bilgisayarlar: Parıldayan taktik radar ve yeşil telemetri ekranları, sunucu kulesi ve durum LED'leri.\n- Mühimmat & Mermiler: Yerde ve tezgahlarda saçılmış pirinç kovanlar, mühimmat sandıkları ve şarjörler.\n- Engelsiz Üs Tabelası: [ BÖLGE 01 // TAKTİK OPERASYON MERKEZİ ] kolon engelinden kurtarılarak arkadan aydınlatmalı tabela paneliyle yukarı taşındı.\n- Menü Alt Boşluk İyileştirmesi: Kompakt panel ve başlık yerleşimiyle ekranın alt kısmında ferah ve dengeli boşluk sağlandı.\n- Karakter Başlıkları: Emojilerden arındırılmış ciddi taktiksel unvanlar (Ateş Uzmanı, Mühendis, Buz Muhafızı, Sıhhiye).\n- Sağ alt köşede düzeltilmiş sürüm gösterimi (v1.2.0)."
 }

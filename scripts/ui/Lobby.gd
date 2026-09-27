@@ -75,7 +75,10 @@ func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	
 	if version_label:
-		version_label.text = "v" + AutoUpdater.CURRENT_VERSION
+		var v_str = AutoUpdater.CURRENT_VERSION
+		if not v_str.begins_with("v"):
+			v_str = "v" + v_str
+		version_label.text = v_str
 	
 	# Sınıf Açılır Menülerini Doldur (İkonsuz / Ciddi Taktiksel İsimler)
 	_setup_class_options()
