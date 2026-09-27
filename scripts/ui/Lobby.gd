@@ -72,6 +72,54 @@ const GAME_SCENE_PATH: String = "res://scenes/levels/main_level.tscn"
 @onready var sens_slider: HSlider = %SensSlider
 @onready var sens_label: Label = %SensLabel
 
+# 8. Sınıf Taktik Yetenek Kartı (Glassmorphism & HUD)
+@onready var class_skill_card: PanelContainer = %ClassSkillCard
+@onready var skill_class_title: Label = %SkillClassTitle
+@onready var skill_role_desc: Label = %SkillRoleDesc
+@onready var skill_tactical_title: Label = %SkillTacticalTitle
+@onready var skill_tactical_desc: Label = %SkillTacticalDesc
+@onready var skill_ult_title: Label = %SkillUltTitle
+@onready var skill_ult_desc: Label = %SkillUltDesc
+
+const CLASS_SKILLS: Dictionary = {
+	"Pyromancer": {
+		"title": "ATEŞ UZMANI",
+		"role": "[SALDIRI / ALAN HASARI]",
+		"tactical_title": "[E] TAKTİK: ALEV DALGASI (14s Bekleme)",
+		"tactical_desc": "İleriye doğru yayılan yakıcı alev dalgası savurur. Sürüleri ateşe verir ve yüksek hasar uygular.",
+		"ult_title": "[Q] NİHAİ: KIYAMET METEORU",
+		"ult_desc": "Hedef noktaya gökyüzünden alevli meteor düşürür. Etki alanındaki tüm zombileri anında yok eder.",
+		"ult_color": Color(1.0, 0.45, 0.35)
+	},
+	"Engineer": {
+		"title": "DUVARCI (MÜHENDİS)",
+		"role": "[SAVUNMA / ALAN KONTROLÜ]",
+		"tactical_title": "[E] TAKTİK: BARİKAT & VORTEX (14s Bekleme)",
+		"tactical_desc": "Zombi geçişlerini kesen taktik barikat kurar veya manyetik vortex bombasıyla düşmanları toplar.",
+		"ult_title": "[Q] NİHAİ: GRAVİTON EMP PATLAMASI",
+		"ult_desc": "Yerçekimsel şok dalgası yayarak hedef bölgedeki tüm zombi sürülerini ezer ve savurur.",
+		"ult_color": Color(0.35, 0.85, 1.0)
+	},
+	"Cryomancer": {
+		"title": "BUZ MUHAFIZI",
+		"role": "[KONTROL / DONDURMA]",
+		"tactical_title": "[E] TAKTİK: KRİYOJENİK BUZ BOMBASI (14s Bekleme)",
+		"tactical_desc": "Çarptığı bölgedeki zombileri anında dondurarak hareket kabiliyetlerini felç eder.",
+		"ult_title": "[Q] NİHAİ: BUZ FIRTINASI (GLACIAL BLAST)",
+		"ult_desc": "Geniş bir alana devasa buz sarkıtları yağdırarak zombi sürülerini dondurup parçalar.",
+		"ult_color": Color(0.45, 0.9, 1.0)
+	},
+	"Medic": {
+		"title": "SIHHİYE (DOKTOR)",
+		"role": "[DESTEK / TAKIM HAYATTA KALMA]",
+		"tactical_title": "[E] TAKTİK: ŞİFA ŞİŞESİ (14s Bekleme)",
+		"tactical_desc": "Patladığı alana taktik şifa sisi yayar. Alandaki tüm dost personelin canını hızla yeniler.",
+		"ult_title": "[Q] NİHAİ: AŞIRI YÜKLEME (MEDIC OVERDRIVE)",
+		"ult_desc": "Tüm ekibin canını anında %100'e çıkarır ve yere düşmüş takım arkadaşlarını kaldırır.",
+		"ult_color": Color(0.35, 1.0, 0.55)
+	}
+}
+
 var is_local_ready: bool = false
 var active_join_mode: String = "ip" # "ip" veya "code"
 
@@ -140,9 +188,11 @@ func _ready() -> void:
 	_show_main_nav()
 	_set_join_mode("ip")
 	
-	# 3D Sahneyi varsayılan sınıfla başlat
+	# 3D Sahneyi varsayılan sınıfla başlat ve yetenek kartını senkronize et
+	var default_class = NetworkManager.local_player_class if NetworkManager.local_player_class != "" else "Pyromancer"
 	if squad_bg:
-		squad_bg.select_class("Pyromancer", true)
+		squad_bg.select_class(default_class, true)
+	_update_class_skill_card(default_class)
 	
 	# Açılışta sessizce güncelleme kontrolü
 	get_tree().create_timer(0.6).timeout.connect(func(): AutoUpdater.check_for_updates())
@@ -194,6 +244,9 @@ func _on_class_selected(index: int) -> void:
 	# 3D karakteri öne getir ve vurgula
 	if squad_bg:
 		squad_bg.select_class(class_code)
+	
+	# Sağ alt köşedeki taktiksel yetenek kartını güncelle
+	_update_class_skill_card(class_code)
 
 func _get_class_code_from_index(index: int) -> String:
 	match index:
@@ -210,6 +263,25 @@ func _get_class_display_title(class_code: String) -> String:
 		"Cryomancer": return "BUZ MUHAFIZI"
 		"Medic": return "SIHHİYE"
 		_: return class_code.to_upper()
+
+func _update_class_skill_card(class_code: String) -> void:
+	if not class_skill_card:
+		return
+	
+	var data = CLASS_SKILLS.get(class_code, CLASS_SKILLS["Pyromancer"])
+	if skill_class_title:
+		skill_class_title.text = data["title"]
+	if skill_role_desc:
+		skill_role_desc.text = data["role"]
+	if skill_tactical_title:
+		skill_tactical_title.text = data["tactical_title"]
+	if skill_tactical_desc:
+		skill_tactical_desc.text = data["tactical_desc"]
+	if skill_ult_title:
+		skill_ult_title.text = data["ult_title"]
+		skill_ult_title.add_theme_color_override("font_color", data.get("ult_color", Color(1.0, 0.45, 0.35)))
+	if skill_ult_desc:
+		skill_ult_desc.text = data["ult_desc"]
 
 # --- Panel Geçişleri ---
 
@@ -287,7 +359,7 @@ func _refresh_singleplayer_floors() -> void:
 		if is_boss:
 			item_text += " [BOSS]"
 		if f == last_played:
-			item_text += " ★ (Son Kalınan)"
+			item_text += " [SON KALINAN]"
 		single_floor_option.add_item(item_text, f)
 	
 	var select_idx = 0
@@ -298,11 +370,11 @@ func _refresh_singleplayer_floors() -> void:
 	single_floor_option.select(select_idx)
 	
 	if single_resume_btn:
-		single_resume_btn.text = "🔄 Son Kat (%02d)" % last_played
+		single_resume_btn.text = "[SON KALINAN: KAT %02d]" % last_played
 	
 	if floor_progress_label:
 		var sector_num = LevelData.get_chapter_for_level(max_unlocked).get("sector", 1)
-		floor_progress_label.text = "🏆 En Yüksek Açık: Kat %02d / 99 (Sektör %d)" % [max_unlocked, sector_num]
+		floor_progress_label.text = "EN YÜKSEK AÇIK SEVİYE: KAT %02d / 99 (SEKTÖR %d)" % [max_unlocked, sector_num]
 
 func _on_single_floor_selected(index: int) -> void:
 	var floor_id = single_floor_option.get_item_id(index)

@@ -41,12 +41,12 @@ func _setup_sector_navigation() -> void:
 	sector_nav_box.theme_override_constants.set("separation", 16)
 	
 	prev_sector_btn = Button.new()
-	prev_sector_btn.text = "◀ ÖNCEKİ SEKTÖR"
+	prev_sector_btn.text = "< ÖNCEKİ SEKTÖR"
 	prev_sector_btn.custom_minimum_size = Vector2(160, 32)
 	prev_sector_btn.pressed.connect(_on_prev_sector_pressed)
 	
 	next_sector_btn = Button.new()
-	next_sector_btn.text = "SONRAKİ SEKTÖR ▶"
+	next_sector_btn.text = "SONRAKİ SEKTÖR >"
 	next_sector_btn.custom_minimum_size = Vector2(160, 32)
 	next_sector_btn.pressed.connect(_on_next_sector_pressed)
 	
@@ -253,7 +253,7 @@ func _update_details() -> void:
 	
 	if detail_desc:
 		if info.get("is_boss_level", false):
-			detail_desc.text = "⚠️ DİKKAT: %s bu katta bekliyor! Yüksek can ve ezici saldırı gücü. Varilleri ve siperleri koordineli kullanın." % str(info.get("boss_name", "SEKTÖR BOSS'U")).to_upper()
+			detail_desc.text = "UYARI: %s bu katta bekliyor! Yüksek can ve ezici saldırı gücü. Varilleri ve siperleri koordineli kullanın." % str(info.get("boss_name", "SEKTÖR BOSS'U")).to_upper()
 		else:
 			detail_desc.text = "Sektör %d: %s. Zombi sürüleri açık koridor ve aralıklardan hücum edecek. Hedef: Asansörü açıp bir sonraki kata tırmanın." % [info.get("sector", 1), str(info.get("theme", ""))]
 	

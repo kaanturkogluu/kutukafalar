@@ -1,21 +1,35 @@
-[gd_scene load_steps=10 format=3 uid="uid://c51wup2e3a1k8"]
+[gd_scene load_steps=11 format=3 uid="uid://c51wup2e3a1k8"]
 
 [ext_resource type="Script" path="res://scripts/ui/Lobby.gd" id="1_lobby"]
 [ext_resource type="PackedScene" uid="uid://squad_bg_3d_01" path="res://scenes/ui/squad_background_3d.tscn" id="2_squad_bg"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glass"]
-bg_color = Color(0.045, 0.055, 0.08, 0.88)
+bg_color = Color(0.035, 0.045, 0.07, 0.76)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.2, 0.32, 0.48, 0.5)
+border_color = Color(0.35, 0.48, 0.65, 0.35)
 corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_left = 10
 corner_radius_bottom_right = 10
 shadow_color = Color(0, 0, 0, 0.6)
-shadow_size = 20
+shadow_size = 22
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glass_skill"]
+bg_color = Color(0.03, 0.04, 0.065, 0.80)
+border_width_left = 3
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.95, 0.68, 0.18, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.65)
+shadow_size = 22
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
 bg_color = Color(0.06, 0.08, 0.12, 0.65)
@@ -269,21 +283,21 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 11
-text = "🔄 Son Kalınan Kat"
+text = "[SON KALINAN KAT]"
 
 [node name="SingleFloor1Btn" type="Button" parent="MenuContainer/SingleplayerPanel/Margin/VBox/QuickFloorButtons"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 11
-text = "1️⃣ Kat 1'den Başla"
+text = "[KAT 01'DEN BAŞLA]"
 
 [node name="FloorProgressLabel" type="Label" parent="MenuContainer/SingleplayerPanel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.75, 0.65, 1)
 theme_override_font_sizes/font_size = 11
-text = "🏆 En Yüksek Açık Kat: Kat 01"
+text = "EN YÜKSEK AÇIK KAT: KAT 01"
 
 [node name="Spacer" type="Control" parent="MenuContainer/SingleplayerPanel/Margin/VBox"]
 layout_mode = 2
@@ -559,6 +573,88 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "AYRIL"
 flat = true
+
+[node name="ClassSkillCard" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -448.0
+offset_top = -296.0
+offset_right = -28.0
+offset_bottom = -46.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_glass_skill")
+
+[node name="Margin" type="MarginContainer" parent="ClassSkillCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 14
+
+[node name="VBox" type="VBoxContainer" parent="ClassSkillCard/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HeaderHBox" type="HBoxContainer" parent="ClassSkillCard/Margin/VBox"]
+layout_mode = 2
+
+[node name="SkillClassTitle" type="Label" parent="ClassSkillCard/Margin/VBox/HeaderHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.95, 0.72, 0.25, 1)
+theme_override_font_sizes/font_size = 14
+text = "ATEŞ UZMANI"
+
+[node name="SkillRoleDesc" type="Label" parent="ClassSkillCard/Margin/VBox/HeaderHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.75, 0.88, 0.85)
+theme_override_font_sizes/font_size = 11
+text = "[SALDIRI / ALAN HASARI]"
+horizontal_alignment = 2
+
+[node name="HSeparator" type="HSeparator" parent="ClassSkillCard/Margin/VBox"]
+layout_mode = 2
+
+[node name="SkillTacticalTitle" type="Label" parent="ClassSkillCard/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.92, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "[E] TAKTİK: ALEV DALGASI (14s)"
+
+[node name="SkillTacticalDesc" type="Label" parent="ClassSkillCard/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.68, 0.75, 0.84, 1)
+theme_override_font_sizes/font_size = 10
+text = "İleriye doğru yayılan alev dalgası gönderir. Zombileri yakarak yüksek hasar verir ve alan kontrolü sağlar."
+autowrap_mode = 2
+
+[node name="HSeparator2" type="HSeparator" parent="ClassSkillCard/Margin/VBox"]
+layout_mode = 2
+
+[node name="SkillUltTitle" type="Label" parent="ClassSkillCard/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.45, 0.35, 1)
+theme_override_font_sizes/font_size = 12
+text = "[Q] NİHAİ: KIYAMET METEORU"
+
+[node name="SkillUltDesc" type="Label" parent="ClassSkillCard/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.68, 0.75, 0.84, 1)
+theme_override_font_sizes/font_size = 10
+text = "Gökyüzünden devasa bir meteor indirir. Geniş alandaki tüm hedefleri yok eder ve yakıcı krater bırakır."
+autowrap_mode = 2
 
 [node name="BottomRightInfo" type="MarginContainer" parent="."]
 layout_mode = 1
