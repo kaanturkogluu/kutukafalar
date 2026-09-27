@@ -1,6 +1,6 @@
 {
-  "version": "v1.3.0",
-  "download_url": "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-  "pck_size": 425200,
-  "changelog": "- Taktiksel ESC Duraklatma Menüsü: Modern koyu cam panel, kehribar vurgulu düz butonlar, sıfır emoji ve tam taktiksel görünüm.\n- Oyun İçi Ayarlar (In-Game Settings): ESC menüsünden anında Ekran Modu (Tam Ekran/Kenarlıksız/Pencereli), VSync, Ana Ses ve Fare Hassasiyeti ayarlayabilme.\n- Asansör Görev & Seviye Terminali: Koyu cam zemin, kehribar ve zümrüt durum rozetleri, temiz grid yapısı.\n- Asansör İkmal & Geliştirme İstasyonu (Mağaza): Yenilenen taktik kartlar, Kredi sistemi, görev terminaline geri dönebilme ve emojilerden tamamen arındırılmış arayüz.\n- TAB Skor Tablosu & HUD İyileştirmeleri: Temiz askeri yazı dili ve optimize edilmiş kullanıcı deneyimi."
+    "version":  "v1.3.0",
+    "download_url":  "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
+    "pck_size":  432176,
+    "changelog":  "- Taktiksel ESC Duraklatma Menüsü: Modern koyu cam panel, kehribar vurgulu düz butonlar, sıfır emoji ve tam taktiksel görünüm.\n- Oyun İçi Ayarlar (In-Game Settings): ESC menüsünden anında Ekran Modu (Tam Ekran/Kenarlıksız/Pencereli), VSync, Ana Ses ve Fare Hassasiyeti ayarlayabilme.\n- Asansör Görev \u0026 Seviye Terminali: Koyu cam zemin, kehribar ve zümrüt durum rozetleri, temiz grid yapısı.\n- Asansör İkmal \u0026 Geliştirme İstasyonu (Mağaza): Yenilenen taktik kartlar, Kredi sistemi, görev terminaline geri dönebilme ve emojilerden tamamen arındırılmış arayüz.\n- TAB Skor Tablosu \u0026 HUD İyileştirmeleri: Temiz askeri yazı dili ve optimize edilmiş kullanıcı deneyimi."
 }
