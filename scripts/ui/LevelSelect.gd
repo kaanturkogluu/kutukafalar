@@ -79,9 +79,9 @@ func _build_level_grid() -> void:
 	
 	var info = LevelData.get_chapter_for_level(selected_level)
 	if chapter_title:
-		chapter_title.text = "BÖLÜM %d: %s" % [info.get("chapter", 1), str(info.get("theme", "BÖLGE")).to_upper()]
+		chapter_title.text = "SEKTÖR %d: %s" % [info.get("sector", 1), str(info.get("sector_name", info.get("theme", "GİRİŞ"))).to_upper()]
 	if completed_label:
-		completed_label.text = "SON GÖREV: SEVİYE %d TAMAMLANDI" % current_completed_level
+		completed_label.text = "ASANSÖR HEDEFİ: KAT %02d // TAHLİYEYE KALAN: %d KAT" % [selected_level, max(0, 99 - selected_level)]
 
 	# 1'den 9'a kadar seviye grid kartları oluştur (3x3 Yan Yana Grid)
 	for lvl in range(1, 10):
@@ -112,8 +112,8 @@ func _select_level(lvl: int) -> void:
 func _style_button(btn: Button, lvl: int) -> void:
 	var is_completed = lvl <= current_completed_level
 	var is_locked = lvl > max_unlocked_level
-	var is_boss = (lvl == 9)
-	var subtitle = LEVEL_SUBTITLES.get(lvl, "SEVİYE " + str(lvl))
+	var is_boss = (lvl % 9 == 0)
+	var subtitle = LevelData.FLOOR_NAMES.get(lvl, LEVEL_SUBTITLES.get(lvl, "KAT " + str(lvl))).to_upper()
 	
 	var status_text = "AÇIK"
 	if lvl == selected_level:
@@ -121,14 +121,14 @@ func _style_button(btn: Button, lvl: int) -> void:
 	elif is_completed:
 		status_text = "TAMAMLANDI"
 	elif lvl == current_completed_level + 1:
-		status_text = "SIRADAKİ GÖREV"
+		status_text = "SIRADAKİ KAT"
 	elif is_locked:
 		status_text = "KİLİTLİ"
 	
 	if is_boss and not is_completed and lvl != selected_level:
 		status_text = "BOSS TEHLİKESİ"
 
-	btn.text = "SEVİYE %02d: %s\n[ %s ]" % [lvl, subtitle, status_text]
+	btn.text = "KAT %02d: %s\n[ %s ]" % [lvl, subtitle, status_text]
 	
 	# Temel Normal Stil
 	var normal_sb = StyleBoxFlat.new()

@@ -56,6 +56,9 @@ func _get_walls_container() -> Node3D:
 @onready var wave_label: Label = $WaveUI/WaveInfo/WaveLabel
 @onready var enemies_label: Label = $WaveUI/WaveInfo/EnemiesLabel
 @onready var boss_notice_label: Label = get_node_or_null("WaveUI/BossNoticeLabel")
+@onready var floor_intro_banner: Control = get_node_or_null("WaveUI/FloorIntroBanner")
+@onready var floor_intro_title: Label = get_node_or_null("WaveUI/FloorIntroBanner/FloorIntroTitle")
+@onready var floor_intro_sub: Label = get_node_or_null("WaveUI/FloorIntroBanner/FloorIntroSubtitle")
 @onready var level_select_ui: CanvasLayer = get_node_or_null("LevelSelectUI")
 
 func _ready() -> void:
@@ -280,6 +283,9 @@ func _start_next_wave() -> void:
 	active_zombie_count = 0
 	_sync_floor_ui.rpc(current_floor, current_wave, zombies_remaining_to_spawn)
 	
+	if current_wave == 1:
+		_show_floor_intro.rpc(current_floor)
+	
 	if is_boss_wave:
 		_show_boss_notice.rpc(true)
 		_spawn_boss_zombie(player_count)
@@ -301,6 +307,25 @@ func _show_boss_notice(show: bool) -> void:
 				if is_instance_valid(boss_notice_label):
 					boss_notice_label.visible = false
 			)
+
+@rpc("call_local", "reliable")
+func _show_floor_intro(floor_num: int) -> void:
+	if floor_intro_banner:
+		var info = LevelData.get_chapter_for_level(floor_num)
+		if floor_intro_title:
+			floor_intro_title.text = "🏙️ KAT %02d: %s" % [floor_num, str(info.get("floor_name", "SOKAK GİRİŞİ")).to_upper()]
+		if floor_intro_sub:
+			floor_intro_sub.text = "SEKTÖR %d: %s // HEDEF: KULE ASANSÖRÜNÜ AÇIN!" % [info.get("sector", 1), str(info.get("theme", "")).to_upper()]
+		floor_intro_banner.visible = true
+		floor_intro_banner.modulate = Color(1, 1, 1, 1)
+		var tween = create_tween()
+		tween.tween_interval(3.5)
+		tween.tween_property(floor_intro_banner, "modulate:a", 0.0, 1.0)
+		tween.tween_callback(func():
+			if is_instance_valid(floor_intro_banner):
+				floor_intro_banner.visible = false
+				floor_intro_banner.modulate.a = 1.0
+		)
 
 func _spawn_boss_zombie(player_count: int = 1) -> void:
 	zombie_id_counter += 1
@@ -513,12 +538,12 @@ func _sync_floor_ui(floor_num: int, wave_num: int, remaining: int) -> void:
 	current_wave = wave_num
 	var info = LevelData.get_chapter_for_level(floor_num)
 	if floor_label:
-		floor_label.text = "BÖLÜM %d: %s" % [info.get("chapter", 1), str(info.get("theme", "BÖLGE")).to_upper()]
+		floor_label.text = "KAT %02d // %s" % [floor_num, str(info.get("floor_name", "SOKAK GİRİŞİ")).to_upper()]
 	if wave_label:
 		if info.get("is_boss_level", false) and wave_num == WAVES_PER_FLOOR:
-			wave_label.text = "SEVİYE %d / %d | BOSS: %s" % [info.get("level_in_chapter", 1), info.get("max_in_chapter", 9), info.get("boss_name", "ŞEF")]
+			wave_label.text = "SEKTÖR %d: %s | BOSS: %s" % [info.get("sector", 1), str(info.get("theme", "")).to_upper(), info.get("boss_name", "ŞEF")]
 		else:
-			wave_label.text = "SEVİYE %d / %d | DALGA: %d / %d" % [info.get("level_in_chapter", 1), info.get("max_in_chapter", 9), wave_num, WAVES_PER_FLOOR]
+			wave_label.text = "SEKTÖR %d: %s | DALGA: %d / %d" % [info.get("sector", 1), str(info.get("theme", "")).to_upper(), wave_num, WAVES_PER_FLOOR]
 	if enemies_label:
 		enemies_label.text = "KALAN DÜŞMAN: " + str(remaining)
 
@@ -531,9 +556,9 @@ func _announce_wave_cleared() -> void:
 func _announce_floor_cleared(was_boss: bool = false) -> void:
 	if enemies_label:
 		if was_boss:
-			enemies_label.text = "BÖLÜM ŞEFİ YENİLDİ! ASANSÖRE BİNİN!"
+			enemies_label.text = "SEKTÖR ŞEFİ YENİLDİ! ASANSÖR ANAHTARI AÇILDI!"
 		else:
-			enemies_label.text = "SEVİYE TEMİZLENDİ! ASANSÖRE BİNİN!"
+			enemies_label.text = "KAT TEMİZLENDİ! ASANSÖRE BİNİN! (SONRAKİ KAT)"
 
 func _on_player_died(_player_node: Node) -> void:
 	if not multiplayer.is_server():
@@ -623,9 +648,9 @@ func sync_reset_game_state(floor_num: int = 1) -> void:
 		enemies_label.text = "SEVİYE YENİDEN BAŞLATILDI"
 	var info = LevelData.get_chapter_for_level(floor_num)
 	if floor_label:
-		floor_label.text = "BÖLÜM %d: %s" % [info.get("chapter", 1), str(info.get("theme", "BÖLGE")).to_upper()]
+		floor_label.text = "KAT %02d // %s" % [floor_num, str(info.get("floor_name", "SOKAK GİRİŞİ")).to_upper()]
 	if wave_label:
-		wave_label.text = "SEVİYE %d / %d | DALGA 1 / %d" % [info.get("level_in_chapter", 1), info.get("max_in_chapter", 9), WAVES_PER_FLOOR]
+		wave_label.text = "SEKTÖR %d: %s | DALGA: 1 / %d" % [info.get("sector", 1), str(info.get("theme", "")).to_upper(), WAVES_PER_FLOOR]
 
 @rpc("call_local", "reliable")
 func sync_clear_all_entities() -> void:

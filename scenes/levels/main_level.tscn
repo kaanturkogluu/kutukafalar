@@ -195,6 +195,64 @@ emission_enabled = true
 emission = Color(0.25, 0.75, 1, 1)
 emission_energy_multiplier = 2.0
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_concrete_barrier"]
+albedo_color = Color(0.45, 0.46, 0.48, 1)
+roughness = 0.85
+
+[sub_resource type="BoxMesh" id="BoxMesh_concrete_barrier"]
+material = SubResource("StandardMaterial3D_concrete_barrier")
+size = Vector3(3.2, 1.2, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_concrete_barrier"]
+size = Vector3(3.2, 1.2, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sandbag"]
+albedo_color = Color(0.5, 0.44, 0.32, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="BoxMesh_sandbag"]
+material = SubResource("StandardMaterial3D_sandbag")
+size = Vector3(2.4, 0.9, 1.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sandbag"]
+size = Vector3(2.4, 0.9, 1.0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_warning_barrier"]
+albedo_color = Color(0.85, 0.65, 0.15, 1)
+roughness = 0.6
+
+[sub_resource type="BoxMesh" id="BoxMesh_warning_barrier"]
+material = SubResource("StandardMaterial3D_warning_barrier")
+size = Vector3(2.8, 1.1, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_warning_barrier"]
+size = Vector3(2.8, 1.1, 0.3)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tower_facade"]
+albedo_color = Color(0.08, 0.1, 0.13, 1)
+metallic = 0.6
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_tower_facade"]
+material = SubResource("StandardMaterial3D_tower_facade")
+size = Vector3(56, 32, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tower_facade"]
+size = Vector3(56, 32, 8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_entrance_canopy"]
+albedo_color = Color(0.14, 0.16, 0.2, 1)
+metallic = 0.7
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_entrance_canopy"]
+material = SubResource("StandardMaterial3D_entrance_canopy")
+size = Vector3(9, 0.7, 5.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_entrance_pillar"]
+material = SubResource("StandardMaterial3D_entrance_canopy")
+size = Vector3(1.3, 4.4, 1.3)
+
 [node name="MainLevel" type="Node3D" unique_id=1920925052]
 script = ExtResource("1_level")
 
@@ -509,6 +567,127 @@ mesh = SubResource("BoxMesh_perimeter_fence_long")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.9, 0)
 shape = SubResource("BoxShape3D_perimeter_boundary_ns")
 
+[node name="MegaTowerEntrance" type="Node3D" parent="Environment" unique_id=710001001]
+
+[node name="TowerFacade" type="StaticBody3D" parent="Environment/MegaTowerEntrance" unique_id=710001002]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, 33.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/MegaTowerEntrance/TowerFacade" unique_id=710001003]
+mesh = SubResource("BoxMesh_tower_facade")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/MegaTowerEntrance/TowerFacade" unique_id=710001004]
+shape = SubResource("BoxShape3D_tower_facade")
+
+[node name="WindowsBand1" type="CSGBox3D" parent="Environment/MegaTowerEntrance" unique_id=710001005]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 29.4)
+size = Vector3(50, 4, 0.4)
+material = SubResource("StandardMaterial3D_city_windows_cyan")
+
+[node name="WindowsBand2" type="CSGBox3D" parent="Environment/MegaTowerEntrance" unique_id=710001006]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 20, 29.4)
+size = Vector3(50, 4, 0.4)
+material = SubResource("StandardMaterial3D_city_windows")
+
+[node name="WindowsBand3" type="CSGBox3D" parent="Environment/MegaTowerEntrance" unique_id=710001007]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 26, 29.4)
+size = Vector3(44, 3, 0.4)
+material = SubResource("StandardMaterial3D_city_windows_cyan")
+
+[node name="EntranceCanopy" type="StaticBody3D" parent="Environment/MegaTowerEntrance" unique_id=710001008]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.4, 27.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/MegaTowerEntrance/EntranceCanopy" unique_id=710001009]
+mesh = SubResource("BoxMesh_entrance_canopy")
+
+[node name="PillarLeft" type="MeshInstance3D" parent="Environment/MegaTowerEntrance" unique_id=710001010]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 2.2, 26.5)
+mesh = SubResource("BoxMesh_entrance_pillar")
+
+[node name="PillarRight" type="MeshInstance3D" parent="Environment/MegaTowerEntrance" unique_id=710001011]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 2.2, 26.5)
+mesh = SubResource("BoxMesh_entrance_pillar")
+
+[node name="TowerSign" type="Label3D" parent="Environment/MegaTowerEntrance" unique_id=710001012]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5, 24.6)
+billboard = 1
+no_depth_test = true
+modulate = Color(0.3, 0.95, 1, 1)
+outline_modulate = Color(0, 0, 0, 1)
+text = "🏢 MEGA TOWER 99 // TAHLİYE ASANSÖRÜ
+[ KAT 01: SOKAK GİRİŞİ ➔ HEDEF: ÇATI ]"
+font_size = 32
+outline_size = 8
+
+[node name="SpotlightLeft" type="SpotLight3D" parent="Environment/MegaTowerEntrance" unique_id=710001013]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, -3.8, 4.2, 25.2)
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 4.5
+spot_range = 18.0
+spot_angle = 45.0
+
+[node name="SpotlightRight" type="SpotLight3D" parent="Environment/MegaTowerEntrance" unique_id=710001014]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 3.8, 4.2, 25.2)
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 4.5
+spot_range = 18.0
+spot_angle = 45.0
+
+[node name="CheckpointBarrierLeft" type="StaticBody3D" parent="Environment/MegaTowerEntrance" unique_id=710001015]
+transform = Transform3D(0.965926, 0, -0.258819, 0, 1, 0, 0.258819, 0, 0.965926, -3.4, 0.6, 23.8)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/MegaTowerEntrance/CheckpointBarrierLeft" unique_id=710001016]
+mesh = SubResource("BoxMesh_concrete_barrier")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/MegaTowerEntrance/CheckpointBarrierLeft" unique_id=710001017]
+shape = SubResource("BoxShape3D_concrete_barrier")
+
+[node name="CheckpointBarrierRight" type="StaticBody3D" parent="Environment/MegaTowerEntrance" unique_id=710001018]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, 3.4, 0.6, 23.8)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/MegaTowerEntrance/CheckpointBarrierRight" unique_id=710001019]
+mesh = SubResource("BoxMesh_concrete_barrier")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/MegaTowerEntrance/CheckpointBarrierRight" unique_id=710001020]
+shape = SubResource("BoxShape3D_concrete_barrier")
+
+[node name="StreetDetails" type="Node3D" parent="Environment" unique_id=710001021]
+
+[node name="RoadblockNorth" type="StaticBody3D" parent="Environment/StreetDetails" unique_id=710001022]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, -9.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/StreetDetails/RoadblockNorth" unique_id=710001023]
+mesh = SubResource("BoxMesh_warning_barrier")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/StreetDetails/RoadblockNorth" unique_id=710001024]
+shape = SubResource("BoxShape3D_warning_barrier")
+
+[node name="RoadblockLabel" type="Label3D" parent="Environment/StreetDetails/RoadblockNorth" unique_id=710001025]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+billboard = 1
+no_depth_test = true
+modulate = Color(1, 0.8, 0.2, 1)
+text = "⚠️ TAHLİYE BÖLGESİ // ASANSÖRE İLERLEYİN ⚠️"
+font_size = 22
+outline_size = 6
+
+[node name="SandbagCoverEast" type="StaticBody3D" parent="Environment/StreetDetails" unique_id=710001026]
+transform = Transform3D(0.906308, 0, -0.422618, 0, 1, 0, 0.422618, 0, 0.906308, 7.5, 0.45, 1.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/StreetDetails/SandbagCoverEast" unique_id=710001027]
+mesh = SubResource("BoxMesh_sandbag")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/StreetDetails/SandbagCoverEast" unique_id=710001028]
+shape = SubResource("BoxShape3D_sandbag")
+
+[node name="SandbagCoverWest" type="StaticBody3D" parent="Environment/StreetDetails" unique_id=710001029]
+transform = Transform3D(0.906308, 0, 0.422618, 0, 1, 0, -0.422618, 0, 0.906308, -7.5, 0.45, 1.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/StreetDetails/SandbagCoverWest" unique_id=710001030]
+mesh = SubResource("BoxMesh_sandbag")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/StreetDetails/SandbagCoverWest" unique_id=710001031]
+shape = SubResource("BoxShape3D_sandbag")
+
 [node name="DistantCity" type="Node3D" parent="Environment" unique_id=1013988164]
 
 [node name="Skyscraper_Central" type="MeshInstance3D" parent="Environment/DistantCity" unique_id=1788682751]
@@ -638,7 +817,7 @@ theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 18
-text = "🏚️ BÖLÜM 1: TERK EDİLMİŞ MAHALLE"
+text = "🏙️ KAT 01 // SOKAK GİRİŞ MEYDANI"
 horizontal_alignment = 1
 
 [node name="WaveLabel" type="Label" parent="WaveUI/WaveInfo" unique_id=1897947715]
@@ -646,7 +825,7 @@ layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 20
-text = "SEVİYE 1 / 9 | DALGA: 1 / 3"
+text = "SEKTÖR 1: SOKAK GİRİŞİ | DALGA: 1 / 3"
 horizontal_alignment = 1
 
 [node name="EnemiesLabel" type="Label" parent="WaveUI/WaveInfo" unique_id=244452089]
@@ -675,6 +854,39 @@ theme_override_colors/font_color = Color(1, 0.15, 0.15, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 28
-text = "⚠️ DİKKAT: MAHALLE ŞEFİ YAKLAŞIYOR! ⚠️"
+text = "⚠️ DİKKAT: BÖLÜM BOSS'U YAKLAŞIYOR! ⚠️"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="FloorIntroBanner" type="VBoxContainer" parent="WaveUI" unique_id=774411223]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -140.0
+offset_right = 350.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="FloorIntroTitle" type="Label" parent="WaveUI/FloorIntroBanner" unique_id=774411224]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.88, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 34
+text = "🏙️ KAT 01: SOKAK GİRİŞ MEYDANI"
+horizontal_alignment = 1
+
+[node name="FloorIntroSubtitle" type="Label" parent="WaveUI/FloorIntroBanner" unique_id=774411225]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.92, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 18
+text = "SEKTÖR 1: GİRİŞ LOBİSİ & ZEMİN // HEDEF: KULE ASANSÖRÜNÜ AÇIN!"
+horizontal_alignment = 1

@@ -24,7 +24,7 @@ func set_elevator_state(open: bool) -> void:
 	if is_open:
 		has_triggered_transition = false
 		light.light_color = Color(0.1, 1.0, 0.3) # Yeşil
-		sign_label.text = "🛗 ASANSÖR HAZIR!\n(İÇERİ GİRİN)"
+		sign_label.text = "🛗 KULE ASANSÖRÜ HAZIR!\n(SONRAKİ KATA GEÇİŞ)"
 		sign_label.modulate = Color(0.2, 1.0, 0.4)
 		_open_doors()
 	else:
