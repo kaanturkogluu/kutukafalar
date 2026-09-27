@@ -10,6 +10,7 @@ const PICKUP_SCENE_PATH: String = "res://scenes/interactables/pickup.tscn"
 @onready var players_container: Node3D = $Players
 @onready var enemies_container: Node3D = $Enemies
 @onready var barrels_container: Node3D = $Barrels
+@onready var pickups_container: Node3D = get_node_or_null("Pickups")
 @onready var elevator: Node3D = $Elevator
 @onready var shop_ui: CanvasLayer = $ShopUI
 @onready var default_camera: Camera3D = $DefaultCamera
@@ -26,10 +27,20 @@ var zombies_remaining_to_spawn: int = 0
 var active_zombie_count: int = 0
 var zombie_id_counter: int = 0
 var barrel_id_counter: int = 0
+var pickup_id_counter: int = 0
 var wave_loop_token: int = 0
 var initial_barrels_spawned: bool = false
 var peers_ready: Dictionary = {}
 var is_wave_in_progress: bool = false
+
+func _get_pickups_container() -> Node3D:
+	if pickups_container == null or not is_instance_valid(pickups_container):
+		pickups_container = get_node_or_null("Pickups")
+		if pickups_container == null:
+			pickups_container = Node3D.new()
+			pickups_container.name = "Pickups"
+			add_child(pickups_container)
+	return pickups_container
 
 @onready var floor_label: Label = $WaveUI/WaveInfo/FloorLabel
 @onready var wave_label: Label = $WaveUI/WaveInfo/WaveLabel
@@ -90,7 +101,18 @@ func _notify_peer_level_ready(peer_id: int) -> void:
 		var hp_val: float = 100.0
 		if "current_health" in existing_zombie and existing_zombie.current_health != null:
 			hp_val = float(existing_zombie.current_health)
-		sync_spawn_zombie.rpc_id(peer_id, existing_zombie.name, existing_zombie.global_position, speed_val, hp_val)
+		if existing_zombie.name.begins_with("BossZombie"):
+			sync_spawn_boss.rpc_id(peer_id, existing_zombie.name, existing_zombie.global_position, hp_val)
+		else:
+			sync_spawn_zombie.rpc_id(peer_id, existing_zombie.name, existing_zombie.global_position, speed_val, hp_val)
+
+	# 4.5) Sahnede zaten mevcut olan yerdeki ganimetleri (pickups) bu oyuncuya doğurt:
+	for existing_pickup in _get_pickups_container().get_children():
+		if is_instance_valid(existing_pickup) and not existing_pickup.get("is_collected"):
+			var p_type = existing_pickup.get("pickup_type")
+			var p_amount = existing_pickup.get("amount")
+			if p_type != null and p_amount != null:
+				sync_spawn_pickup.rpc_id(peer_id, existing_pickup.name, str(p_type), int(p_amount), existing_pickup.position)
 	
 	# 5) Güncel dalga/kat durumunu bildir:
 	_sync_floor_ui.rpc_id(peer_id, current_floor, current_wave, active_zombie_count + zombies_remaining_to_spawn)
@@ -166,6 +188,27 @@ func spawn_barrel(pos: Vector3) -> void:
 	var b_name = "Barrel_" + str(barrel_id_counter)
 	sync_spawn_barrel.rpc(b_name, pos)
 
+func spawn_pickup(p_type: String, p_amount: int, pos: Vector3) -> void:
+	if not multiplayer.is_server():
+		return
+	pickup_id_counter += 1
+	var p_name = "Pickup_" + str(pickup_id_counter)
+	sync_spawn_pickup.rpc(p_name, p_type, p_amount, pos)
+
+@rpc("call_local", "reliable")
+func sync_spawn_pickup(p_name: String, p_type: String, p_amount: int, pos: Vector3) -> void:
+	var container = _get_pickups_container()
+	if container.has_node(p_name):
+		return
+	var pickup_scene = load(PICKUP_SCENE_PATH)
+	if pickup_scene:
+		var item = pickup_scene.instantiate()
+		item.name = p_name
+		item.pickup_type = p_type
+		item.amount = p_amount
+		item.position = pos
+		container.add_child(item, true)
+
 func _on_player_connected(id: int, _info: Dictionary) -> void:
 	if multiplayer.is_server():
 		spawn_player(id)
@@ -192,19 +235,30 @@ func _start_next_wave() -> void:
 	var current_token = wave_loop_token
 	
 	var is_boss_wave = LevelData.is_boss_level(current_floor) and current_wave == WAVES_PER_FLOOR
-	zombies_remaining_to_spawn = 4 + (current_floor * 2) + (current_wave * 2)
+	var base_zombies = 4 + (current_floor * 2) + (current_wave * 2)
+	
+	# Çok oyunculu oyuncu sayısına göre dinamik zombi çarpanı
+	var player_count: int = 1
+	if players_container:
+		player_count = max(1, players_container.get_child_count())
+	else:
+		player_count = max(1, get_tree().get_nodes_in_group("players").size())
+	
+	# 1 Oyuncu: 1.0x, 2 Oyuncu: 1.65x, 3 Oyuncu: 2.30x, 4 Oyuncu: 2.95x
+	var player_mult: float = 1.0 + (player_count - 1) * 0.65
+	zombies_remaining_to_spawn = int(ceil(base_zombies * player_mult))
 	active_zombie_count = 0
 	_sync_floor_ui.rpc(current_floor, current_wave, zombies_remaining_to_spawn)
 	
 	if is_boss_wave:
 		_show_boss_notice.rpc(true)
-		_spawn_boss_zombie()
+		_spawn_boss_zombie(player_count)
 		active_zombie_count += 1
 		_sync_floor_ui.rpc(current_floor, current_wave, active_zombie_count + zombies_remaining_to_spawn)
 	else:
 		_show_boss_notice.rpc(false)
 
-	_spawn_zombie_loop(current_token)
+	_spawn_zombie_loop(current_token, player_count)
 
 @rpc("call_local", "reliable")
 func _show_boss_notice(show: bool) -> void:
@@ -218,16 +272,17 @@ func _show_boss_notice(show: bool) -> void:
 					boss_notice_label.visible = false
 			)
 
-func _spawn_boss_zombie() -> void:
+func _spawn_boss_zombie(player_count: int = 1) -> void:
 	zombie_id_counter += 1
 	var b_name = "BossZombie_" + str(zombie_id_counter)
 	var spawn_pos = Vector3(0, 1.5, -23)
 	if zombie_spawn_points.size() > 0:
 		spawn_pos = zombie_spawn_points[0].global_position
-	sync_spawn_boss.rpc(b_name, spawn_pos)
+	var boss_hp: float = 1200.0 * (1.0 + (player_count - 1) * 0.5)
+	sync_spawn_boss.rpc(b_name, spawn_pos, boss_hp)
 
 @rpc("call_local", "reliable")
-func sync_spawn_boss(b_name: String, pos: Vector3) -> void:
+func sync_spawn_boss(b_name: String, pos: Vector3, hp_val: float = 1200.0) -> void:
 	if enemies_container.has_node(b_name):
 		return
 	var boss_scene = load(BOSS_SCENE_PATH)
@@ -235,15 +290,17 @@ func sync_spawn_boss(b_name: String, pos: Vector3) -> void:
 		var boss = boss_scene.instantiate()
 		boss.name = b_name
 		boss.position = pos
+		boss.max_health = hp_val
+		boss.current_health = hp_val
 		boss.died.connect(_on_zombie_died)
 		enemies_container.add_child(boss, true)
 
-func _spawn_zombie_loop(token: int) -> void:
+func _spawn_zombie_loop(token: int, player_count: int = 1) -> void:
 	while zombies_remaining_to_spawn > 0:
 		if not is_instance_valid(self) or token != wave_loop_token:
 			return
 		
-		var spawn_delay = max(0.24, 0.55 - (current_floor * 0.03))
+		var spawn_delay = max(0.18, (0.55 - (current_floor * 0.03)) / (1.0 + (player_count - 1) * 0.35))
 		await get_tree().create_timer(spawn_delay).timeout
 		if token != wave_loop_token:
 			return
@@ -546,9 +603,12 @@ func sync_clear_all_entities() -> void:
 		child.queue_free()
 	for child in barrels_container.get_children():
 		child.queue_free()
+	for child in _get_pickups_container().get_children():
+		child.queue_free()
 	var pickups = get_tree().get_nodes_in_group("pickups")
 	for p in pickups:
-		p.queue_free()
+		if is_instance_valid(p):
+			p.queue_free()
 
 ## Çok Oyunculu Senkronize Büyü Oluşturma (Tüm ekranlarda görünür!)
 @rpc("call_local", "reliable")

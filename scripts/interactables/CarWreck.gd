@@ -121,6 +121,12 @@ func _explode() -> void:
 func _detonate() -> void:
 	is_exploded = true
 	is_critical = false
+	if is_in_group("destructibles"):
+		remove_from_group("destructibles")
+	if is_in_group("barrels"):
+		remove_from_group("barrels")
+	if is_in_group("interactables"):
+		remove_from_group("interactables")
 	if warning_light:
 		warning_light.visible = false
 

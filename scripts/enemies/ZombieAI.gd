@@ -323,13 +323,19 @@ func _die(is_headshot: bool, attacker_id: int = 1) -> void:
 		collision_layer = 0
 
 func _spawn_pickup(p_type: String, p_amount: int, pos: Vector3) -> void:
-	var scene = load(PICKUP_SCENE_PATH)
-	if scene:
-		var item = scene.instantiate()
-		item.pickup_type = p_type
-		item.amount = p_amount
-		item.position = pos
-		get_tree().current_scene.add_child(item, true)
+	var main_level = get_tree().get_first_node_in_group("main_level")
+	if not main_level:
+		main_level = get_tree().current_scene
+	if main_level and main_level.has_method("spawn_pickup"):
+		main_level.spawn_pickup(p_type, p_amount, pos)
+	else:
+		var scene = load(PICKUP_SCENE_PATH)
+		if scene:
+			var item = scene.instantiate()
+			item.pickup_type = p_type
+			item.amount = p_amount
+			item.position = pos
+			get_tree().current_scene.add_child(item, true)
 
 static var freeze_mat: StandardMaterial3D = null
 

@@ -584,8 +584,11 @@ func _fire_bullet(dmg: float, spread: Vector3) -> void:
 		target = hit_collider
 
 	if target and target.has_method("take_damage"):
+		if target.get("is_exploded") == true:
+			return
 		target.take_damage(dmg, is_headshot, hit_point, player_id)
-		_register_kill_streak()
+		if target.get("is_exploded") != true:
+			_register_kill_streak()
 	
 	_spawn_hit_effect.rpc(hit_point, hit_normal)
 
@@ -601,39 +604,48 @@ func _request_spawn_rocket(pos: Vector3, dir: Vector3) -> void:
 			get_tree().current_scene.add_child(r, true)
 
 ## Eşya Toplama (Zombilerden Düşenler & Mühimmat)
+@rpc("any_peer", "call_local", "reliable")
 func apply_pickup(p_type: String, p_amount: int) -> void:
 	if is_dead:
 		return
 	match p_type:
 		"gold":
 			gold += p_amount
-			SoundManager.play_sfx("pickup")
-			sync_player_stats.rpc(gold)
+			if is_multiplayer_authority():
+				SoundManager.play_sfx("pickup")
+				sync_player_stats.rpc(gold)
 		"shotgun", "uzi", "bixi", "rocket":
 			var max_cap = WEAPON_MAX_AMMO.get(p_type, 250)
 			var current_ammo = weapon_ammo_dict.get(p_type, 0)
 			var is_new = not weapon_inventory.has(p_type)
 			
 			if not is_new and current_ammo >= max_cap:
-				_show_weapon_notice("⚠️ " + _get_weapon_display_name(p_type).to_upper() + " CEPHANESİ DOLU! (" + str(max_cap) + ")")
+				if is_multiplayer_authority():
+					_show_weapon_notice("⚠️ " + _get_weapon_display_name(p_type).to_upper() + " CEPHANESİ DOLU! (" + str(max_cap) + ")")
 				return
 			
-			SoundManager.play_sfx("pickup")
+			if is_multiplayer_authority():
+				SoundManager.play_sfx("pickup")
 			if is_new:
 				weapon_inventory.append(p_type)
 				weapon_ammo_dict[p_type] = min(p_amount, max_cap)
 				# Toplanan silaha hemen geçiş yap
-				switch_to_weapon(p_type)
+				if is_multiplayer_authority():
+					switch_to_weapon(p_type)
 			else:
 				weapon_ammo_dict[p_type] = min(max_cap, current_ammo + p_amount)
-			_show_weapon_notice("🎁 " + _get_weapon_display_name(p_type).to_upper() + " ALINDI! (+" + str(p_amount) + ") [" + str(weapon_ammo_dict[p_type]) + "/" + str(max_cap) + "]")
+			if is_multiplayer_authority():
+				_show_weapon_notice("🎁 " + _get_weapon_display_name(p_type).to_upper() + " ALINDI! (+" + str(p_amount) + ") [" + str(weapon_ammo_dict[p_type]) + "/" + str(max_cap) + "]")
 		"barrel":
 			barrel_count += p_amount
-			SoundManager.play_sfx("pickup")
+			if is_multiplayer_authority():
+				SoundManager.play_sfx("pickup")
 		"health":
 			current_health = clamp(current_health + p_amount, 0, max_health)
-			SoundManager.play_sfx("pickup")
-	_update_hud()
+			if is_multiplayer_authority():
+				SoundManager.play_sfx("pickup")
+	if is_multiplayer_authority():
+		_update_hud()
 
 ## Kutu Tekmesi Fonksiyonu (F Tuşu)
 func _kick() -> void:
