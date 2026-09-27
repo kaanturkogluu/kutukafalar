@@ -1,32 +1,32 @@
-[gd_scene load_steps=7 format=3 uid="uid://level_select_scene_01"]
+[gd_scene load_steps=9 format=3 uid="uid://level_select_scene_01"]
 
 [ext_resource type="Script" path="res://scripts/ui/LevelSelect.gd" id="1_lvlselect"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal"]
-bg_color = Color(0.06, 0.08, 0.12, 0.98)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.2, 0.32, 0.48, 1)
+bg_color = Color(0.045, 0.055, 0.08, 0.94)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.28, 0.38, 0.85)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 shadow_color = Color(0, 0, 0, 0.85)
-shadow_size = 24
+shadow_size = 28
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_detail"]
-content_margin_left = 16.0
-content_margin_top = 10.0
-content_margin_right = 16.0
-content_margin_bottom = 10.0
-bg_color = Color(0.09, 0.12, 0.17, 1)
-border_width_left = 1
+content_margin_left = 18.0
+content_margin_top = 12.0
+content_margin_right = 18.0
+content_margin_bottom = 12.0
+bg_color = Color(0.065, 0.08, 0.11, 0.95)
+border_width_left = 3
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.18, 0.28, 0.42, 1)
+border_color = Color(0.2, 0.3, 0.42, 0.8)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -37,12 +37,28 @@ content_margin_left = 16.0
 content_margin_top = 10.0
 content_margin_right = 16.0
 content_margin_bottom = 10.0
-bg_color = Color(0.12, 0.16, 0.23, 1)
+bg_color = Color(0.09, 0.12, 0.16, 0.9)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.28, 0.4, 0.58, 1)
+border_color = Color(0.22, 0.3, 0.42, 0.8)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_shop_hover"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 14.0
+content_margin_bottom = 10.0
+bg_color = Color(0.14, 0.17, 0.22, 0.95)
+border_width_left = 3
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.95, 0.68, 0.18, 0.9)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -53,12 +69,28 @@ content_margin_left = 16.0
 content_margin_top = 10.0
 content_margin_right = 16.0
 content_margin_bottom = 10.0
-bg_color = Color(0.1, 0.44, 0.26, 1)
-border_width_left = 1
+bg_color = Color(0.12, 0.22, 0.16, 0.95)
+border_width_left = 2
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.25, 0.75, 0.45, 1)
+border_color = Color(0.25, 0.75, 0.45, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_start_hover"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 14.0
+content_margin_bottom = 10.0
+bg_color = Color(0.16, 0.3, 0.22, 1.0)
+border_width_left = 4
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.9, 0.55, 1.0)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -69,12 +101,12 @@ content_margin_left = 16.0
 content_margin_top = 10.0
 content_margin_right = 16.0
 content_margin_bottom = 10.0
-bg_color = Color(0.1, 0.12, 0.15, 0.7)
+bg_color = Color(0.08, 0.09, 0.12, 0.6)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.2, 0.22, 0.26, 0.5)
+border_color = Color(0.18, 0.2, 0.24, 0.4)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -91,19 +123,19 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.02, 0.04, 0.07, 0.82)
+color = Color(0.02, 0.03, 0.05, 0.85)
 
 [node name="Panel" type="Panel" parent="."]
-custom_minimum_size = Vector2(800, 580)
+custom_minimum_size = Vector2(820, 600)
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -400.0
-offset_top = -290.0
-offset_right = 400.0
-offset_bottom = 290.0
+offset_left = -410.0
+offset_top = -300.0
+offset_right = 410.0
+offset_bottom = 300.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
@@ -112,10 +144,10 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 24.0
-offset_top = 18.0
-offset_right = -24.0
-offset_bottom = -18.0
+offset_left = 26.0
+offset_top = 20.0
+offset_right = -26.0
+offset_bottom = -20.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 12
@@ -128,14 +160,14 @@ theme_override_constants/separation = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.97, 1, 1)
 theme_override_font_sizes/font_size = 20
-text = "BÖLÜM 1: TERK EDİLMİŞ MAHALLE"
+text = "BÖLÜM 1: TERK EDİLMİŞ MAHALLE // SEVİYE TERMİNALİ"
 horizontal_alignment = 1
 
 [node name="CompletedLabel" type="Label" parent="Panel/VBoxContainer/HeaderBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 0.8, 0.5, 1)
+theme_override_colors/font_color = Color(0.95, 0.68, 0.18, 0.95)
 theme_override_font_sizes/font_size = 13
-text = "SON GÖREV: SEVİYE 1 TAMAMLANDI"
+text = "GÖREV DURUMU: SEVİYE 1 TAMAMLANDI"
 horizontal_alignment = 1
 
 [node name="HSeparator" type="HSeparator" parent="Panel/VBoxContainer"]
@@ -154,18 +186,18 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_detail")
 
 [node name="VBox" type="VBoxContainer" parent="Panel/VBoxContainer/DetailCard"]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 5
 alignment = 1
 
 [node name="DetailTitle" type="Label" parent="Panel/VBoxContainer/DetailCard/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.85, 1, 1)
+theme_override_colors/font_color = Color(0.95, 0.68, 0.18, 1)
 theme_override_font_sizes/font_size = 15
 text = "GÖREV DOSYASI // SEVİYE 02: KAVŞAK DEVRİYESİ"
 
 [node name="DetailDesc" type="Label" parent="Panel/VBoxContainer/DetailCard/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.84, 0.9, 1)
+theme_override_colors/font_color = Color(0.82, 0.86, 0.92, 1)
 theme_override_font_sizes/font_size = 13
 text = "Dalgalar hızlanıyor. Zombi sürüleri açık sokak aralıklarından hücum edecek."
 autowrap_mode = 2
@@ -180,6 +212,8 @@ custom_minimum_size = Vector2(230, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_shop")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_shop_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_shop_hover")
 text = "MAĞAZA VE GELİŞTİRME"
 
 [node name="StartLevelButton" type="Button" parent="Panel/VBoxContainer/HBoxActions"]
@@ -187,5 +221,7 @@ custom_minimum_size = Vector2(270, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_start")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_start_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_start_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_btn_start_disabled")
 text = "SEVİYEYİ BAŞLAT"

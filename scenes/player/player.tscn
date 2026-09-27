@@ -37,6 +37,53 @@ roughness = 0.4
 material = SubResource("StandardMaterial3D_head")
 size = Vector3(0.5, 0.5, 0.5)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glass"]
+bg_color = Color(0.045, 0.055, 0.08, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.32, 0.48, 0.5)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_left = 8
+corner_radius_bottom_right = 8
+shadow_color = Color(0, 0, 0, 0.75)
+shadow_size = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+bg_color = Color(0.06, 0.08, 0.12, 0.7)
+border_width_left = 2
+border_color = Color(0.25, 0.35, 0.5, 0.6)
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+bg_color = Color(0.12, 0.16, 0.24, 0.9)
+border_width_left = 4
+border_color = Color(0.95, 0.68, 0.18, 1)
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+content_margin_left = 22.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+bg_color = Color(0.18, 0.22, 0.32, 0.95)
+border_width_left = 4
+border_color = Color(1, 0.85, 0.3, 1)
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+content_margin_left = 22.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_player"]
 properties/0/path = NodePath(".:position")
 properties/0/spawn = true
@@ -379,49 +426,52 @@ grow_vertical = 2
 
 [node name="VBox" type="VBoxContainer" parent="HUD/DeathScreen/CenterContainer"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 12
 alignment = 1
 
 [node name="DeathTitleLabel" type="Label" parent="HUD/DeathScreen/CenterContainer/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.15, 0.15, 1)
-theme_override_colors/font_shadow_color = Color(0.4, 0, 0, 0.8)
-theme_override_constants/shadow_offset_x = 2
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 46
-text = "💀 ÖLDÜNÜZ! 💀"
+theme_override_colors/font_color = Color(0.95, 0.25, 0.25, 1)
+theme_override_font_sizes/font_size = 28
+text = "OPERASYON BAŞARISIZ"
 horizontal_alignment = 1
 
 [node name="DeathReasonLabel" type="Label" parent="HUD/DeathScreen/CenterContainer/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 18
-text = "Kutun parçalandı..."
+theme_override_colors/font_color = Color(0.8, 0.65, 0.65, 1)
+theme_override_font_sizes/font_size = 13
+text = "KUTU ASKER ETKİSİZ HALE GETİRİLDİ"
 horizontal_alignment = 1
 
 [node name="DeathInfoLabel" type="Label" parent="HUD/DeathScreen/CenterContainer/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.75, 0.8, 1)
-theme_override_font_sizes/font_size = 15
-text = "Takım arkadaşının asansöre ulaşmasını bekle veya yeniden başla."
+theme_override_colors/font_color = Color(0.65, 0.7, 0.78, 1)
+theme_override_font_sizes/font_size = 12
+text = "Takım arkadaşının asansöre ulaşmasını bekle veya yeniden başlat."
 horizontal_alignment = 1
 
 [node name="Buttons" type="HBoxContainer" parent="HUD/DeathScreen/CenterContainer/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 14
 alignment = 1
 
 [node name="RestartBtn" type="Button" parent="HUD/DeathScreen/CenterContainer/VBox/Buttons"]
-custom_minimum_size = Vector2(180, 44)
+custom_minimum_size = Vector2(170, 40)
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "🔄 YENİDEN BAŞLAT [R]"
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "YENİDEN BAŞLAT [R]"
 
 [node name="LobbyBtn" type="Button" parent="HUD/DeathScreen/CenterContainer/VBox/Buttons"]
-custom_minimum_size = Vector2(150, 44)
+custom_minimum_size = Vector2(140, 40)
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "🚪 LOBİYE DÖN"
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "LOBİYE DÖN"
 
 [node name="PauseMenu" type="Control" parent="HUD"]
 visible = false
@@ -439,7 +489,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.04, 0.05, 0.08, 0.8)
+color = Color(0.02, 0.03, 0.05, 0.82)
 
 [node name="CenterContainer" type="CenterContainer" parent="HUD/PauseMenu"]
 layout_mode = 1
@@ -450,55 +500,185 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Panel" type="PanelContainer" parent="HUD/PauseMenu/CenterContainer"]
-custom_minimum_size = Vector2(340, 340)
+custom_minimum_size = Vector2(380, 390)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_glass")
 
-[node name="VBox" type="VBoxContainer" parent="HUD/PauseMenu/CenterContainer/Panel"]
+[node name="Margin" type="MarginContainer" parent="HUD/PauseMenu/CenterContainer/Panel"]
 layout_mode = 2
-theme_override_constants/separation = 14
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="PauseNav" type="VBoxContainer" parent="HUD/PauseMenu/CenterContainer/Panel/Margin"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
 alignment = 1
 
-[node name="TitleLabel" type="Label" parent="HUD/PauseMenu/CenterContainer/Panel/VBox"]
+[node name="TitleLabel" type="Label" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.85, 0.25, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
-theme_override_font_sizes/font_size = 28
-text = "⏸️ OYUN DURAKLATILDI"
+theme_override_colors/font_color = Color(0.95, 0.95, 0.98, 1)
+theme_override_font_sizes/font_size = 22
+text = "DURAKLATILDI"
 horizontal_alignment = 1
 
-[node name="SubtitleLabel" type="Label" parent="HUD/PauseMenu/CenterContainer/Panel/VBox"]
+[node name="SubtitleLabel" type="Label" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.75, 0.85, 1)
+theme_override_colors/font_color = Color(0.55, 0.65, 0.78, 1)
+theme_override_font_sizes/font_size = 11
+text = "KUTU KAFALAR // OPERASYON BEKLEMEDE"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav"]
+layout_mode = 2
+
+[node name="ResumeBtn" type="Button" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Kutu Kafalar Multiplayer"
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+alignment = 0
+text = "DEVAM ET"
+
+[node name="SettingsBtn" type="Button" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+alignment = 0
+text = "AYARLAR"
+
+[node name="RestartBtn" type="Button" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+alignment = 0
+text = "YENİDEN BAŞLAT"
+
+[node name="LobbyBtn" type="Button" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+alignment = 0
+text = "LOBİYE DÖN"
+
+[node name="QuitBtn" type="Button" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.45, 0.45, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+alignment = 0
+text = "OYUNDAN ÇIKIŞ"
+
+[node name="PauseSettings" type="VBoxContainer" parent="HUD/PauseMenu/CenterContainer/Panel/Margin"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="SettingsTitle" type="Label" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.95, 0.98, 1)
+theme_override_font_sizes/font_size = 18
+text = "OYUN AYARLARI"
 horizontal_alignment = 1
 
-[node name="HSeparator" type="HSeparator" parent="HUD/PauseMenu/CenterContainer/Panel/VBox"]
+[node name="HSeparator" type="HSeparator" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings"]
 layout_mode = 2
 
-[node name="ResumeBtn" type="Button" parent="HUD/PauseMenu/CenterContainer/Panel/VBox"]
-custom_minimum_size = Vector2(0, 42)
+[node name="WindowModeBox" type="HBoxContainer" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "▶ DEVAM ET [ESC]"
 
-[node name="RestartBtn" type="Button" parent="HUD/PauseMenu/CenterContainer/Panel/VBox"]
-custom_minimum_size = Vector2(0, 42)
+[node name="Label" type="Label" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings/WindowModeBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "🔄 YENİDEN BAŞLAT"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "EKRAN MODU"
 
-[node name="LobbyBtn" type="Button" parent="HUD/PauseMenu/CenterContainer/Panel/VBox"]
-custom_minimum_size = Vector2(0, 42)
+[node name="PauseWindowMode" type="OptionButton" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings/WindowModeBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(170, 32)
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "🚪 LOBİYE DÖN"
 
-[node name="QuitBtn" type="Button" parent="HUD/PauseMenu/CenterContainer/Panel/VBox"]
-custom_minimum_size = Vector2(0, 42)
+[node name="VSyncBox" type="HBoxContainer" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "❌ OYUNDAN ÇIK"
+
+[node name="Label" type="Label" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings/VSyncBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "DİKEY EŞİTLEME (VSYNC)"
+
+[node name="PauseVSyncCheck" type="CheckBox" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings/VSyncBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ETKİN"
+
+[node name="VolumeBox" type="VBoxContainer" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="PauseVolumeLabel" type="Label" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings/VolumeBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "ANA SES: %85"
+
+[node name="PauseVolumeSlider" type="HSlider" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings/VolumeBox"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 0.0
+max_value = 100.0
+step = 1.0
+value = 85.0
+
+[node name="SensBox" type="VBoxContainer" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="PauseSensLabel" type="Label" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings/SensBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "FARE HASSASİYETİ: 2.5"
+
+[node name="PauseSensSlider" type="HSlider" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings/SensBox"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 0.0005
+max_value = 0.008
+step = 0.0002
+value = 0.0025
+
+[node name="HSeparator2" type="HSeparator" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings"]
+layout_mode = 2
+
+[node name="BackFromSettingsBtn" type="Button" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+alignment = 0
+text = "GERİ DÖN"
 
 [node name="Scoreboard" type="Control" parent="HUD"]
 visible = false

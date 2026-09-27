@@ -130,10 +130,21 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 # Duraklatma Menüsü UI (ESC Menu)
 @onready var pause_menu: Control = $HUD/PauseMenu
-@onready var pause_resume_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/VBox/ResumeBtn
-@onready var pause_restart_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/VBox/RestartBtn
-@onready var pause_lobby_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/VBox/LobbyBtn
-@onready var pause_quit_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/VBox/QuitBtn
+@onready var pause_nav: VBoxContainer = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav
+@onready var pause_settings: VBoxContainer = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings
+@onready var pause_resume_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav/ResumeBtn
+@onready var pause_settings_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav/SettingsBtn
+@onready var pause_restart_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav/RestartBtn
+@onready var pause_lobby_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav/LobbyBtn
+@onready var pause_quit_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav/QuitBtn
+
+@onready var pause_window_mode: OptionButton = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings/WindowModeBox/PauseWindowMode
+@onready var pause_vsync_check: CheckBox = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings/VSyncBox/PauseVSyncCheck
+@onready var pause_volume_slider: HSlider = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings/VolumeBox/PauseVolumeSlider
+@onready var pause_volume_label: Label = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings/VolumeBox/PauseVolumeLabel
+@onready var pause_sens_slider: HSlider = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings/SensBox/PauseSensSlider
+@onready var pause_sens_label: Label = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings/SensBox/PauseSensLabel
+@onready var back_from_settings_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings/BackFromSettingsBtn
 
 # Skor Tablosu UI (TAB Scoreboard)
 @onready var scoreboard: Control = $HUD/Scoreboard
@@ -177,12 +188,29 @@ func _ready() -> void:
 	
 	if pause_resume_btn:
 		pause_resume_btn.pressed.connect(_on_pause_resume_pressed)
+	if pause_settings_btn:
+		pause_settings_btn.pressed.connect(_on_pause_settings_pressed)
+	if back_from_settings_btn:
+		back_from_settings_btn.pressed.connect(_on_pause_back_from_settings_pressed)
 	if pause_restart_btn:
 		pause_restart_btn.pressed.connect(_on_restart_pressed)
 	if pause_lobby_btn:
 		pause_lobby_btn.pressed.connect(_on_lobby_pressed)
 	if pause_quit_btn:
 		pause_quit_btn.pressed.connect(_on_pause_quit_pressed)
+	
+	if pause_window_mode:
+		pause_window_mode.clear()
+		pause_window_mode.add_item("PENCERELİ", 0)
+		pause_window_mode.add_item("KENARLIKSIZ", 1)
+		pause_window_mode.add_item("TAM EKRAN", 2)
+		pause_window_mode.item_selected.connect(_on_pause_window_mode_selected)
+	if pause_vsync_check:
+		pause_vsync_check.toggled.connect(_on_pause_vsync_toggled)
+	if pause_volume_slider:
+		pause_volume_slider.value_changed.connect(_on_pause_volume_changed)
+	if pause_sens_slider:
+		pause_sens_slider.value_changed.connect(_on_pause_sens_changed)
 	
 	if NetworkManager.players.has(player_id):
 		player_name = NetworkManager.players[player_id].get("name", "Kutu Kafa")
@@ -215,7 +243,7 @@ func _ready() -> void:
 		revive_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		revive_label.add_theme_font_size_override("font_size", 16)
 		revive_label.add_theme_color_override("font_color", Color(0.2, 1.0, 0.4))
-		revive_label.text = "❤️ [E'YE BASILI TUT] Canlandırılıyor..."
+		revive_label.text = "[E] CANLANDIRILIYOR..."
 		revive_box.add_child(revive_label)
 		
 		revive_bar = ProgressBar.new()
@@ -236,14 +264,14 @@ func _ready() -> void:
 			var vbox = death_screen.get_node_or_null("CenterContainer/VBox")
 			if vbox:
 				toggle_death_ui_btn = Button.new()
-				toggle_death_ui_btn.text = "👁 Arayüzü Gizle [H]"
+				toggle_death_ui_btn.text = "Arayüzü Gizle [H]"
 				toggle_death_ui_btn.add_theme_font_size_override("font_size", 14)
 				toggle_death_ui_btn.custom_minimum_size = Vector2(180, 36)
 				toggle_death_ui_btn.pressed.connect(toggle_death_ui)
 				vbox.add_child(toggle_death_ui_btn)
 			
 			floating_show_ui_btn = Button.new()
-			floating_show_ui_btn.text = "👁 Arayüzü Göster [H]"
+			floating_show_ui_btn.text = "Arayüzü Göster [H]"
 			floating_show_ui_btn.add_theme_font_size_override("font_size", 13)
 			floating_show_ui_btn.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 			floating_show_ui_btn.offset_left = -180.0
@@ -1456,6 +1484,11 @@ func _on_lobby_pressed() -> void:
 func _open_pause_menu() -> void:
 	if not is_multiplayer_authority() or not pause_menu:
 		return
+	if pause_nav:
+		pause_nav.visible = true
+	if pause_settings:
+		pause_settings.visible = false
+	_sync_pause_settings_ui()
 	pause_menu.visible = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
@@ -1468,6 +1501,61 @@ func _close_pause_menu() -> void:
 
 func _on_pause_resume_pressed() -> void:
 	_close_pause_menu()
+
+func _on_pause_settings_pressed() -> void:
+	if pause_nav:
+		pause_nav.visible = false
+	if pause_settings:
+		pause_settings.visible = true
+	_sync_pause_settings_ui()
+
+func _on_pause_back_from_settings_pressed() -> void:
+	if pause_settings:
+		pause_settings.visible = false
+	if pause_nav:
+		pause_nav.visible = true
+
+func _sync_pause_settings_ui() -> void:
+	if not SettingsManager:
+		return
+	if pause_window_mode:
+		for idx in range(pause_window_mode.item_count):
+			if pause_window_mode.get_item_id(idx) == SettingsManager.current_window_mode:
+				pause_window_mode.selected = idx
+				break
+	if pause_vsync_check:
+		pause_vsync_check.set_pressed_no_signal(SettingsManager.vsync_enabled)
+	if pause_volume_slider:
+		pause_volume_slider.set_value_no_signal(SettingsManager.master_volume * 100.0)
+	if pause_volume_label:
+		pause_volume_label.text = "ANA SES (%%%d)" % int(SettingsManager.master_volume * 100.0)
+	if pause_sens_slider:
+		pause_sens_slider.set_value_no_signal(SettingsManager.mouse_sensitivity)
+	if pause_sens_label:
+		pause_sens_label.text = "FARE HASSASİYETİ (%.4f)" % SettingsManager.mouse_sensitivity
+
+func _on_pause_window_mode_selected(index: int) -> void:
+	if not pause_window_mode or not SettingsManager:
+		return
+	var mode_id = pause_window_mode.get_item_id(index)
+	SettingsManager.set_window_mode(mode_id)
+
+func _on_pause_vsync_toggled(toggled_on: bool) -> void:
+	if SettingsManager:
+		SettingsManager.set_vsync(toggled_on)
+
+func _on_pause_volume_changed(val: float) -> void:
+	if SettingsManager:
+		SettingsManager.set_master_volume(val / 100.0)
+	if pause_volume_label:
+		pause_volume_label.text = "ANA SES (%%%d)" % int(val)
+
+func _on_pause_sens_changed(val: float) -> void:
+	if SettingsManager:
+		SettingsManager.set_mouse_sensitivity(val)
+		mouse_sensitivity = val
+	if pause_sens_label:
+		pause_sens_label.text = "FARE HASSASİYETİ (%.4f)" % val
 
 func _on_pause_quit_pressed() -> void:
 	get_tree().quit()
@@ -1509,11 +1597,11 @@ func _refresh_scoreboard() -> void:
 		var lbl_cls = Label.new()
 		lbl_cls.custom_minimum_size = Vector2(110, 0)
 		match p.player_class:
-			"Pyromancer": lbl_cls.text = "🔥 Büyücü"
-			"Engineer": lbl_cls.text = "⚙️ Mühendis"
-			"Cryomancer": lbl_cls.text = "❄️ Buzcu"
-			"Medic": lbl_cls.text = "💚 Sıhhiye"
-			_: lbl_cls.text = p.player_class
+			"Pyromancer": lbl_cls.text = "BÜYÜCÜ"
+			"Engineer": lbl_cls.text = "MÜHENDİS"
+			"Cryomancer": lbl_cls.text = "BUZCU"
+			"Medic": lbl_cls.text = "SIHHİYE"
+			_: lbl_cls.text = p.player_class.to_upper()
 		row.add_child(lbl_cls)
 		
 		# Leş
@@ -1530,7 +1618,7 @@ func _refresh_scoreboard() -> void:
 		lbl_hs.text = str(p.headshot_count)
 		row.add_child(lbl_hs)
 		
-		# Altın
+		# Kredi / Altın
 		var lbl_gold = Label.new()
 		lbl_gold.custom_minimum_size = Vector2(75, 0)
 		lbl_gold.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -1543,10 +1631,10 @@ func _refresh_scoreboard() -> void:
 		lbl_status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		lbl_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		if p.is_dead:
-			lbl_status.text = "💀 ÖLÜ"
+			lbl_status.text = "ÖLÜ"
 			lbl_status.modulate = Color(0.9, 0.2, 0.2)
 		else:
-			lbl_status.text = "❤️ " + str(int(p.current_health)) + " HP"
+			lbl_status.text = str(int(p.current_health)) + " HP"
 			lbl_status.modulate = Color(0.2, 0.9, 0.3)
 		row.add_child(lbl_status)
 		

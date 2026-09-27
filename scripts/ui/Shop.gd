@@ -1,9 +1,12 @@
 extends CanvasLayer
 
-# --- Asansör Mağazası ve Yükseltme Kartları (Shop & Upgrades) ---
+# --- Asansör İkmal ve Geliştirme İstasyonu (Shop & Upgrades) ---
 signal next_floor_requested
+signal back_to_levels_requested
 
-@onready var gold_label: Label = $Panel/VBoxContainer/GoldLabel
+@onready var title_label: Label = $Panel/VBoxContainer/HeaderBox/TitleLabel
+@onready var gold_label: Label = $Panel/VBoxContainer/HeaderBox/GoldLabel
+
 @onready var card1_btn: Button = $Panel/VBoxContainer/HBoxCards/Card1/VBox/BuyButton
 @onready var card1_title: Label = $Panel/VBoxContainer/HBoxCards/Card1/VBox/Title
 @onready var card1_desc: Label = $Panel/VBoxContainer/HBoxCards/Card1/VBox/Desc
@@ -16,7 +19,8 @@ signal next_floor_requested
 @onready var card3_title: Label = $Panel/VBoxContainer/HBoxCards/Card3/VBox/Title
 @onready var card3_desc: Label = $Panel/VBoxContainer/HBoxCards/Card3/VBox/Desc
 
-@onready var next_floor_btn: Button = $Panel/VBoxContainer/NextFloorButton
+@onready var back_to_levels_btn: Button = $Panel/VBoxContainer/HBoxActions/BackToLevelsButton
+@onready var next_floor_btn: Button = $Panel/VBoxContainer/HBoxActions/NextFloorButton
 
 var local_player: CharacterBody3D
 var current_floor: int = 1
@@ -24,10 +28,16 @@ var current_offers: Array[Dictionary] = []
 
 func _ready() -> void:
 	visible = false
-	card1_btn.pressed.connect(func(): _buy_card(0))
-	card2_btn.pressed.connect(func(): _buy_card(1))
-	card3_btn.pressed.connect(func(): _buy_card(2))
-	next_floor_btn.pressed.connect(_on_next_floor_pressed)
+	if card1_btn:
+		card1_btn.pressed.connect(func(): _buy_card(0))
+	if card2_btn:
+		card2_btn.pressed.connect(func(): _buy_card(1))
+	if card3_btn:
+		card3_btn.pressed.connect(func(): _buy_card(2))
+	if back_to_levels_btn:
+		back_to_levels_btn.pressed.connect(_on_back_to_levels_pressed)
+	if next_floor_btn:
+		next_floor_btn.pressed.connect(_on_next_floor_pressed)
 
 func open_shop(p_player: CharacterBody3D, floor_num: int) -> void:
 	local_player = p_player
@@ -36,6 +46,8 @@ func open_shop(p_player: CharacterBody3D, floor_num: int) -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	if local_player and local_player.has_method("set_in_shop"):
 		local_player.set_in_shop(true)
+	if title_label:
+		title_label.text = "ASANSÖR İKMAL VE GELİŞTİRME İSTASYONU // KAT %02d" % current_floor
 	_generate_offers()
 	_update_ui()
 
@@ -46,38 +58,39 @@ func close_shop() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _update_ui() -> void:
-	if local_player:
-		gold_label.text = "🪙 MEVCUT ALTININIZ: " + str(local_player.gold)
+	if local_player and gold_label:
+		gold_label.text = "MEVCUT KREDİ: " + str(local_player.gold)
 	
 	if current_offers.size() >= 3:
-		card1_title.text = current_offers[0].title
-		card1_desc.text = current_offers[0].desc
-		card1_btn.text = "SATIN AL (" + str(current_offers[0].cost) + " 🪙)"
-		card1_btn.disabled = current_offers[0].bought or (local_player and local_player.gold < current_offers[0].cost)
+		_setup_card_ui(card1_title, card1_desc, card1_btn, current_offers[0])
+		_setup_card_ui(card2_title, card2_desc, card2_btn, current_offers[1])
+		_setup_card_ui(card3_title, card3_desc, card3_btn, current_offers[2])
 
-		card2_title.text = current_offers[1].title
-		card2_desc.text = current_offers[1].desc
-		card2_btn.text = "SATIN AL (" + str(current_offers[1].cost) + " 🪙)"
-		card2_btn.disabled = current_offers[1].bought or (local_player and local_player.gold < current_offers[1].cost)
-
-		card3_title.text = current_offers[2].title
-		card3_desc.text = current_offers[2].desc
-		card3_btn.text = "SATIN AL (" + str(current_offers[2].cost) + " 🪙)"
-		card3_btn.disabled = current_offers[2].bought or (local_player and local_player.gold < current_offers[2].cost)
+func _setup_card_ui(title_node: Label, desc_node: Label, btn_node: Button, offer: Dictionary) -> void:
+	if not title_node or not desc_node or not btn_node:
+		return
+	title_node.text = offer.title
+	desc_node.text = offer.desc
+	if offer.bought:
+		btn_node.text = "SATIN ALINDI"
+		btn_node.disabled = true
+	else:
+		btn_node.text = "SATIN AL (" + str(offer.cost) + " KREDİ)"
+		btn_node.disabled = (local_player != null and local_player.gold < offer.cost)
 
 func _generate_offers() -> void:
 	current_offers.clear()
 	var base_cost = 40 + (current_floor * 15)
 	
 	var pool = [
-		{"type": "health", "title": "🛡️ Zırh Takviyesi", "desc": "+35 Maksimum Can ve Tam Şifa", "cost": base_cost, "bought": false},
-		{"type": "damage", "title": "💥 Ağır Mühimmat", "desc": "Tüm Silah Hasarı +%25 Artar", "cost": base_cost + 20, "bought": false},
-		{"type": "speed", "title": "🏃 Kutu Çevikliği", "desc": "Koşma Hızı +%15 Hızlanır", "cost": base_cost - 10, "bought": false},
-		{"type": "firerate", "title": "⚡ Seri Tetik", "desc": "Silah Atış Hızı +%20 Hızlanır", "cost": base_cost + 15, "bought": false},
-		{"type": "barrels", "title": "📦 Varil İkmali", "desc": "+3 Patlayıcı Varil Kapasitesi", "cost": base_cost - 15, "bought": false},
-		{"type": "cooldown", "title": "🔮 Büyü Odaklanması", "desc": "Taktiksel Büyü Bekleme Süresi -2.5 sn", "cost": base_cost + 25, "bought": false},
-		{"type": "droprate", "title": "🍀 Ganimet Şansı", "desc": "Zombilerden Eşya ve Silah Düşme Şansı +%50 Artar", "cost": base_cost + 10, "bought": false},
-		{"type": "bixi", "title": "🔥 Bixi (PKM) Ağır Makineli", "desc": "Yüksek Mermi Kapasiteli Tam Otomatik Ağır Makineli (+120 Mermi)", "cost": base_cost + 40, "bought": false}
+		{"type": "health", "title": "ZIRH TAKVİYESİ", "desc": "+35 Maksimum Can ve Tam Şifa", "cost": base_cost, "bought": false},
+		{"type": "damage", "title": "AĞIR MÜHİMMAT", "desc": "Tüm Silah Hasarı +%25 Artar", "cost": base_cost + 20, "bought": false},
+		{"type": "speed", "title": "TAKTIKSEL HIZ", "desc": "Koşma Hızı +%15 Hızlanır", "cost": base_cost - 10, "bought": false},
+		{"type": "firerate", "title": "SERİ TETİK", "desc": "Silah Atış Hızı +%20 Hızlanır", "cost": base_cost + 15, "bought": false},
+		{"type": "barrels", "title": "VARİL İKMALİ", "desc": "+3 Patlayıcı Varil Kapasitesi", "cost": base_cost - 15, "bought": false},
+		{"type": "cooldown", "title": "BÜYÜ ODAKLANMASI", "desc": "Taktiksel Büyü Bekleme Süresi -2.5 sn", "cost": base_cost + 25, "bought": false},
+		{"type": "droprate", "title": "GANİMET ŞANSI", "desc": "Zombilerden Mühimmat ve Silah Düşme Şansı +%50 Artar", "cost": base_cost + 10, "bought": false},
+		{"type": "bixi", "title": "BİXİ (PKM) AĞIR MAKİNELİ", "desc": "Yüksek Mermi Kapasiteli Tam Otomatik Ağır Makineli (+120 Mermi)", "cost": base_cost + 40, "bought": false}
 	]
 	pool.shuffle()
 	current_offers = [pool[0], pool[1], pool[2]]
@@ -121,6 +134,10 @@ func _buy_card(index: int) -> void:
 	local_player._update_hud()
 	_update_ui()
 	print("[Mağaza] Satın alındı: ", offer.title)
+
+func _on_back_to_levels_pressed() -> void:
+	close_shop()
+	back_to_levels_requested.emit()
 
 func _on_next_floor_pressed() -> void:
 	close_shop()

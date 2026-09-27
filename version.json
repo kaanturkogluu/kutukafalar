@@ -1,6 +1,6 @@
 {
-  "version": "v1.2.0",
+  "version": "v1.3.0",
   "download_url": "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
   "pck_size": 425200,
-  "changelog": "- Yeni Düşük Poligonlu (Low-Poly) İnsansı Zombi Modeli: Kambur duruş, açık alt çene, dişler, çökük göz çukurları, yırtık gri-mavi gömlek ve yamalı pantolon.\n- Prosedürel Zombi Yürüyüş & Saldırı Animasyonları: Sendeleyen yürüyüş, kollarla pençeleme, çene ve kafa seğirmesi.\n- Taktiksel Askeri Üs & Cephanelik Arka Planı: Duvar silah rafları, taktik komuta konsolları ve yerlerde pirinç kovanlar.\n- Menü Alt Boşluk İyileştirmesi ve Engelsiz Operasyon Merkezi Tabelası."
+  "changelog": "- Taktiksel ESC Duraklatma Menüsü: Modern koyu cam panel, kehribar vurgulu düz butonlar, sıfır emoji ve tam taktiksel görünüm.\n- Oyun İçi Ayarlar (In-Game Settings): ESC menüsünden anında Ekran Modu (Tam Ekran/Kenarlıksız/Pencereli), VSync, Ana Ses ve Fare Hassasiyeti ayarlayabilme.\n- Asansör Görev & Seviye Terminali: Koyu cam zemin, kehribar ve zümrüt durum rozetleri, temiz grid yapısı.\n- Asansör İkmal & Geliştirme İstasyonu (Mağaza): Yenilenen taktik kartlar, Kredi sistemi, görev terminaline geri dönebilme ve emojilerden tamamen arındırılmış arayüz.\n- TAB Skor Tablosu & HUD İyileştirmeleri: Temiz askeri yazı dili ve optimize edilmiş kullanıcı deneyimi."
 }

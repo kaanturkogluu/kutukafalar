@@ -43,6 +43,8 @@ func _ready() -> void:
 		elevator.players_entered_elevator.connect(_on_players_entered_elevator)
 	if shop_ui:
 		shop_ui.next_floor_requested.connect(_on_next_floor_requested)
+		if shop_ui.has_signal("back_to_levels_requested"):
+			shop_ui.back_to_levels_requested.connect(_on_shop_back_to_levels_requested)
 	if level_select_ui:
 		level_select_ui.level_start_requested.connect(_on_level_start_requested)
 		level_select_ui.shop_requested.connect(_on_level_select_shop_requested)
@@ -347,6 +349,10 @@ func _on_level_start_requested(target_lvl: int) -> void:
 func _on_level_select_shop_requested() -> void:
 	_close_level_select_ui.rpc()
 	_open_shop_ui.rpc(current_floor)
+
+func _on_shop_back_to_levels_requested() -> void:
+	_close_shop_ui.rpc()
+	_open_level_select_ui.rpc(current_floor)
 
 @rpc("any_peer", "call_local", "reliable")
 func _request_start_level(target_lvl: int) -> void:

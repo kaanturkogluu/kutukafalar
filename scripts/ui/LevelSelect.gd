@@ -145,45 +145,45 @@ func _style_button(btn: Button, lvl: int) -> void:
 	var hover_sb = normal_sb.duplicate() as StyleBoxFlat
 
 	if lvl == selected_level:
-		# Aktif Seçili Kart: Parlak Neon Cyan Çerçeve
-		normal_sb.bg_color = Color(0.09, 0.22, 0.35, 1.0)
-		normal_sb.border_color = Color(0.2, 0.8, 1.0, 1.0)
-		normal_sb.border_width_left = 2
-		normal_sb.border_width_top = 2
-		normal_sb.border_width_right = 2
-		normal_sb.border_width_bottom = 2
-		
-		hover_sb.bg_color = Color(0.12, 0.28, 0.44, 1.0)
-		hover_sb.border_color = Color(0.4, 0.9, 1.0, 1.0)
-		hover_sb.border_width_left = 2
-		hover_sb.border_width_top = 2
-		hover_sb.border_width_right = 2
-		hover_sb.border_width_bottom = 2
-		
-		btn.add_theme_color_override("font_color", Color(0.95, 0.98, 1.0))
-		btn.add_theme_color_override("font_hover_color", Color(1.0, 1.0, 1.0))
-	elif is_completed:
-		# Tamamlanmış Görev: Koyu Taktiksel Zümrüt Yeşili
-		normal_sb.bg_color = Color(0.08, 0.14, 0.11, 1.0)
-		normal_sb.border_color = Color(0.18, 0.45, 0.28, 1.0)
-		normal_sb.border_width_left = 1
+		# Aktif Seçili Kart: Kehribar (Amber) Taktiksel Çerçeve
+		normal_sb.bg_color = Color(0.13, 0.10, 0.05, 0.95)
+		normal_sb.border_color = Color(0.95, 0.68, 0.18, 1.0)
+		normal_sb.border_width_left = 3
 		normal_sb.border_width_top = 1
 		normal_sb.border_width_right = 1
 		normal_sb.border_width_bottom = 1
 		
-		hover_sb.bg_color = Color(0.11, 0.2, 0.16, 1.0)
-		hover_sb.border_color = Color(0.3, 0.7, 0.45, 1.0)
-		hover_sb.border_width_left = 2
-		hover_sb.border_width_top = 2
-		hover_sb.border_width_right = 2
-		hover_sb.border_width_bottom = 2
+		hover_sb.bg_color = Color(0.18, 0.14, 0.07, 1.0)
+		hover_sb.border_color = Color(1.0, 0.82, 0.35, 1.0)
+		hover_sb.border_width_left = 4
+		hover_sb.border_width_top = 1
+		hover_sb.border_width_right = 1
+		hover_sb.border_width_bottom = 1
 		
-		btn.add_theme_color_override("font_color", Color(0.65, 0.9, 0.72))
-		btn.add_theme_color_override("font_hover_color", Color(0.85, 1.0, 0.9))
+		btn.add_theme_color_override("font_color", Color(1.0, 0.95, 0.8))
+		btn.add_theme_color_override("font_hover_color", Color(1.0, 1.0, 1.0))
+	elif is_completed:
+		# Tamamlanmış Görev: Koyu Taktiksel Zümrüt Yeşili
+		normal_sb.bg_color = Color(0.06, 0.11, 0.08, 0.9)
+		normal_sb.border_color = Color(0.2, 0.48, 0.3, 0.9)
+		normal_sb.border_width_left = 2
+		normal_sb.border_width_top = 1
+		normal_sb.border_width_right = 1
+		normal_sb.border_width_bottom = 1
+		
+		hover_sb.bg_color = Color(0.09, 0.16, 0.12, 1.0)
+		hover_sb.border_color = Color(0.3, 0.72, 0.45, 1.0)
+		hover_sb.border_width_left = 3
+		hover_sb.border_width_top = 1
+		hover_sb.border_width_right = 1
+		hover_sb.border_width_bottom = 1
+		
+		btn.add_theme_color_override("font_color", Color(0.7, 0.92, 0.76))
+		btn.add_theme_color_override("font_hover_color", Color(0.9, 1.0, 0.94))
 	elif is_locked:
 		# Kilitli Görev: Sönük Grafit Gri
-		normal_sb.bg_color = Color(0.06, 0.07, 0.09, 0.6)
-		normal_sb.border_color = Color(0.18, 0.2, 0.24, 0.4)
+		normal_sb.bg_color = Color(0.05, 0.06, 0.08, 0.6)
+		normal_sb.border_color = Color(0.16, 0.18, 0.22, 0.4)
 		normal_sb.border_width_left = 1
 		normal_sb.border_width_top = 1
 		normal_sb.border_width_right = 1
@@ -193,27 +193,27 @@ func _style_button(btn: Button, lvl: int) -> void:
 	else:
 		# Açık Görev (Sıradaki veya Oynanabilir)
 		if is_boss:
-			normal_sb.bg_color = Color(0.2, 0.08, 0.1, 1.0)
-			normal_sb.border_color = Color(0.7, 0.22, 0.25, 1.0)
-			hover_sb.bg_color = Color(0.28, 0.1, 0.13, 1.0)
+			normal_sb.bg_color = Color(0.18, 0.07, 0.08, 0.95)
+			normal_sb.border_color = Color(0.75, 0.22, 0.25, 0.9)
+			hover_sb.bg_color = Color(0.25, 0.09, 0.11, 1.0)
 			hover_sb.border_color = Color(0.95, 0.35, 0.4, 1.0)
 			btn.add_theme_color_override("font_color", Color(1.0, 0.75, 0.75))
 			btn.add_theme_color_override("font_hover_color", Color(1.0, 0.9, 0.9))
 		else:
-			normal_sb.bg_color = Color(0.11, 0.15, 0.2, 1.0)
-			normal_sb.border_color = Color(0.28, 0.4, 0.55, 1.0)
-			hover_sb.bg_color = Color(0.16, 0.22, 0.3, 1.0)
-			hover_sb.border_color = Color(0.45, 0.65, 0.85, 1.0)
+			normal_sb.bg_color = Color(0.08, 0.11, 0.15, 0.9)
+			normal_sb.border_color = Color(0.22, 0.32, 0.45, 0.8)
+			hover_sb.bg_color = Color(0.13, 0.18, 0.24, 0.95)
+			hover_sb.border_color = Color(0.95, 0.68, 0.18, 0.9)
 			btn.add_theme_color_override("font_color", Color(0.85, 0.9, 0.96))
 			btn.add_theme_color_override("font_hover_color", Color(1.0, 1.0, 1.0))
 		normal_sb.border_width_left = 1
 		normal_sb.border_width_top = 1
 		normal_sb.border_width_right = 1
 		normal_sb.border_width_bottom = 1
-		hover_sb.border_width_left = 2
-		hover_sb.border_width_top = 2
-		hover_sb.border_width_right = 2
-		hover_sb.border_width_bottom = 2
+		hover_sb.border_width_left = 3
+		hover_sb.border_width_top = 1
+		hover_sb.border_width_right = 1
+		hover_sb.border_width_bottom = 1
 
 	btn.add_theme_stylebox_override("normal", normal_sb)
 	btn.add_theme_stylebox_override("hover", hover_sb)
