@@ -60,9 +60,13 @@ func _get_walls_container() -> Node3D:
 @onready var floor_intro_title: Label = get_node_or_null("WaveUI/FloorIntroBanner/FloorIntroTitle")
 @onready var floor_intro_sub: Label = get_node_or_null("WaveUI/FloorIntroBanner/FloorIntroSubtitle")
 @onready var level_select_ui: CanvasLayer = get_node_or_null("LevelSelectUI")
+@onready var floor_container: Node3D = get_node_or_null("FloorContainer")
+var current_floor_instance: Node3D = null
 
 func _ready() -> void:
 	add_to_group("main_level")
+	if floor_container and floor_container.get_child_count() > 0:
+		current_floor_instance = floor_container.get_child(0)
 	if elevator:
 		elevator.players_entered_elevator.connect(_on_players_entered_elevator)
 	if shop_ui:
@@ -92,6 +96,9 @@ func _notify_peer_level_ready(peer_id: int) -> void:
 	print("[MainLevel] Seviyeye giriş yapan oyuncu hazır: ", peer_id)
 	peers_ready[peer_id] = true
 	
+	# 0) Bu oyuncunun ekranında güncel kat ortamını yükle:
+	sync_load_floor_environment.rpc_id(peer_id, current_floor)
+
 	# 1) Bu oyuncuya sahnede zaten mevcut olan TÜM oyuncuları doğurt:
 	for existing_player in players_container.get_children():
 		var p_id = existing_player.name.to_int()
@@ -133,7 +140,7 @@ func _notify_peer_level_ready(peer_id: int) -> void:
 	# Eğer host hazırsa ve başlangıç varilleri konmadıysa koy:
 	if peer_id == 1 and not initial_barrels_spawned:
 		initial_barrels_spawned = true
-		_spawn_initial_barrels()
+		_spawn_initial_barrels(current_floor)
 		
 		# 1 saniye sonra 1. Dalgayı Başlat
 		get_tree().create_timer(1.0).timeout.connect(func():
@@ -172,14 +179,33 @@ func spawn_player(id: int) -> void:
 	var spawn_pos = _get_spawn_position(id)
 	sync_spawn_player.rpc(id, spawn_pos)
 
-func _spawn_initial_barrels() -> void:
-	var initial_positions = [
-		Vector3(-4.5, 0.5, 2.5),
-		Vector3(4.5, 0.5, -2.5),
-		Vector3(9.0, 0.5, -7.0),
-		Vector3(-9.0, 0.5, 7.0),
-		Vector3(0.0, 0.5, -14.0)
-	]
+func _spawn_initial_barrels(floor_num: int = 1) -> void:
+	var initial_positions: Array[Vector3] = []
+	match floor_num:
+		1:
+			initial_positions = [
+				Vector3(-4.5, 0.5, 2.5),
+				Vector3(4.5, 0.5, -2.5),
+				Vector3(9.0, 0.5, -7.0),
+				Vector3(-9.0, 0.5, 7.0),
+				Vector3(0.0, 0.5, -14.0)
+			]
+		2:
+			initial_positions = [
+				Vector3(-7.0, 0.5, -6.0),
+				Vector3(7.0, 0.5, -6.0),
+				Vector3(-12.0, 0.5, 8.0),
+				Vector3(12.0, 0.5, 8.0),
+				Vector3(0.0, 0.5, -12.0),
+				Vector3(0.0, 0.5, 6.0)
+			]
+		_:
+			initial_positions = [
+				Vector3(-6.0, 0.5, -6.0),
+				Vector3(6.0, 0.5, -6.0),
+				Vector3(-8.0, 0.5, 6.0),
+				Vector3(8.0, 0.5, 6.0)
+			]
 	for pos in initial_positions:
 		spawn_barrel(pos)
 
@@ -486,6 +512,15 @@ func _request_start_level(target_lvl: int) -> void:
 	current_floor = target_lvl
 	current_wave = 1
 
+	# Eski varilleri, zombileri ve yerdeki eşyaları temizle
+	sync_clear_all_entities.rpc()
+
+	# Yeni kat ortamını tüm oyuncuların ekranında yükle
+	sync_load_floor_environment.rpc(current_floor)
+
+	# Yeni kata uygun başlangıç varillerini doğur
+	_spawn_initial_barrels(current_floor)
+
 	# Oyuncuları asansörden haritadaki spawn noktalarına taşı (RPC ile)
 	var players = get_tree().get_nodes_in_group("players")
 	for i in range(players.size()):
@@ -531,6 +566,27 @@ func _close_shop_ui() -> void:
 func _on_next_floor_requested() -> void:
 	if multiplayer.is_server():
 		_request_start_level(current_floor + 1)
+
+@rpc("call_local", "reliable")
+func sync_load_floor_environment(floor_num: int) -> void:
+	if not floor_container:
+		floor_container = get_node_or_null("FloorContainer")
+		if not floor_container:
+			return
+
+	for child in floor_container.get_children():
+		child.queue_free()
+	current_floor_instance = null
+
+	var floor_path = "res://scenes/levels/floors/floor_%02d.tscn" % floor_num
+	if not ResourceLoader.exists(floor_path):
+		floor_path = "res://scenes/levels/floors/floor_01.tscn"
+
+	var scene = load(floor_path)
+	if scene:
+		current_floor_instance = scene.instantiate()
+		floor_container.add_child(current_floor_instance)
+		print("[MainLevel] Kat ortamı başarıyla yüklendi: ", floor_path)
 
 @rpc("call_local", "reliable")
 func _sync_floor_ui(floor_num: int, wave_num: int, remaining: int) -> void:
@@ -618,9 +674,10 @@ func _restart_game() -> void:
 		_close_level_select_ui.rpc()
 	sync_clear_all_entities.rpc()
 	sync_reset_game_state.rpc(current_floor)
+	sync_load_floor_environment.rpc(current_floor)
 	
 	# Başlangıç varillerini yeniden doğur
-	_spawn_initial_barrels()
+	_spawn_initial_barrels(current_floor)
 	
 	# Tüm oyuncuları doğuş noktalarında canlandır ve envanterlerini sıfırla
 	var players = get_tree().get_nodes_in_group("players")
