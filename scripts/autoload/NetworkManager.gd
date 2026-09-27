@@ -9,9 +9,12 @@ signal connection_succeeded
 signal lobby_updated(players_dict: Dictionary)
 signal game_started
 signal game_rejected(reason: String)
+signal lan_lobbies_updated(lobbies: Dictionary)
 
 const DEFAULT_PORT: int = 7000
 const MAX_PLAYERS: int = 4
+const LAN_DISCOVERY_PORT: int = 7001
+const BASE62_CHARS: String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
 # Bağlı oyuncular: { peer_id: { "name": String, "class": String, "is_ready": bool, "is_host": bool } }
 var players: Dictionary = {}
@@ -23,12 +26,35 @@ var local_player_info: Dictionary = {
 }
 var is_game_in_progress: bool = false
 
+# --- Yerel Ağ (LAN) Keşif Değişkenleri ---
+var lan_broadcaster: PacketPeerUDP = null
+var lan_listener: PacketPeerUDP = null
+var lan_broadcast_timer: float = 0.0
+var lan_prune_timer: float = 0.0
+var is_lan_broadcasting: bool = false
+var is_lan_discovering: bool = false
+var discovered_lobbies: Dictionary = {} # target_ip -> lobby_info Dictionary
+
 func _ready() -> void:
 	multiplayer.peer_connected.connect(_on_peer_connected)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	multiplayer.connection_failed.connect(_on_connection_failed)
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
+
+func _process(delta: float) -> void:
+	if is_lan_broadcasting:
+		lan_broadcast_timer += delta
+		if lan_broadcast_timer >= 1.0:
+			lan_broadcast_timer = 0.0
+			_send_lan_broadcast()
+	
+	if is_lan_discovering:
+		_poll_lan_listener()
+		lan_prune_timer += delta
+		if lan_prune_timer >= 2.0:
+			lan_prune_timer = 0.0
+			_prune_expired_lobbies()
 
 ## Sunucu (Host) Başlat
 func create_game(player_name: String = "Host", port: int = DEFAULT_PORT) -> Error:
@@ -51,6 +77,7 @@ func create_game(player_name: String = "Host", port: int = DEFAULT_PORT) -> Erro
 	print("[NetworkManager] Sunucu (Host) başlatıldı. Port: ", port)
 	player_connected.emit(1, local_player_info)
 	lobby_updated.emit(players)
+	start_lan_broadcasting()
 	return OK
 
 ## İstemci (Client) Olarak Bağlan
@@ -74,6 +101,8 @@ func join_game(address: String = "127.0.0.1", player_name: String = "İstemci", 
 
 ## Bağlantıyı Kes / Odadan Ayrıl
 func disconnect_game() -> void:
+	stop_lan_broadcasting()
+	stop_lan_discovery()
 	if multiplayer.multiplayer_peer:
 		multiplayer.multiplayer_peer.close()
 		multiplayer.multiplayer_peer = null
@@ -115,6 +144,7 @@ func start_game() -> void:
 	if not multiplayer.is_server():
 		return
 	is_game_in_progress = true
+	stop_lan_broadcasting()
 	_start_game_rpc.rpc()
 
 # --- Ağ Sinyal Yakalayıcıları ---
@@ -190,6 +220,7 @@ func _start_game_rpc() -> void:
 func return_to_lobby() -> void:
 	if multiplayer.is_server():
 		is_game_in_progress = false
+		start_lan_broadcasting()
 		_return_to_lobby_rpc.rpc()
 
 @rpc("call_local", "reliable")
@@ -205,3 +236,132 @@ func _reject_connection(reason: String) -> void:
 	print("[NetworkManager] Bağlantı reddedildi: ", reason)
 	game_rejected.emit(reason)
 	disconnect_game()
+
+# --- Yerel Ağ (LAN) Keşif & Yayın Fonksiyonları ---
+
+func start_lan_broadcasting() -> void:
+	is_lan_broadcasting = true
+	lan_broadcast_timer = 1.0 # İlk yayını hemen gönder
+	if not lan_broadcaster:
+		lan_broadcaster = PacketPeerUDP.new()
+		lan_broadcaster.set_broadcast_enabled(true)
+	print("[NetworkManager] LAN lobi yayını devrede.")
+
+func stop_lan_broadcasting() -> void:
+	is_lan_broadcasting = false
+	if lan_broadcaster:
+		lan_broadcaster.close()
+		lan_broadcaster = null
+	print("[NetworkManager] LAN lobi yayını kapatıldı.")
+
+func start_lan_discovery() -> void:
+	is_lan_discovering = true
+	discovered_lobbies.clear()
+	lan_lobbies_updated.emit(discovered_lobbies)
+	if not lan_listener:
+		lan_listener = PacketPeerUDP.new()
+		var err = lan_listener.bind(LAN_DISCOVERY_PORT)
+		if err != OK:
+			print("[NetworkManager] LAN dinleyici portu açılamadı (Port: %d, Hata: %d)" % [LAN_DISCOVERY_PORT, err])
+		else:
+			print("[NetworkManager] LAN lobi arama dinleyicisi başlatıldı (Port: %d)" % LAN_DISCOVERY_PORT)
+
+func stop_lan_discovery() -> void:
+	is_lan_discovering = false
+	if lan_listener:
+		lan_listener.close()
+		lan_listener = null
+	print("[NetworkManager] LAN lobi araması durduruldu.")
+
+func _send_lan_broadcast() -> void:
+	if not multiplayer.is_server() or is_game_in_progress:
+		return
+	if not lan_broadcaster:
+		lan_broadcaster = PacketPeerUDP.new()
+		lan_broadcaster.set_broadcast_enabled(true)
+	
+	var host_name = local_player_info.get("name", "Kutu Komutan")
+	var host_class = local_player_info.get("class", "Pyromancer")
+	var start_flr = SaveManager.get_starting_floor()
+	var local_ip = _get_local_ip()
+	var code = _calculate_room_code(local_ip)
+	
+	var payload = {
+		"app": "kutukafalar",
+		"host_name": host_name,
+		"host_class": host_class,
+		"ip": local_ip,
+		"port": DEFAULT_PORT,
+		"code": code,
+		"players_count": players.size(),
+		"max_players": MAX_PLAYERS,
+		"floor": start_flr,
+		"floor_name": LevelData.FLOOR_NAMES.get(start_flr, "Kat " + str(start_flr))
+	}
+	var json_bytes = JSON.stringify(payload).to_utf8_buffer()
+	
+	# Yerel alt ağa yayın yap (Broadcast)
+	lan_broadcaster.set_dest_address("255.255.255.255", LAN_DISCOVERY_PORT)
+	lan_broadcaster.put_packet(json_bytes)
+	
+	# Aynı bilgisayardaki diğer pencerelerin de görebilmesi için loopback'e de yolla
+	lan_broadcaster.set_dest_address("127.0.0.1", LAN_DISCOVERY_PORT)
+	lan_broadcaster.put_packet(json_bytes)
+
+func _poll_lan_listener() -> void:
+	if not lan_listener:
+		return
+	while lan_listener.get_available_packet_count() > 0:
+		var pkt = lan_listener.get_packet()
+		var sender_ip = lan_listener.get_packet_ip()
+		var pkt_str = pkt.get_string_from_utf8()
+		var parsed = JSON.parse_string(pkt_str)
+		if typeof(parsed) == TYPE_DICTIONARY and parsed.get("app") == "kutukafalar":
+			# Eğer sunucu bizsek kendi kendimizi listeye eklemeyelim
+			if multiplayer.is_server() and (sender_ip == "127.0.0.1" or sender_ip == _get_local_ip()):
+				continue
+			var target_ip = sender_ip
+			if target_ip.is_empty():
+				target_ip = "127.0.0.1"
+			# Eğer paketin içinde gerçek yerel IP varsa onu tercih et
+			if parsed.has("ip") and str(parsed["ip"]).count(".") == 3 and not str(parsed["ip"]).begins_with("127."):
+				target_ip = str(parsed["ip"])
+			
+			parsed["ip"] = target_ip
+			parsed["last_seen"] = Time.get_ticks_msec()
+			discovered_lobbies[target_ip] = parsed
+			lan_lobbies_updated.emit(discovered_lobbies)
+
+func _prune_expired_lobbies() -> void:
+	var now = Time.get_ticks_msec()
+	var changed = false
+	var to_remove = []
+	for ip_key in discovered_lobbies.keys():
+		var lobby = discovered_lobbies[ip_key]
+		var last_seen = lobby.get("last_seen", 0)
+		if now - last_seen > 3500:
+			to_remove.append(ip_key)
+	for ip_key in to_remove:
+		discovered_lobbies.erase(ip_key)
+		changed = true
+	if changed:
+		lan_lobbies_updated.emit(discovered_lobbies)
+
+func _get_local_ip() -> String:
+	for ip in IP.get_local_addresses():
+		if ip.count(".") == 3 and not ip.begins_with("127.") and not ip.begins_with("169.254."):
+			return ip
+	return "127.0.0.1"
+
+func _calculate_room_code(ip_str: String) -> String:
+	var parts = ip_str.split(".")
+	if parts.size() != 4:
+		return ip_str
+	var n: int = (clampi(parts[0].to_int(), 0, 255) << 24) | (clampi(parts[1].to_int(), 0, 255) << 16) | (clampi(parts[2].to_int(), 0, 255) << 8) | clampi(parts[3].to_int(), 0, 255)
+	n = n & 0xFFFFFFFF
+	var code = ""
+	for i in range(6):
+		var rem = n % 62
+		code = BASE62_CHARS[rem] + code
+		n = int(n / 62)
+	return code

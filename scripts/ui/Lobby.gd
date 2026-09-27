@@ -29,8 +29,13 @@ const GAME_SCENE_PATH: String = "res://scenes/levels/main_level.tscn"
 @onready var multi_name_input: LineEdit = %MultiNameInput
 @onready var multi_class_option: OptionButton = %MultiClassOption
 @onready var host_btn: Button = %HostBtn
+@onready var tab_lan_btn: Button = %TabLanBtn
 @onready var tab_ip_btn: Button = %TabIpBtn
 @onready var tab_code_btn: Button = %TabCodeBtn
+@onready var lan_join_box: VBoxContainer = %LanJoinBox
+@onready var lan_lobby_list_box: VBoxContainer = %LanLobbyListBox
+@onready var refresh_lan_btn: Button = %RefreshLanBtn
+@onready var lan_status_placeholder: Label = %LanStatusPlaceholder
 @onready var ip_join_box: VBoxContainer = %IpJoinBox
 @onready var ip_input: LineEdit = %IpInput
 @onready var join_ip_btn: Button = %JoinIpBtn
@@ -145,7 +150,7 @@ const CLASS_SKILLS: Dictionary = {
 }
 
 var is_local_ready: bool = false
-var active_join_mode: String = "ip" # "ip" veya "code"
+var active_join_mode: String = "lan" # "lan", "code" veya "ip"
 var current_room_code: String = ""
 const BASE62_CHARS: String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
@@ -191,10 +196,14 @@ func _ready() -> void:
 	# Çok Oyunculu Butonları
 	host_btn.pressed.connect(_on_host_pressed)
 	multi_back_btn.pressed.connect(_show_main_nav)
+	if tab_lan_btn:
+		tab_lan_btn.pressed.connect(func(): _set_join_mode("lan"))
 	tab_ip_btn.pressed.connect(func(): _set_join_mode("ip"))
 	tab_code_btn.pressed.connect(func(): _set_join_mode("code"))
 	join_ip_btn.pressed.connect(_on_join_ip_pressed)
 	join_code_btn.pressed.connect(_on_join_code_pressed)
+	if refresh_lan_btn:
+		refresh_lan_btn.pressed.connect(_on_refresh_lan_pressed)
 	
 	# Oda Butonları
 	ready_btn.pressed.connect(_on_ready_pressed)
@@ -211,6 +220,7 @@ func _ready() -> void:
 	NetworkManager.server_disconnected.connect(_on_server_disconnected)
 	NetworkManager.lobby_updated.connect(_on_lobby_updated)
 	NetworkManager.game_rejected.connect(_on_game_rejected)
+	NetworkManager.lan_lobbies_updated.connect(_on_lan_lobbies_updated)
 	
 	# Ayarlar Paneli
 	_setup_settings_ui()
@@ -233,7 +243,7 @@ func _ready() -> void:
 				room_info_label.text = "Oda Sahibi (Host)  |  Yerel IP: " + local_ip
 	else:
 		_show_main_nav()
-	_set_join_mode("ip")
+	_set_join_mode("lan")
 	
 	# 3D Sahneyi varsayılan sınıfla başlat ve yetenek kartını senkronize et
 	var default_class = NetworkManager.local_player_info.get("class", "Pyromancer")
@@ -372,6 +382,7 @@ func _update_class_skill_card(class_code: String) -> void:
 # --- Panel Geçişleri ---
 
 func _show_main_nav() -> void:
+	NetworkManager.stop_lan_discovery()
 	main_nav.visible = true
 	single_panel.visible = false
 	multi_panel.visible = false
@@ -380,6 +391,7 @@ func _show_main_nav() -> void:
 		class_skills_container.visible = false
 
 func _show_single_panel() -> void:
+	NetworkManager.stop_lan_discovery()
 	main_nav.visible = false
 	single_panel.visible = true
 	multi_panel.visible = false
@@ -396,8 +408,11 @@ func _show_multi_panel() -> void:
 	if class_skills_container:
 		class_skills_container.visible = true
 	status_label.text = ""
+	_set_join_mode("lan")
+	NetworkManager.start_lan_discovery()
 
 func _show_room_panel() -> void:
+	NetworkManager.stop_lan_discovery()
 	main_nav.visible = false
 	single_panel.visible = false
 	multi_panel.visible = false
@@ -409,16 +424,22 @@ func _show_room_panel() -> void:
 
 func _set_join_mode(mode: String) -> void:
 	active_join_mode = mode
-	if mode == "ip":
-		ip_join_box.visible = true
-		code_join_box.visible = false
-		tab_ip_btn.modulate = Color(1.0, 1.0, 1.0)
-		tab_code_btn.modulate = Color(0.65, 0.65, 0.7)
-	else:
-		ip_join_box.visible = false
-		code_join_box.visible = true
-		tab_ip_btn.modulate = Color(0.65, 0.65, 0.7)
-		tab_code_btn.modulate = Color(1.0, 1.0, 1.0)
+	if lan_join_box:
+		lan_join_box.visible = (mode == "lan")
+	if ip_join_box:
+		ip_join_box.visible = (mode == "ip")
+	if code_join_box:
+		code_join_box.visible = (mode == "code")
+	
+	if tab_lan_btn:
+		tab_lan_btn.modulate = Color(1.0, 1.0, 1.0) if mode == "lan" else Color(0.65, 0.65, 0.7)
+	if tab_code_btn:
+		tab_code_btn.modulate = Color(1.0, 1.0, 1.0) if mode == "code" else Color(0.65, 0.65, 0.7)
+	if tab_ip_btn:
+		tab_ip_btn.modulate = Color(1.0, 1.0, 1.0) if mode == "ip" else Color(0.65, 0.65, 0.7)
+	
+	if mode == "lan":
+		NetworkManager.start_lan_discovery()
 
 # --- Navigasyon Buton Aksiyonları ---
 
@@ -538,6 +559,111 @@ func _on_host_pressed() -> void:
 	else:
 		status_label.text = "Hata: Oda oluşturulamadı! (Port 7000 meşgul olabilir)"
 
+func _on_refresh_lan_pressed() -> void:
+	status_label.text = "Yerel ağ yeniden taranıyor..."
+	NetworkManager.start_lan_discovery()
+
+func _on_lan_lobbies_updated(lobbies: Dictionary) -> void:
+	if not is_instance_valid(lan_lobby_list_box):
+		return
+	
+	for child in lan_lobby_list_box.get_children():
+		child.queue_free()
+	
+	if lobbies.is_empty():
+		var placeholder = Label.new()
+		placeholder.text = "Yerel ağ taranıyor... Açık lobi aranıyor."
+		placeholder.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		placeholder.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		placeholder.custom_minimum_size = Vector2(0, 50)
+		placeholder.add_theme_color_override("font_color", Color(0.6, 0.65, 0.75, 0.8))
+		placeholder.add_theme_font_size_override("font_size", 11)
+		lan_lobby_list_box.add_child(placeholder)
+		return
+	
+	for ip_key in lobbies.keys():
+		var lobby_info = lobbies[ip_key]
+		var host_name = str(lobby_info.get("host_name", "Host"))
+		var host_class = str(lobby_info.get("host_class", "Pyromancer"))
+		var floor_num = int(lobby_info.get("floor", 1))
+		var floor_name = str(lobby_info.get("floor_name", "Kat %02d" % floor_num))
+		var p_count = int(lobby_info.get("players_count", 1))
+		var max_p = int(lobby_info.get("max_players", 4))
+		var target_ip = str(lobby_info.get("ip", ip_key))
+		var code = str(lobby_info.get("code", ""))
+		var is_full = p_count >= max_p
+		
+		# Kart Paneli
+		var card = PanelContainer.new()
+		var card_style = StyleBoxFlat.new()
+		card_style.bg_color = Color(0.06, 0.08, 0.12, 0.85)
+		card_style.border_width_left = 2
+		card_style.border_color = Color(0.3, 0.75, 1.0, 0.75) if not is_full else Color(0.5, 0.5, 0.5, 0.5)
+		card_style.corner_radius_top_left = 4
+		card_style.corner_radius_top_right = 4
+		card_style.corner_radius_bottom_left = 4
+		card_style.corner_radius_bottom_right = 4
+		card.add_theme_stylebox_override("panel", card_style)
+		
+		var margin = MarginContainer.new()
+		margin.add_theme_constant_override("margin_left", 8)
+		margin.add_theme_constant_override("margin_top", 6)
+		margin.add_theme_constant_override("margin_right", 8)
+		margin.add_theme_constant_override("margin_bottom", 6)
+		
+		var hbox = HBoxContainer.new()
+		hbox.add_theme_constant_override("separation", 8)
+		
+		# Sol bilgi kolonu
+		var vbox = VBoxContainer.new()
+		vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		vbox.add_theme_constant_override("separation", 2)
+		
+		var title_lbl = Label.new()
+		title_lbl.text = "👑 " + host_name + " • " + _get_class_display_title(host_class)
+		title_lbl.add_theme_font_size_override("font_size", 12)
+		title_lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4) if not is_full else Color(0.7, 0.7, 0.7))
+		vbox.add_child(title_lbl)
+		
+		var sub_lbl = Label.new()
+		var code_str = (" [Kod: %s]" % code) if not code.is_empty() else ""
+		sub_lbl.text = "Kat %02d (%s) • %d/%d Kişi • %s%s" % [floor_num, floor_name, p_count, max_p, target_ip, code_str]
+		sub_lbl.add_theme_font_size_override("font_size", 10)
+		sub_lbl.add_theme_color_override("font_color", Color(0.65, 0.75, 0.85, 0.9))
+		vbox.add_child(sub_lbl)
+		
+		hbox.add_child(vbox)
+		
+		# Sağ Katıl Butonu
+		var join_btn = Button.new()
+		join_btn.custom_minimum_size = Vector2(74, 28)
+		join_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		join_btn.add_theme_font_size_override("font_size", 11)
+		if is_full:
+			join_btn.text = "DOLU"
+			join_btn.disabled = true
+		else:
+			join_btn.text = "🚀 KATIL"
+			var btn_style = StyleBoxFlat.new()
+			btn_style.bg_color = Color(0.12, 0.28, 0.18, 0.9)
+			btn_style.border_width_left = 2
+			btn_style.border_color = Color(0.35, 0.9, 0.5, 0.95)
+			btn_style.corner_radius_top_left = 4
+			btn_style.corner_radius_top_right = 4
+			btn_style.corner_radius_bottom_left = 4
+			btn_style.corner_radius_bottom_right = 4
+			join_btn.add_theme_stylebox_override("normal", btn_style)
+			
+			join_btn.pressed.connect(func():
+				current_room_code = code
+				_attempt_join(target_ip)
+			)
+		hbox.add_child(join_btn)
+		
+		margin.add_child(hbox)
+		card.add_child(margin)
+		lan_lobby_list_box.add_child(card)
+
 func _on_join_ip_pressed() -> void:
 	var ip = ip_input.text.strip_edges()
 	if ip.is_empty():
@@ -566,6 +692,12 @@ func _attempt_join(target_ip: String) -> void:
 	status_label.text = "Bağlanılıyor: " + target_ip + "..."
 	join_ip_btn.disabled = true
 	join_code_btn.disabled = true
+	
+	# LAN listesindeki katıl butonlarını da geçici olarak devre dışı bırak
+	if is_instance_valid(lan_lobby_list_box):
+		for card in lan_lobby_list_box.get_children():
+			for btn in card.find_children("*", "Button", true, false):
+				btn.disabled = true
 	
 	var error = NetworkManager.join_game(target_ip, player_name, 7000)
 	if error != OK:
@@ -775,9 +907,15 @@ func _on_connection_succeeded() -> void:
 	join_ip_btn.disabled = false
 	join_code_btn.disabled = false
 	_show_room_panel()
-	var entered_target = ip_input.text.strip_edges() if active_join_mode == "ip" else code_input.text.strip_edges()
+	var entered_target = ""
+	if active_join_mode == "ip":
+		entered_target = ip_input.text.strip_edges()
+	elif active_join_mode == "code":
+		entered_target = code_input.text.strip_edges()
+	else:
+		entered_target = "Yerel Lobi"
 	if room_info_label:
-		room_info_label.text = "Bağlanıldı: " + entered_target
+		room_info_label.text = "Bağlanıldı: " + (entered_target if not entered_target.is_empty() else current_room_code)
 	if room_code_label:
 		room_code_label.text = current_room_code if not current_room_code.is_empty() else entered_target
 	_update_room_buttons()

@@ -446,7 +446,7 @@ flat = true
 [node name="MultiplayerPanel" type="PanelContainer" parent="MenuContainer"]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(390, 380)
+custom_minimum_size = Vector2(400, 440)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_glass")
 
@@ -495,7 +495,6 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
@@ -516,24 +515,76 @@ layout_mode = 2
 
 [node name="JoinTabs" type="HBoxContainer" parent="MenuContainer/MultiplayerPanel/Margin/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
-[node name="TabIpBtn" type="Button" parent="MenuContainer/MultiplayerPanel/Margin/VBox/JoinTabs"]
+[node name="TabLanBtn" type="Button" parent="MenuContainer/MultiplayerPanel/Margin/VBox/JoinTabs"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 12
-text = "IP İLE KATIL"
+theme_override_font_sizes/font_size = 11
+text = "🌐 YEREL"
 
 [node name="TabCodeBtn" type="Button" parent="MenuContainer/MultiplayerPanel/Margin/VBox/JoinTabs"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 12
-text = "KOD İLE KATIL"
+theme_override_font_sizes/font_size = 11
+text = "🔑 KOD"
+
+[node name="TabIpBtn" type="Button" parent="MenuContainer/MultiplayerPanel/Margin/VBox/JoinTabs"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+text = "💻 IP"
+
+[node name="LanJoinBox" type="VBoxContainer" parent="MenuContainer/MultiplayerPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="LanHeaderHBox" type="HBoxContainer" parent="MenuContainer/MultiplayerPanel/Margin/VBox/LanJoinBox"]
+layout_mode = 2
+
+[node name="LanTitle" type="Label" parent="MenuContainer/MultiplayerPanel/Margin/VBox/LanJoinBox/LanHeaderHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.7, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "YEREL AĞDAKİ ODALAR"
+
+[node name="RefreshLanBtn" type="Button" parent="MenuContainer/MultiplayerPanel/Margin/VBox/LanJoinBox/LanHeaderHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(76, 24)
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "🔄 YENİLE"
+
+[node name="LanScroll" type="ScrollContainer" parent="MenuContainer/MultiplayerPanel/Margin/VBox/LanJoinBox"]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="LanLobbyListBox" type="VBoxContainer" parent="MenuContainer/MultiplayerPanel/Margin/VBox/LanJoinBox/LanScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="LanStatusPlaceholder" type="Label" parent="MenuContainer/MultiplayerPanel/Margin/VBox/LanJoinBox/LanScroll/LanLobbyListBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.65, 0.75, 1)
+theme_override_font_sizes/font_size = 11
+text = "Yerel ağ taranıyor...
+Açık lobi aranıyor..."
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="IpJoinBox" type="VBoxContainer" parent="MenuContainer/MultiplayerPanel/Margin/VBox"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme_override_constants/separation = 6
 
