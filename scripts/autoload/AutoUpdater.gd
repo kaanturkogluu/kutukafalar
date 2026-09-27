@@ -62,15 +62,18 @@ func _load_local_version() -> void:
 ## Çalışma yollarını belirle (user:// ve exe dizini)
 func _setup_paths() -> void:
 	exe_path = OS.get_executable_path()
-	var base_dir: String
-	if OS.has_feature("editor"):
-		base_dir = ProjectSettings.globalize_path("res://builds")
-		target_pck_path = base_dir.path_join("KutuKafalar.pck")
-	else:
-		base_dir = exe_path.get_base_dir()
-		var pck_name = exe_path.get_file().get_basename() + ".pck"
-		target_pck_path = base_dir.path_join(pck_name)
+	var base_dir = exe_path.get_base_dir()
 	
+	# Hedef PCK her zaman çalıştırılan exe'nin yanındaki .pck dosyasıdır
+	var pck_name = exe_path.get_file().get_basename() + ".pck"
+	target_pck_path = base_dir.path_join(pck_name)
+	
+	if not FileAccess.file_exists(target_pck_path):
+		var fallback_pck = base_dir.path_join("KutuKafalar.pck")
+		if FileAccess.file_exists(fallback_pck):
+			target_pck_path = fallback_pck
+	
+	print("[AutoUpdater] Hedef PCK yolu: ", target_pck_path)
 	# İndirilen dosya her zaman izin garantili user:// dizinine yazılır
 	temp_download_path = ProjectSettings.globalize_path("user://update_download.pck")
 
@@ -261,10 +264,11 @@ func apply_update_and_restart() -> void:
 		update_failed.emit("Uygulanacak güncelleme dosyası bulunamadı.")
 		return
 	
-	# Editörde test ediliyorsa runtime pack yükle
-	if OS.has_feature("editor"):
-		print("[AutoUpdater] Editör modunda runtime pack yükleniyor...")
+	# Eğer hedef PCK diski bulunamazsa (sadece Godot editör geliştirme ortamında çalışırken)
+	if not FileAccess.file_exists(target_pck_path):
+		print("[AutoUpdater] Hedef PCK bulunamadı (Editör geliştirme ortamı). Runtime pack yükleniyor...")
 		ProjectSettings.load_resource_pack(temp_download_path, true)
+		_load_local_version()
 		get_tree().reload_current_scene()
 		return
 	
@@ -323,6 +327,7 @@ exit /b 1
 	if not file:
 		print("[AutoUpdater] Betik oluşturulamadı, direkt pack yükleniyor...")
 		ProjectSettings.load_resource_pack(temp_download_path, true)
+		_load_local_version()
 		get_tree().reload_current_scene()
 		return
 	

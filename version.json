@@ -1,6 +1,6 @@
 {
-    "version":  "v1.3.1",
+    "version":  "v1.3.2",
     "download_url":  "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-    "pck_size":  433840,
-    "changelog":  "- Asansör Çok Oyunculu Senkronizasyonu: Yeni seviye başladığında tüm oyuncuların asansörden haritaya sorunsuz çıkabilmesi için istemci ışınlanma RPC\u0027si (teleport_to) eklendi.\n- Asansör Kapı Koruması: Kapıların oyuncuların yüzüne hemen kilitlenmesi engellendi, 2.5 saniyelik çıkış payı tanındı.\n- Oda Sahibi Yetkisi: Mağazada ve Seviye Seçim ekranında sonraki seviyeyi başlatma yetkisi yalnızca oda sahibine (Host) verildi."
+    "pck_size":  434048,
+    "changelog":  "- Otomatik Güncelleyici Yeniden Başlatma Düzeltmesi: Güncelle butonuna basıldığında oyunun kapanıp yeni sürümle yeniden başlatılması sağlandı.\n- Asansör Çok Oyunculu Senkronizasyonu: Yeni seviye başladığında tüm oyuncuların asansörden haritaya sorunsuz çıkabilmesi için istemci ışınlanma RPC\u0027si eklendi.\n- Asansör Kapı Koruması: Kapıların oyuncuların yüzüne hemen kilitlenmesi engellendi, 2.5 saniyelik çıkış payı tanındı.\n- Oda Sahibi Yetkisi: Sonraki seviyeyi başlatma yetkisi yalnızca oda sahibine verildi."
 }
