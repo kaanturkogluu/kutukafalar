@@ -1,0 +1,296 @@
+[gd_scene load_steps=29 format=3 uid="uid://sector_02_parking_scene"]
+
+[ext_resource type="PackedScene" uid="uid://car_wreck_scene_01" path="res://scenes/interactables/car_wreck.tscn" id="1_car"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_outer_ground"]
+albedo_color = Color(0.06, 0.07, 0.08, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="BoxMesh_outer_ground"]
+material = SubResource("StandardMaterial3D_outer_ground")
+size = Vector3(280, 1, 280)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_outer_ground"]
+size = Vector3(280, 1, 280)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_concrete_parking"]
+albedo_color = Color(0.18, 0.19, 0.2, 1)
+roughness = 0.85
+
+[sub_resource type="BoxMesh" id="BoxMesh_parking_floor"]
+material = SubResource("StandardMaterial3D_concrete_parking")
+size = Vector3(52, 1, 52)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_parking_floor"]
+size = Vector3(52, 1, 52)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_parking_pillar"]
+albedo_color = Color(0.25, 0.27, 0.29, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_pillar"]
+material = SubResource("StandardMaterial3D_parking_pillar")
+size = Vector3(2.6, 5.0, 2.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pillar"]
+size = Vector3(2.6, 5.0, 2.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_boiler"]
+albedo_color = Color(0.35, 0.22, 0.16, 1)
+metallic = 0.7
+roughness = 0.4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_boiler"]
+material = SubResource("StandardMaterial3D_boiler")
+top_radius = 1.8
+bottom_radius = 1.8
+height = 3.6
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_boiler"]
+height = 3.6
+radius = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pipe"]
+albedo_color = Color(0.65, 0.35, 0.15, 1)
+metallic = 0.6
+roughness = 0.5
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_pipe"]
+material = SubResource("StandardMaterial3D_pipe")
+top_radius = 0.25
+bottom_radius = 0.25
+height = 48.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wall_concrete"]
+albedo_color = Color(0.2, 0.22, 0.24, 1)
+roughness = 0.85
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_long"]
+material = SubResource("StandardMaterial3D_wall_concrete")
+size = Vector3(52, 5.0, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_long"]
+size = Vector3(52, 9, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_half"]
+material = SubResource("StandardMaterial3D_wall_concrete")
+size = Vector3(24.5, 5.0, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_half"]
+size = Vector3(24.5, 9, 1.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tower_facade"]
+albedo_color = Color(0.08, 0.1, 0.13, 1)
+metallic = 0.6
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_tower_facade"]
+material = SubResource("StandardMaterial3D_tower_facade")
+size = Vector3(56, 32, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tower_facade"]
+size = Vector3(56, 32, 8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_entrance_canopy"]
+albedo_color = Color(0.14, 0.16, 0.2, 1)
+metallic = 0.7
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_entrance_canopy"]
+material = SubResource("StandardMaterial3D_entrance_canopy")
+size = Vector3(9, 0.7, 5.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_entrance_pillar"]
+material = SubResource("StandardMaterial3D_entrance_canopy")
+size = Vector3(1.3, 4.4, 1.3)
+
+[node name="Sector02_Parking" type="Node3D"]
+
+[node name="OuterTerrain" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.7, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="OuterTerrain"]
+mesh = SubResource("BoxMesh_outer_ground")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="OuterTerrain"]
+shape = SubResource("BoxShape3D_outer_ground")
+
+[node name="ParkingFloor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ParkingFloor"]
+mesh = SubResource("BoxMesh_parking_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ParkingFloor"]
+shape = SubResource("BoxShape3D_parking_floor")
+
+[node name="PerimeterWalls" type="Node3D" parent="."]
+
+[node name="Wall_North" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -25.8)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_North"]
+mesh = SubResource("BoxMesh_wall_long")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_North"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_long")
+
+[node name="Wall_West" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -25.8, 2.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_West"]
+mesh = SubResource("BoxMesh_wall_long")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_long")
+
+[node name="Wall_East" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 25.8, 2.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_East"]
+mesh = SubResource("BoxMesh_wall_long")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_long")
+
+[node name="Wall_South_Left" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.25, 2.5, 25.8)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_South_Left"]
+mesh = SubResource("BoxMesh_wall_half")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_South_Left"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_half")
+
+[node name="Wall_South_Right" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.25, 2.5, 25.8)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PerimeterWalls/Wall_South_Right"]
+mesh = SubResource("BoxMesh_wall_half")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PerimeterWalls/Wall_South_Right"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("BoxShape3D_wall_half")
+
+[node name="ConcretePillars" type="Node3D" parent="."]
+
+[node name="Pillar1" type="StaticBody3D" parent="ConcretePillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.0, 2.5, -12.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ConcretePillars/Pillar1"]
+mesh = SubResource("BoxMesh_pillar")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ConcretePillars/Pillar1"]
+shape = SubResource("BoxShape3D_pillar")
+
+[node name="Pillar2" type="StaticBody3D" parent="ConcretePillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.0, 2.5, -12.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ConcretePillars/Pillar2"]
+mesh = SubResource("BoxMesh_pillar")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ConcretePillars/Pillar2"]
+shape = SubResource("BoxShape3D_pillar")
+
+[node name="Pillar3" type="StaticBody3D" parent="ConcretePillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.0, 2.5, 10.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ConcretePillars/Pillar3"]
+mesh = SubResource("BoxMesh_pillar")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ConcretePillars/Pillar3"]
+shape = SubResource("BoxShape3D_pillar")
+
+[node name="Pillar4" type="StaticBody3D" parent="ConcretePillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.0, 2.5, 10.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ConcretePillars/Pillar4"]
+mesh = SubResource("BoxMesh_pillar")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ConcretePillars/Pillar4"]
+shape = SubResource("BoxShape3D_pillar")
+
+[node name="BoilerRoom" type="Node3D" parent="."]
+
+[node name="Boiler1" type="StaticBody3D" parent="BoilerRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, -18.0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="BoilerRoom/Boiler1"]
+mesh = SubResource("CylinderMesh_boiler")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BoilerRoom/Boiler1"]
+shape = SubResource("CylinderShape3D_boiler")
+
+[node name="OverheadPipe" type="MeshInstance3D" parent="BoilerRoom"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 4.4, 0)
+mesh = SubResource("CylinderMesh_pipe")
+
+[node name="Vehicles" type="Node3D" parent="."]
+
+[node name="Van_West" parent="Vehicles" instance=ExtResource("1_car")]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -11.0, 0, 0)
+car_type = "van"
+car_color = Color(0.25, 0.28, 0.32, 1)
+
+[node name="Sedan_East" parent="Vehicles" instance=ExtResource("1_car")]
+transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 10.0, 0, -1.0)
+car_color = Color(0.35, 0.2, 0.15, 1)
+
+[node name="MegaTowerEntrance" type="Node3D" parent="."]
+
+[node name="TowerFacade" type="StaticBody3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, 33.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MegaTowerEntrance/TowerFacade"]
+mesh = SubResource("BoxMesh_tower_facade")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MegaTowerEntrance/TowerFacade"]
+shape = SubResource("BoxShape3D_tower_facade")
+
+[node name="EntranceCanopy" type="StaticBody3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.4, 27.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MegaTowerEntrance/EntranceCanopy"]
+mesh = SubResource("BoxMesh_entrance_canopy")
+
+[node name="PillarLeft" type="MeshInstance3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 2.2, 26.5)
+mesh = SubResource("BoxMesh_entrance_pillar")
+
+[node name="PillarRight" type="MeshInstance3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 2.2, 26.5)
+mesh = SubResource("BoxMesh_entrance_pillar")
+
+[node name="TowerSign" type="Label3D" parent="MegaTowerEntrance"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5, 24.6)
+billboard = 1
+no_depth_test = true
+modulate = Color(1, 0.65, 0.2, 1)
+text = "🚇 SEKTÖR 2 // YERALTI OTOPARKI & KAZAN DAİRESİ
+[ KAT 10 - 18 // DİKKAT: SANAYİ ALANI ]"
+font_size = 32
+outline_size = 8
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="SodiumLight1" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 4.0, -10)
+light_color = Color(1, 0.72, 0.35, 1)
+light_energy = 4.0
+omni_range = 16.0
+
+[node name="SodiumLight2" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 4.0, -10)
+light_color = Color(1, 0.72, 0.35, 1)
+light_energy = 4.0
+omni_range = 16.0
+
+[node name="SodiumLight3" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.2, 8)
+light_color = Color(1, 0.72, 0.35, 1)
+light_energy = 4.5
+omni_range = 18.0

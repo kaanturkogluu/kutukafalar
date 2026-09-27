@@ -1,0 +1,275 @@
+[gd_scene load_steps=31 format=3 uid="uid://sector_08_botanic_greenhouse_scene"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_outer_lush"]
+albedo_color = Color(0.18, 0.38, 0.16, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="BoxMesh_outer_lush"]
+material = SubResource("StandardMaterial3D_outer_lush")
+size = Vector3(280, 1, 280)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_outer_lush"]
+size = Vector3(280, 1, 280)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_green_grass"]
+albedo_color = Color(0.24, 0.56, 0.22, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_greenhouse_floor"]
+material = SubResource("StandardMaterial3D_green_grass")
+size = Vector3(52, 1, 52)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_greenhouse_floor"]
+size = Vector3(52, 1, 52)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_glass_dome"]
+albedo_color = Color(0.7, 0.92, 1.0, 0.3)
+roughness = 0.05
+emission_enabled = true
+emission = Color(0.6, 0.9, 0.8, 1)
+emission_energy_multiplier = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_glass_wall_z"]
+material = SubResource("StandardMaterial3D_glass_dome")
+size = Vector3(52, 7.0, 0.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_glass_wall_z"]
+size = Vector3(52, 10.0, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_glass_wall_x"]
+material = SubResource("StandardMaterial3D_glass_dome")
+size = Vector3(0.6, 7.0, 52)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_glass_wall_x"]
+size = Vector3(1.2, 10.0, 52)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_clear_water"]
+albedo_color = Color(0.12, 0.55, 0.72, 0.8)
+roughness = 0.1
+metallic = 0.2
+
+[sub_resource type="BoxMesh" id="BoxMesh_pond_water"]
+material = SubResource("StandardMaterial3D_clear_water")
+size = Vector3(14.0, 0.4, 10.0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wood_bridge"]
+albedo_color = Color(0.55, 0.38, 0.25, 1)
+roughness = 0.6
+
+[sub_resource type="BoxMesh" id="BoxMesh_bridge"]
+material = SubResource("StandardMaterial3D_wood_bridge")
+size = Vector3(4.0, 0.6, 12.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bridge"]
+size = Vector3(4.0, 0.6, 12.0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_palm_trunk"]
+albedo_color = Color(0.45, 0.32, 0.2, 1)
+roughness = 0.8
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_trunk"]
+material = SubResource("StandardMaterial3D_palm_trunk")
+top_radius = 0.4
+bottom_radius = 0.5
+height = 5.0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_trunk"]
+size = Vector3(0.8, 5.0, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_palm_leaves"]
+albedo_color = Color(0.18, 0.68, 0.24, 1)
+roughness = 0.7
+
+[sub_resource type="BoxMesh" id="BoxMesh_foliage_canopy"]
+material = SubResource("StandardMaterial3D_palm_leaves")
+size = Vector3(4.5, 1.2, 4.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stone_planter"]
+albedo_color = Color(0.5, 0.52, 0.55, 1)
+roughness = 0.75
+
+[sub_resource type="BoxMesh" id="BoxMesh_flower_bed"]
+material = SubResource("StandardMaterial3D_stone_planter")
+size = Vector3(10.0, 0.9, 3.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_flower_bed"]
+size = Vector3(10.0, 0.9, 3.0)
+
+[node name="Sector08_BotanicPark" type="Node3D"]
+
+[node name="OuterGround" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="OuterGround"]
+mesh = SubResource("BoxMesh_outer_lush")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="OuterGround"]
+shape = SubResource("BoxShape3D_outer_lush")
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("BoxMesh_greenhouse_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("BoxShape3D_greenhouse_floor")
+
+[node name="PerimeterWalls" type="Node3D" parent="."]
+
+[node name="GlassNorth" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, -26)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/GlassNorth"]
+mesh = SubResource("BoxMesh_glass_wall_z")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/GlassNorth"]
+shape = SubResource("BoxShape3D_glass_wall_z")
+
+[node name="GlassSouth" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 26)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/GlassSouth"]
+mesh = SubResource("BoxMesh_glass_wall_z")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/GlassSouth"]
+shape = SubResource("BoxShape3D_glass_wall_z")
+
+[node name="GlassWest" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, 3.5, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/GlassWest"]
+mesh = SubResource("BoxMesh_glass_wall_x")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/GlassWest"]
+shape = SubResource("BoxShape3D_glass_wall_x")
+
+[node name="GlassEast" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 3.5, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/GlassEast"]
+mesh = SubResource("BoxMesh_glass_wall_x")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/GlassEast"]
+shape = SubResource("BoxShape3D_glass_wall_x")
+
+[node name="CentralPondArea" type="Node3D" parent="."]
+
+[node name="PondWater" type="MeshInstance3D" parent="CentralPondArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+mesh = SubResource("BoxMesh_pond_water")
+
+[node name="Bridge" type="StaticBody3D" parent="CentralPondArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="CentralPondArea/Bridge"]
+mesh = SubResource("BoxMesh_bridge")
+
+[node name="Col" type="CollisionShape3D" parent="CentralPondArea/Bridge"]
+shape = SubResource("BoxShape3D_bridge")
+
+[node name="PalmTrees" type="Node3D" parent="."]
+
+[node name="Palm1" type="StaticBody3D" parent="PalmTrees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.5, -12)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Trunk" type="MeshInstance3D" parent="PalmTrees/Palm1"]
+mesh = SubResource("CylinderMesh_trunk")
+
+[node name="Col" type="CollisionShape3D" parent="PalmTrees/Palm1"]
+shape = SubResource("BoxShape3D_trunk")
+
+[node name="Canopy" type="MeshInstance3D" parent="PalmTrees/Palm1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+mesh = SubResource("BoxMesh_foliage_canopy")
+
+[node name="Palm2" type="StaticBody3D" parent="PalmTrees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.5, -12)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Trunk" type="MeshInstance3D" parent="PalmTrees/Palm2"]
+mesh = SubResource("CylinderMesh_trunk")
+
+[node name="Col" type="CollisionShape3D" parent="PalmTrees/Palm2"]
+shape = SubResource("BoxShape3D_trunk")
+
+[node name="Canopy" type="MeshInstance3D" parent="PalmTrees/Palm2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+mesh = SubResource("BoxMesh_foliage_canopy")
+
+[node name="Palm3" type="StaticBody3D" parent="PalmTrees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.5, 12)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Trunk" type="MeshInstance3D" parent="PalmTrees/Palm3"]
+mesh = SubResource("CylinderMesh_trunk")
+
+[node name="Col" type="CollisionShape3D" parent="PalmTrees/Palm3"]
+shape = SubResource("BoxShape3D_trunk")
+
+[node name="Canopy" type="MeshInstance3D" parent="PalmTrees/Palm3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+mesh = SubResource("BoxMesh_foliage_canopy")
+
+[node name="Palm4" type="StaticBody3D" parent="PalmTrees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.5, 12)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Trunk" type="MeshInstance3D" parent="PalmTrees/Palm4"]
+mesh = SubResource("CylinderMesh_trunk")
+
+[node name="Col" type="CollisionShape3D" parent="PalmTrees/Palm4"]
+shape = SubResource("BoxShape3D_trunk")
+
+[node name="Canopy" type="MeshInstance3D" parent="PalmTrees/Palm4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+mesh = SubResource("BoxMesh_foliage_canopy")
+
+[node name="FlowerBeds" type="Node3D" parent="."]
+
+[node name="Bed1" type="StaticBody3D" parent="FlowerBeds"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, -17)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="FlowerBeds/Bed1"]
+mesh = SubResource("BoxMesh_flower_bed")
+
+[node name="Col" type="CollisionShape3D" parent="FlowerBeds/Bed1"]
+shape = SubResource("BoxShape3D_flower_bed")
+
+[node name="Bed2" type="StaticBody3D" parent="FlowerBeds"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 17)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="FlowerBeds/Bed2"]
+mesh = SubResource("BoxMesh_flower_bed")
+
+[node name="Col" type="CollisionShape3D" parent="FlowerBeds/Bed2"]
+shape = SubResource("BoxShape3D_flower_bed")
+
+[node name="SunlightAura" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.0, 0)
+light_color = Color(1.0, 0.95, 0.75, 1)
+light_energy = 3.6
+omni_range = 28.0

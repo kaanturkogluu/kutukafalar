@@ -7,12 +7,14 @@ signal died(zombie_ref)
 @export var speed: float = 4.4
 @export var attack_damage: float = 15.0
 @export var attack_rate: float = 0.8
+@export var zombie_type: String = "normal"
 
 var current_health: float
 var attack_timer: float = 0.0
 var target_player: CharacterBody3D = null
 var is_frozen: bool = false
 var is_dead: bool = false
+var is_exploding: bool = false
 var slow_factor: float = 1.0
 var slow_timer: float = 0.0
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
@@ -38,6 +40,8 @@ func _ready() -> void:
 	add_to_group("enemies")
 	last_anim_pos = global_position
 	anim_phase = randf_range(0.0, TAU)
+	if zombie_type != "normal" and zombie_type != "boss":
+		setup_type(zombie_type)
 
 func _process(delta: float) -> void:
 	_animate_limbs(delta)
@@ -147,6 +151,12 @@ func _physics_process(delta: float) -> void:
 		# Mesafe kontrolü: Kovalama mı, Saldırı mı?
 		var vert_diff = abs(global_position.y - target_player.global_position.y)
 		var move_speed = speed * slow_factor
+
+		# Patlayıcı Zombi (Boomer): Oyuncunun dibine ulaştığında kendini patlatır!
+		if zombie_type == "boomer" and distance <= 2.2:
+			_detonate_boomer()
+			return
+
 		if distance > 1.7 or vert_diff > 1.9:
 			# Zombi havadaysa veya oyuncudan çok uzaktaysa yaklaşmalı
 			var direction = diff.normalized()
@@ -318,6 +328,12 @@ func _die(is_headshot: bool, attacker_id: int = 1) -> void:
 		return
 	is_dead = true
 	died.emit(self)
+
+	# Zombi Türü Özel Efektleri
+	if zombie_type == "toxic":
+		_toxic_burst()
+	elif zombie_type == "boomer" and not is_exploding:
+		_trigger_boomer_explosion.rpc()
 	
 	# Skoru vuran oyuncuya yaz
 	var killer = get_tree().current_scene.find_child(str(attacker_id), true, false)
@@ -418,3 +434,115 @@ func _apply_freeze(duration: float) -> void:
 func apply_slow(factor: float = 0.4, duration: float = 1.0) -> void:
 	slow_factor = min(slow_factor, factor)
 	slow_timer = max(slow_timer, duration)
+
+# --- Zombi Türleri ve Boss Özelleştirme Mantığı ---
+
+func setup_type(type_name: String) -> void:
+	zombie_type = type_name
+	match type_name:
+		"runner":
+			speed = speed * 1.45
+			max_health = max_health * 0.72
+			current_health = max_health
+			attack_damage = 12.0
+			scale = Vector3(0.85, 0.9, 0.85)
+			_tint_zombie(Color(0.85, 0.45, 0.25), Color(1.0, 0.35, 0.05))
+		"tank":
+			speed = max(2.6, speed * 0.70)
+			max_health = max_health * 2.6
+			current_health = max_health
+			attack_damage = 32.0
+			scale = Vector3(1.35, 1.35, 1.35)
+			_tint_zombie(Color(0.25, 0.28, 0.3), Color(0.85, 0.15, 0.15))
+		"toxic":
+			speed = speed * 0.95
+			max_health = max_health * 1.15
+			current_health = max_health
+			_tint_zombie(Color(0.25, 0.65, 0.25), Color(0.2, 1.0, 0.25))
+		"boomer":
+			speed = speed * 1.25
+			max_health = max_health * 0.65
+			current_health = max_health
+			_tint_zombie(Color(0.85, 0.22, 0.15), Color(1.0, 0.7, 0.1), true)
+
+func _tint_zombie(body_color: Color, eye_color: Color, is_pulsing: bool = false) -> void:
+	var body_mat = StandardMaterial3D.new()
+	body_mat.albedo_color = body_color
+	body_mat.roughness = 0.7
+	if is_pulsing:
+		body_mat.emission_enabled = true
+		body_mat.emission = Color(1.0, 0.2, 0.1)
+		body_mat.emission_energy_multiplier = 1.6
+
+	var eye_mat = StandardMaterial3D.new()
+	eye_mat.albedo_color = eye_color
+	eye_mat.emission_enabled = true
+	eye_mat.emission = eye_color
+	eye_mat.emission_energy_multiplier = 4.0
+
+	var meshes = find_children("*", "MeshInstance3D")
+	for m in meshes:
+		if "Pupil" in m.name or "Eye" in m.name:
+			m.material_override = eye_mat
+		elif "Torso" in m.name or "Head" in m.name:
+			m.material_override = body_mat
+
+func setup_boss_sector(sector_num: int) -> void:
+	zombie_type = "boss"
+	var boss_scale = 1.35 + (sector_num * 0.08)
+	if sector_num == 11:
+		boss_scale = 2.2 # Nihai Kat 99 Kutu Şah!
+	scale = Vector3(boss_scale, boss_scale, boss_scale)
+	
+	match sector_num:
+		1:
+			_tint_zombie(Color(0.7, 0.15, 0.15), Color(1.0, 0.1, 0.1))
+		2:
+			_tint_zombie(Color(0.45, 0.35, 0.25), Color(1.0, 0.4, 0.0))
+		3:
+			_tint_zombie(Color(0.65, 0.1, 0.2), Color(1.0, 0.1, 0.1))
+		4:
+			_tint_zombie(Color(0.2, 0.22, 0.28), Color(0.3, 0.6, 1.0))
+		5:
+			_tint_zombie(Color(0.15, 0.25, 0.45), Color(0.1, 0.9, 1.0))
+		6:
+			_tint_zombie(Color(0.8, 0.85, 0.8), Color(0.2, 1.0, 0.4))
+		7:
+			_tint_zombie(Color(0.85, 0.72, 0.2), Color(1.0, 0.9, 0.2))
+		8:
+			_tint_zombie(Color(0.2, 0.45, 0.15), Color(0.4, 1.0, 0.2))
+		9:
+			_tint_zombie(Color(0.1, 0.5, 0.5), Color(0.1, 1.0, 0.8))
+		10:
+			_tint_zombie(Color(0.28, 0.34, 0.22), Color(1.0, 0.2, 0.1))
+		11:
+			_tint_zombie(Color(0.08, 0.08, 0.1), Color(1.0, 0.05, 0.05), true)
+
+func _detonate_boomer() -> void:
+	if is_exploding or is_dead:
+		return
+	is_exploding = true
+	is_dead = true
+	_trigger_boomer_explosion.rpc()
+	
+	if multiplayer.is_server():
+		var players = get_tree().get_nodes_in_group("players")
+		for p in players:
+			if is_instance_valid(p) and not p.get("is_dead"):
+				var dist = global_position.distance_to(p.global_position)
+				if dist < 5.5:
+					var dmg = lerp(45.0, 10.0, dist / 5.5)
+					p.take_damage(dmg)
+		_die.rpc(false, 1)
+
+@rpc("call_local", "unreliable")
+func _trigger_boomer_explosion() -> void:
+	SoundManager.play_3d_sfx("barrel_explode", global_position, 0.15, 0.0)
+
+func _toxic_burst() -> void:
+	if multiplayer.is_server():
+		var players = get_tree().get_nodes_in_group("players")
+		for p in players:
+			if is_instance_valid(p) and not p.get("is_dead"):
+				if global_position.distance_to(p.global_position) < 4.0:
+					p.take_damage(18.0)

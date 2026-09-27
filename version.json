@@ -1,6 +1,6 @@
 {
-    "version":  "v1.3.8",
+    "version":  "v1.3.9",
     "download_url":  "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-    "pck_size":  566468,
+    "pck_size":  684012,
     "changelog":  "- Çok Oyunculu Eşya ve Silah Düşüşü: Zombilerden düşen silah, cephane, altın, can ve varillerin tüm oyuncular tarafından görünmesi ve toplanabilmesi sağlandı.\n- Patlamış Araç Kombo İstismarı Engellendi: Patlamış hurda araçlara ateş edildiğinde sınırsız kombo ve ulti birikmesi düzeltildi.\n- Oyuncu Sayısına Göre Zombi Çarpanı: Çok oyunculu modda odadaki oyuncu sayısına göre dalga zombi sayısı ve boss canı dinamik çarpanla dengelendi."
 }

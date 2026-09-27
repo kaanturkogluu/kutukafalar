@@ -1,0 +1,294 @@
+[gd_scene load_steps=33 format=3 uid="uid://sector_11_open_rooftop_helipad_scene"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_open_sky_drop"]
+albedo_color = Color(0.04, 0.05, 0.08, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="BoxMesh_open_sky_drop"]
+material = SubResource("StandardMaterial3D_open_sky_drop")
+size = Vector3(280, 1, 280)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_open_sky_drop"]
+size = Vector3(280, 1, 280)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_helipad_asphalt"]
+albedo_color = Color(0.2, 0.22, 0.24, 1)
+roughness = 0.85
+
+[sub_resource type="BoxMesh" id="BoxMesh_helipad_floor"]
+material = SubResource("StandardMaterial3D_helipad_asphalt")
+size = Vector3(54, 1, 54)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_helipad_floor"]
+size = Vector3(54, 1, 54)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_helipad_yellow"]
+albedo_color = Color(0.95, 0.8, 0.1, 1)
+emission_enabled = true
+emission = Color(0.95, 0.8, 0.1, 1)
+emission_energy_multiplier = 0.8
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_helipad_circle"]
+material = SubResource("StandardMaterial3D_helipad_yellow")
+top_radius = 9.0
+bottom_radius = 9.0
+height = 0.05
+
+[sub_resource type="BoxMesh" id="BoxMesh_helipad_bar_v"]
+material = SubResource("StandardMaterial3D_helipad_yellow")
+size = Vector3(0.8, 0.08, 7.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_helipad_bar_h"]
+material = SubResource("StandardMaterial3D_helipad_yellow")
+size = Vector3(3.5, 0.08, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_steel_railing"]
+albedo_color = Color(0.6, 0.65, 0.7, 1)
+metallic = 0.8
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_roof_railing_z"]
+material = SubResource("StandardMaterial3D_steel_railing")
+size = Vector3(54, 1.4, 0.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_roof_railing_z"]
+size = Vector3(54, 8.0, 1.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_roof_railing_x"]
+material = SubResource("StandardMaterial3D_steel_railing")
+size = Vector3(0.4, 1.4, 54)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_roof_railing_x"]
+size = Vector3(1.0, 8.0, 54)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_chopper_hull"]
+albedo_color = Color(0.18, 0.32, 0.22, 1)
+metallic = 0.6
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_chopper_body"]
+material = SubResource("StandardMaterial3D_chopper_hull")
+size = Vector3(3.6, 2.5, 7.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_chopper_body"]
+size = Vector3(3.6, 2.5, 7.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_chopper_skids"]
+albedo_color = Color(0.15, 0.15, 0.15, 1)
+metallic = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_chopper_skids"]
+material = SubResource("StandardMaterial3D_chopper_skids")
+size = Vector3(3.8, 0.3, 8.0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_chopper_rotor"]
+albedo_color = Color(0.2, 0.2, 0.2, 1)
+metallic = 0.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_chopper_rotor"]
+material = SubResource("StandardMaterial3D_chopper_rotor")
+size = Vector3(10.0, 0.15, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_aviation_beacon"]
+albedo_color = Color(1.0, 0.1, 0.1, 1)
+emission_enabled = true
+emission = Color(1.0, 0.1, 0.1, 1)
+emission_energy_multiplier = 5.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_beacon"]
+material = SubResource("StandardMaterial3D_aviation_beacon")
+top_radius = 0.3
+bottom_radius = 0.4
+height = 2.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ac_unit"]
+albedo_color = Color(0.45, 0.48, 0.5, 1)
+metallic = 0.5
+roughness = 0.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_ac_unit"]
+material = SubResource("StandardMaterial3D_ac_unit")
+size = Vector3(4.2, 2.2, 4.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ac_unit"]
+size = Vector3(4.2, 2.2, 4.2)
+
+[node name="Sector11_OpenRooftopHelipad" type="Node3D"]
+
+[node name="OuterGround" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="OuterGround"]
+mesh = SubResource("BoxMesh_open_sky_drop")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="OuterGround"]
+shape = SubResource("BoxShape3D_open_sky_drop")
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("BoxMesh_helipad_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("BoxShape3D_helipad_floor")
+
+[node name="HelipadMarkings" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+
+[node name="CircleRing" type="MeshInstance3D" parent="HelipadMarkings"]
+mesh = SubResource("CylinderMesh_helipad_circle")
+
+[node name="H_Left" type="MeshInstance3D" parent="HelipadMarkings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.05, 0)
+mesh = SubResource("BoxMesh_helipad_bar_v")
+
+[node name="H_Right" type="MeshInstance3D" parent="HelipadMarkings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.05, 0)
+mesh = SubResource("BoxMesh_helipad_bar_v")
+
+[node name="H_Center" type="MeshInstance3D" parent="HelipadMarkings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+mesh = SubResource("BoxMesh_helipad_bar_h")
+
+[node name="RooftopRailings" type="Node3D" parent="."]
+
+[node name="RailingNorth" type="StaticBody3D" parent="RooftopRailings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, -27)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="RooftopRailings/RailingNorth"]
+mesh = SubResource("BoxMesh_roof_railing_z")
+
+[node name="Col" type="CollisionShape3D" parent="RooftopRailings/RailingNorth"]
+shape = SubResource("BoxShape3D_roof_railing_z")
+
+[node name="RailingSouth" type="StaticBody3D" parent="RooftopRailings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 27)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="RooftopRailings/RailingSouth"]
+mesh = SubResource("BoxMesh_roof_railing_z")
+
+[node name="Col" type="CollisionShape3D" parent="RooftopRailings/RailingSouth"]
+shape = SubResource("BoxShape3D_roof_railing_z")
+
+[node name="RailingWest" type="StaticBody3D" parent="RooftopRailings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27, 0.7, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="RooftopRailings/RailingWest"]
+mesh = SubResource("BoxMesh_roof_railing_x")
+
+[node name="Col" type="CollisionShape3D" parent="RooftopRailings/RailingWest"]
+shape = SubResource("BoxShape3D_roof_railing_x")
+
+[node name="RailingEast" type="StaticBody3D" parent="RooftopRailings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27, 0.7, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="RooftopRailings/RailingEast"]
+mesh = SubResource("BoxMesh_roof_railing_x")
+
+[node name="Col" type="CollisionShape3D" parent="RooftopRailings/RailingEast"]
+shape = SubResource("BoxShape3D_roof_railing_x")
+
+[node name="RescueHelicopter" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -17)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Skids" type="MeshInstance3D" parent="RescueHelicopter"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+mesh = SubResource("BoxMesh_chopper_skids")
+
+[node name="Fuselage" type="MeshInstance3D" parent="RescueHelicopter"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+mesh = SubResource("BoxMesh_chopper_body")
+
+[node name="MainRotor" type="MeshInstance3D" parent="RescueHelicopter"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, 0)
+mesh = SubResource("BoxMesh_chopper_rotor")
+
+[node name="Col" type="CollisionShape3D" parent="RescueHelicopter"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("BoxShape3D_chopper_body")
+
+[node name="RooftopACUnits" type="Node3D" parent="."]
+
+[node name="AC1" type="StaticBody3D" parent="RooftopACUnits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 1.1, -10)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="RooftopACUnits/AC1"]
+mesh = SubResource("BoxMesh_ac_unit")
+
+[node name="Col" type="CollisionShape3D" parent="RooftopACUnits/AC1"]
+shape = SubResource("BoxShape3D_ac_unit")
+
+[node name="AC2" type="StaticBody3D" parent="RooftopACUnits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 1.1, -10)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="RooftopACUnits/AC2"]
+mesh = SubResource("BoxMesh_ac_unit")
+
+[node name="Col" type="CollisionShape3D" parent="RooftopACUnits/AC2"]
+shape = SubResource("BoxShape3D_ac_unit")
+
+[node name="AC3" type="StaticBody3D" parent="RooftopACUnits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 1.1, 12)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="RooftopACUnits/AC3"]
+mesh = SubResource("BoxMesh_ac_unit")
+
+[node name="Col" type="CollisionShape3D" parent="RooftopACUnits/AC3"]
+shape = SubResource("BoxShape3D_ac_unit")
+
+[node name="AC4" type="StaticBody3D" parent="RooftopACUnits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 1.1, 12)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="RooftopACUnits/AC4"]
+mesh = SubResource("BoxMesh_ac_unit")
+
+[node name="Col" type="CollisionShape3D" parent="RooftopACUnits/AC4"]
+shape = SubResource("BoxShape3D_ac_unit")
+
+[node name="Beacons" type="Node3D" parent="."]
+
+[node name="BeaconNW" type="MeshInstance3D" parent="Beacons"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 1.0, -25)
+mesh = SubResource("CylinderMesh_beacon")
+
+[node name="BeaconNE" type="MeshInstance3D" parent="Beacons"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 1.0, -25)
+mesh = SubResource("CylinderMesh_beacon")
+
+[node name="BeaconSW" type="MeshInstance3D" parent="Beacons"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 1.0, 25)
+mesh = SubResource("CylinderMesh_beacon")
+
+[node name="BeaconSE" type="MeshInstance3D" parent="Beacons"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 1.0, 25)
+mesh = SubResource("CylinderMesh_beacon")
+
+[node name="HelipadSpotLight" type="SpotLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 18, 0)
+light_color = Color(1.0, 0.95, 0.85, 1)
+light_energy = 5.0
+spot_range = 35.0
+spot_angle = 45.0

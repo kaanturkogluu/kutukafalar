@@ -1,0 +1,268 @@
+[gd_scene load_steps=29 format=3 uid="uid://sector_09_secret_biolab_scene"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_outer_lab"]
+albedo_color = Color(0.12, 0.16, 0.2, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_outer_lab"]
+material = SubResource("StandardMaterial3D_outer_lab")
+size = Vector3(280, 1, 280)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_outer_lab"]
+size = Vector3(280, 1, 280)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lab_tile"]
+albedo_color = Color(0.82, 0.88, 0.92, 1)
+roughness = 0.15
+metallic = 0.2
+
+[sub_resource type="BoxMesh" id="BoxMesh_lab_floor"]
+material = SubResource("StandardMaterial3D_lab_tile")
+size = Vector3(52, 1, 52)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lab_floor"]
+size = Vector3(52, 1, 52)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lab_wall"]
+albedo_color = Color(0.2, 0.25, 0.3, 1)
+roughness = 0.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_lab_wall_z"]
+material = SubResource("StandardMaterial3D_lab_wall")
+size = Vector3(52, 6.0, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lab_wall_z"]
+size = Vector3(52, 9.0, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_lab_wall_x"]
+material = SubResource("StandardMaterial3D_lab_wall")
+size = Vector3(0.8, 6.0, 52)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lab_wall_x"]
+size = Vector3(1.2, 9.0, 52)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stasis_fluid"]
+albedo_color = Color(0.1, 0.85, 0.65, 0.7)
+roughness = 0.1
+emission_enabled = true
+emission = Color(0.1, 0.85, 0.65, 1)
+emission_energy_multiplier = 2.5
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_stasis_pod"]
+material = SubResource("StandardMaterial3D_stasis_fluid")
+top_radius = 1.3
+bottom_radius = 1.3
+height = 3.6
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_stasis_pod"]
+size = Vector3(2.6, 3.6, 2.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_steel_base"]
+albedo_color = Color(0.3, 0.34, 0.38, 1)
+metallic = 0.8
+roughness = 0.3
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_pod_base"]
+material = SubResource("StandardMaterial3D_steel_base")
+top_radius = 1.6
+bottom_radius = 1.8
+height = 0.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_centrifuge"]
+albedo_color = Color(0.25, 0.3, 0.35, 1)
+metallic = 0.7
+roughness = 0.3
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_reactor"]
+material = SubResource("StandardMaterial3D_centrifuge")
+top_radius = 3.0
+bottom_radius = 3.5
+height = 3.0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_reactor"]
+size = Vector3(6.2, 3.0, 6.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lab_bench"]
+albedo_color = Color(0.9, 0.92, 0.94, 1)
+metallic = 0.4
+roughness = 0.25
+
+[sub_resource type="BoxMesh" id="BoxMesh_bench"]
+material = SubResource("StandardMaterial3D_lab_bench")
+size = Vector3(5.0, 1.0, 2.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bench"]
+size = Vector3(5.0, 1.0, 2.0)
+
+[node name="Sector09_SecretBioLab" type="Node3D"]
+
+[node name="OuterGround" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="OuterGround"]
+mesh = SubResource("BoxMesh_outer_lab")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="OuterGround"]
+shape = SubResource("BoxShape3D_outer_lab")
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("BoxMesh_lab_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("BoxShape3D_lab_floor")
+
+[node name="PerimeterWalls" type="Node3D" parent="."]
+
+[node name="WallNorth" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -26)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallNorth"]
+mesh = SubResource("BoxMesh_lab_wall_z")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallNorth"]
+shape = SubResource("BoxShape3D_lab_wall_z")
+
+[node name="WallSouth" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 26)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallSouth"]
+mesh = SubResource("BoxMesh_lab_wall_z")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallSouth"]
+shape = SubResource("BoxShape3D_lab_wall_z")
+
+[node name="WallWest" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, 3, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallWest"]
+mesh = SubResource("BoxMesh_lab_wall_x")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallWest"]
+shape = SubResource("BoxShape3D_lab_wall_x")
+
+[node name="WallEast" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 3, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallEast"]
+mesh = SubResource("BoxMesh_lab_wall_x")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallEast"]
+shape = SubResource("BoxShape3D_lab_wall_x")
+
+[node name="StasisPods" type="Node3D" parent="."]
+
+[node name="Pod1" type="StaticBody3D" parent="StasisPods"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 1.8, -12)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Glass" type="MeshInstance3D" parent="StasisPods/Pod1"]
+mesh = SubResource("CylinderMesh_stasis_pod")
+
+[node name="Base" type="MeshInstance3D" parent="StasisPods/Pod1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.6, 0)
+mesh = SubResource("CylinderMesh_pod_base")
+
+[node name="Col" type="CollisionShape3D" parent="StasisPods/Pod1"]
+shape = SubResource("BoxShape3D_stasis_pod")
+
+[node name="Pod2" type="StaticBody3D" parent="StasisPods"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 1.8, -12)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Glass" type="MeshInstance3D" parent="StasisPods/Pod2"]
+mesh = SubResource("CylinderMesh_stasis_pod")
+
+[node name="Base" type="MeshInstance3D" parent="StasisPods/Pod2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.6, 0)
+mesh = SubResource("CylinderMesh_pod_base")
+
+[node name="Col" type="CollisionShape3D" parent="StasisPods/Pod2"]
+shape = SubResource("BoxShape3D_stasis_pod")
+
+[node name="Pod3" type="StaticBody3D" parent="StasisPods"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 1.8, 12)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Glass" type="MeshInstance3D" parent="StasisPods/Pod3"]
+mesh = SubResource("CylinderMesh_stasis_pod")
+
+[node name="Base" type="MeshInstance3D" parent="StasisPods/Pod3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.6, 0)
+mesh = SubResource("CylinderMesh_pod_base")
+
+[node name="Col" type="CollisionShape3D" parent="StasisPods/Pod3"]
+shape = SubResource("BoxShape3D_stasis_pod")
+
+[node name="Pod4" type="StaticBody3D" parent="StasisPods"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 1.8, 12)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Glass" type="MeshInstance3D" parent="StasisPods/Pod4"]
+mesh = SubResource("CylinderMesh_stasis_pod")
+
+[node name="Base" type="MeshInstance3D" parent="StasisPods/Pod4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.6, 0)
+mesh = SubResource("CylinderMesh_pod_base")
+
+[node name="Col" type="CollisionShape3D" parent="StasisPods/Pod4"]
+shape = SubResource("BoxShape3D_stasis_pod")
+
+[node name="CentralReactor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="CentralReactor"]
+mesh = SubResource("CylinderMesh_reactor")
+
+[node name="Col" type="CollisionShape3D" parent="CentralReactor"]
+shape = SubResource("BoxShape3D_reactor")
+
+[node name="ReactorGlow" type="OmniLight3D" parent="CentralReactor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+light_color = Color(0.1, 0.95, 0.7, 1)
+light_energy = 3.2
+omni_range = 16.0
+
+[node name="LabBenches" type="Node3D" parent="."]
+
+[node name="Bench1" type="StaticBody3D" parent="LabBenches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -16)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="LabBenches/Bench1"]
+mesh = SubResource("BoxMesh_bench")
+
+[node name="Col" type="CollisionShape3D" parent="LabBenches/Bench1"]
+shape = SubResource("BoxShape3D_bench")
+
+[node name="Bench2" type="StaticBody3D" parent="LabBenches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 16)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="LabBenches/Bench2"]
+mesh = SubResource("BoxMesh_bench")
+
+[node name="Col" type="CollisionShape3D" parent="LabBenches/Bench2"]
+shape = SubResource("BoxShape3D_bench")

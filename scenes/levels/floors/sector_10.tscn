@@ -1,0 +1,277 @@
+[gd_scene load_steps=29 format=3 uid="uid://sector_10_military_defense_scene"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_outer_military"]
+albedo_color = Color(0.12, 0.14, 0.12, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_outer_military"]
+material = SubResource("StandardMaterial3D_outer_military")
+size = Vector3(280, 1, 280)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_outer_military"]
+size = Vector3(280, 1, 280)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_military_concrete"]
+albedo_color = Color(0.25, 0.28, 0.25, 1)
+roughness = 0.85
+metallic = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_military_floor"]
+material = SubResource("StandardMaterial3D_military_concrete")
+size = Vector3(52, 1, 52)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_military_floor"]
+size = Vector3(52, 1, 52)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fortified_wall"]
+albedo_color = Color(0.18, 0.2, 0.19, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_fortified_wall_z"]
+material = SubResource("StandardMaterial3D_fortified_wall")
+size = Vector3(52, 6.0, 1.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fortified_wall_z"]
+size = Vector3(52, 9.0, 1.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_fortified_wall_x"]
+material = SubResource("StandardMaterial3D_fortified_wall")
+size = Vector3(1.2, 6.0, 52)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fortified_wall_x"]
+size = Vector3(1.5, 9.0, 52)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sandbag"]
+albedo_color = Color(0.58, 0.52, 0.38, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="BoxMesh_sandbag_bunker"]
+material = SubResource("StandardMaterial3D_sandbag")
+size = Vector3(6.0, 1.3, 1.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sandbag_bunker"]
+size = Vector3(6.0, 1.3, 1.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ammo_crate"]
+albedo_color = Color(0.28, 0.36, 0.24, 1)
+roughness = 0.6
+metallic = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_ammo_stack"]
+material = SubResource("StandardMaterial3D_ammo_crate")
+size = Vector3(3.2, 2.0, 3.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ammo_stack"]
+size = Vector3(3.2, 2.0, 3.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_steel_barrier"]
+albedo_color = Color(0.4, 0.42, 0.44, 1)
+metallic = 0.85
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_steel_barrier"]
+material = SubResource("StandardMaterial3D_steel_barrier")
+size = Vector3(4.5, 1.5, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_steel_barrier"]
+size = Vector3(4.5, 1.5, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floodlight"]
+albedo_color = Color(1.0, 0.9, 0.7, 1)
+emission_enabled = true
+emission = Color(1.0, 0.9, 0.7, 1)
+emission_energy_multiplier = 4.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_floodlight"]
+material = SubResource("StandardMaterial3D_floodlight")
+size = Vector3(1.2, 0.8, 0.8)
+
+[node name="Sector10_MilitaryDefense" type="Node3D"]
+
+[node name="OuterGround" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="OuterGround"]
+mesh = SubResource("BoxMesh_outer_military")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="OuterGround"]
+shape = SubResource("BoxShape3D_outer_military")
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("BoxMesh_military_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("BoxShape3D_military_floor")
+
+[node name="PerimeterWalls" type="Node3D" parent="."]
+
+[node name="WallNorth" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -26)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallNorth"]
+mesh = SubResource("BoxMesh_fortified_wall_z")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallNorth"]
+shape = SubResource("BoxShape3D_fortified_wall_z")
+
+[node name="WallSouth" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 26)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallSouth"]
+mesh = SubResource("BoxMesh_fortified_wall_z")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallSouth"]
+shape = SubResource("BoxShape3D_fortified_wall_z")
+
+[node name="WallWest" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, 3, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallWest"]
+mesh = SubResource("BoxMesh_fortified_wall_x")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallWest"]
+shape = SubResource("BoxShape3D_fortified_wall_x")
+
+[node name="WallEast" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 3, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallEast"]
+mesh = SubResource("BoxMesh_fortified_wall_x")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallEast"]
+shape = SubResource("BoxShape3D_fortified_wall_x")
+
+[node name="SandbagBunkers" type="Node3D" parent="."]
+
+[node name="Bunker1" type="StaticBody3D" parent="SandbagBunkers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.65, -8)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="SandbagBunkers/Bunker1"]
+mesh = SubResource("BoxMesh_sandbag_bunker")
+
+[node name="Col" type="CollisionShape3D" parent="SandbagBunkers/Bunker1"]
+shape = SubResource("BoxShape3D_sandbag_bunker")
+
+[node name="Bunker2" type="StaticBody3D" parent="SandbagBunkers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.65, -8)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="SandbagBunkers/Bunker2"]
+mesh = SubResource("BoxMesh_sandbag_bunker")
+
+[node name="Col" type="CollisionShape3D" parent="SandbagBunkers/Bunker2"]
+shape = SubResource("BoxShape3D_sandbag_bunker")
+
+[node name="Bunker3" type="StaticBody3D" parent="SandbagBunkers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.65, 8)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="SandbagBunkers/Bunker3"]
+mesh = SubResource("BoxMesh_sandbag_bunker")
+
+[node name="Col" type="CollisionShape3D" parent="SandbagBunkers/Bunker3"]
+shape = SubResource("BoxShape3D_sandbag_bunker")
+
+[node name="Bunker4" type="StaticBody3D" parent="SandbagBunkers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.65, 8)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="SandbagBunkers/Bunker4"]
+mesh = SubResource("BoxMesh_sandbag_bunker")
+
+[node name="Col" type="CollisionShape3D" parent="SandbagBunkers/Bunker4"]
+shape = SubResource("BoxShape3D_sandbag_bunker")
+
+[node name="AmmoCaches" type="Node3D" parent="."]
+
+[node name="Stack1" type="StaticBody3D" parent="AmmoCaches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 1.0, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="AmmoCaches/Stack1"]
+mesh = SubResource("BoxMesh_ammo_stack")
+
+[node name="Col" type="CollisionShape3D" parent="AmmoCaches/Stack1"]
+shape = SubResource("BoxShape3D_ammo_stack")
+
+[node name="Stack2" type="StaticBody3D" parent="AmmoCaches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 1.0, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="AmmoCaches/Stack2"]
+mesh = SubResource("BoxMesh_ammo_stack")
+
+[node name="Col" type="CollisionShape3D" parent="AmmoCaches/Stack2"]
+shape = SubResource("BoxShape3D_ammo_stack")
+
+[node name="SteelBarriers" type="Node3D" parent="."]
+
+[node name="Barrier1" type="StaticBody3D" parent="SteelBarriers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, -14)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="SteelBarriers/Barrier1"]
+mesh = SubResource("BoxMesh_steel_barrier")
+
+[node name="Col" type="CollisionShape3D" parent="SteelBarriers/Barrier1"]
+shape = SubResource("BoxShape3D_steel_barrier")
+
+[node name="Barrier2" type="StaticBody3D" parent="SteelBarriers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 14)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="SteelBarriers/Barrier2"]
+mesh = SubResource("BoxMesh_steel_barrier")
+
+[node name="Col" type="CollisionShape3D" parent="SteelBarriers/Barrier2"]
+shape = SubResource("BoxShape3D_steel_barrier")
+
+[node name="PerimeterFloodlight1" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 5.0, -18)
+
+[node name="Fixture" type="MeshInstance3D" parent="PerimeterFloodlight1"]
+mesh = SubResource("BoxMesh_floodlight")
+
+[node name="Light" type="SpotLight3D" parent="PerimeterFloodlight1"]
+transform = Transform3D(0.707, -0.5, 0.5, 0, 0.707, 0.707, -0.707, -0.5, 0.5, 0, 0, 0)
+light_color = Color(1.0, 0.95, 0.8, 1)
+light_energy = 4.0
+spot_range = 35.0
+spot_angle = 50.0
+
+[node name="PerimeterFloodlight2" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 5.0, 18)
+
+[node name="Fixture" type="MeshInstance3D" parent="PerimeterFloodlight2"]
+mesh = SubResource("BoxMesh_floodlight")
+
+[node name="Light" type="SpotLight3D" parent="PerimeterFloodlight2"]
+transform = Transform3D(-0.707, 0.5, -0.5, 0, 0.707, 0.707, 0.707, 0.5, -0.5, 0, 0, 0)
+light_color = Color(1.0, 0.95, 0.8, 1)
+light_energy = 4.0
+spot_range = 35.0
+spot_angle = 50.0

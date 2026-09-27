@@ -1,0 +1,305 @@
+[gd_scene load_steps=29 format=3 uid="uid://sector_07_luxury_casino_scene"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_outer_dark_velvet"]
+albedo_color = Color(0.12, 0.04, 0.06, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_outer_dark_velvet"]
+material = SubResource("StandardMaterial3D_outer_dark_velvet")
+size = Vector3(280, 1, 280)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_outer_dark_velvet"]
+size = Vector3(280, 1, 280)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_casino_carpet"]
+albedo_color = Color(0.52, 0.08, 0.12, 1)
+roughness = 0.85
+
+[sub_resource type="BoxMesh" id="BoxMesh_casino_floor"]
+material = SubResource("StandardMaterial3D_casino_carpet")
+size = Vector3(52, 1, 52)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_casino_floor"]
+size = Vector3(52, 1, 52)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_casino_wall"]
+albedo_color = Color(0.24, 0.08, 0.1, 1)
+roughness = 0.6
+
+[sub_resource type="BoxMesh" id="BoxMesh_casino_wall_z"]
+material = SubResource("StandardMaterial3D_casino_wall")
+size = Vector3(52, 6.0, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_casino_wall_z"]
+size = Vector3(52, 9.0, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_casino_wall_x"]
+material = SubResource("StandardMaterial3D_casino_wall")
+size = Vector3(0.8, 6.0, 52)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_casino_wall_x"]
+size = Vector3(1.2, 9.0, 52)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gold_trim"]
+albedo_color = Color(0.88, 0.72, 0.22, 1)
+metallic = 0.85
+roughness = 0.25
+
+[sub_resource type="BoxMesh" id="BoxMesh_gold_pillar"]
+material = SubResource("StandardMaterial3D_gold_trim")
+size = Vector3(1.8, 6.0, 1.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gold_pillar"]
+size = Vector3(1.8, 6.0, 1.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_slot_machine"]
+albedo_color = Color(0.18, 0.18, 0.22, 1)
+metallic = 0.6
+roughness = 0.35
+
+[sub_resource type="BoxMesh" id="BoxMesh_slot_bank"]
+material = SubResource("StandardMaterial3D_slot_machine")
+size = Vector3(5.5, 2.2, 1.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_slot_bank"]
+size = Vector3(5.5, 2.2, 1.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_neon_777"]
+albedo_color = Color(1.0, 0.85, 0.1, 1)
+emission_enabled = true
+emission = Color(1.0, 0.85, 0.1, 1)
+emission_energy_multiplier = 4.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_neon_sign"]
+material = SubResource("StandardMaterial3D_neon_777")
+size = Vector3(4.8, 0.5, 0.15)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_roulette_felt"]
+albedo_color = Color(0.12, 0.45, 0.22, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_roulette_table"]
+material = SubResource("StandardMaterial3D_roulette_felt")
+size = Vector3(4.5, 0.85, 2.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_roulette_table"]
+size = Vector3(4.5, 0.85, 2.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vip_couch"]
+albedo_color = Color(0.12, 0.12, 0.14, 1)
+roughness = 0.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_vip_booth"]
+material = SubResource("StandardMaterial3D_vip_couch")
+size = Vector3(4.2, 1.2, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vip_booth"]
+size = Vector3(4.2, 1.2, 2.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_chandelier"]
+albedo_color = Color(1.0, 0.9, 0.6, 1)
+emission_enabled = true
+emission = Color(1.0, 0.85, 0.4, 1)
+emission_energy_multiplier = 4.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_chandelier"]
+material = SubResource("StandardMaterial3D_chandelier")
+top_radius = 2.4
+bottom_radius = 0.8
+height = 1.0
+
+[node name="Sector07_LuxuryCasino" type="Node3D"]
+
+[node name="OuterGround" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="OuterGround"]
+mesh = SubResource("BoxMesh_outer_dark_velvet")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="OuterGround"]
+shape = SubResource("BoxShape3D_outer_dark_velvet")
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("BoxMesh_casino_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("BoxShape3D_casino_floor")
+
+[node name="PerimeterWalls" type="Node3D" parent="."]
+
+[node name="WallNorth" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -26)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallNorth"]
+mesh = SubResource("BoxMesh_casino_wall_z")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallNorth"]
+shape = SubResource("BoxShape3D_casino_wall_z")
+
+[node name="WallSouth" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 26)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallSouth"]
+mesh = SubResource("BoxMesh_casino_wall_z")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallSouth"]
+shape = SubResource("BoxShape3D_casino_wall_z")
+
+[node name="WallWest" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, 3, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallWest"]
+mesh = SubResource("BoxMesh_casino_wall_x")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallWest"]
+shape = SubResource("BoxShape3D_casino_wall_x")
+
+[node name="WallEast" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 3, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallEast"]
+mesh = SubResource("BoxMesh_casino_wall_x")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallEast"]
+shape = SubResource("BoxShape3D_casino_wall_x")
+
+[node name="GoldPillars" type="Node3D" parent="."]
+
+[node name="Pillar1" type="StaticBody3D" parent="GoldPillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3.0, -10)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="GoldPillars/Pillar1"]
+mesh = SubResource("BoxMesh_gold_pillar")
+
+[node name="Col" type="CollisionShape3D" parent="GoldPillars/Pillar1"]
+shape = SubResource("BoxShape3D_gold_pillar")
+
+[node name="Pillar2" type="StaticBody3D" parent="GoldPillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3.0, -10)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="GoldPillars/Pillar2"]
+mesh = SubResource("BoxMesh_gold_pillar")
+
+[node name="Col" type="CollisionShape3D" parent="GoldPillars/Pillar2"]
+shape = SubResource("BoxShape3D_gold_pillar")
+
+[node name="Pillar3" type="StaticBody3D" parent="GoldPillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3.0, 10)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="GoldPillars/Pillar3"]
+mesh = SubResource("BoxMesh_gold_pillar")
+
+[node name="Col" type="CollisionShape3D" parent="GoldPillars/Pillar3"]
+shape = SubResource("BoxShape3D_gold_pillar")
+
+[node name="Pillar4" type="StaticBody3D" parent="GoldPillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3.0, 10)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="GoldPillars/Pillar4"]
+mesh = SubResource("BoxMesh_gold_pillar")
+
+[node name="Col" type="CollisionShape3D" parent="GoldPillars/Pillar4"]
+shape = SubResource("BoxShape3D_gold_pillar")
+
+[node name="SlotMachineBanks" type="Node3D" parent="."]
+
+[node name="SlotBank1" type="StaticBody3D" parent="SlotMachineBanks"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 1.1, -5)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="SlotMachineBanks/SlotBank1"]
+mesh = SubResource("BoxMesh_slot_bank")
+
+[node name="Col" type="CollisionShape3D" parent="SlotMachineBanks/SlotBank1"]
+shape = SubResource("BoxShape3D_slot_bank")
+
+[node name="Neon" type="MeshInstance3D" parent="SlotMachineBanks/SlotBank1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0.82)
+mesh = SubResource("BoxMesh_neon_sign")
+
+[node name="SlotBank2" type="StaticBody3D" parent="SlotMachineBanks"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 1.1, -5)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="SlotMachineBanks/SlotBank2"]
+mesh = SubResource("BoxMesh_slot_bank")
+
+[node name="Col" type="CollisionShape3D" parent="SlotMachineBanks/SlotBank2"]
+shape = SubResource("BoxShape3D_slot_bank")
+
+[node name="Neon" type="MeshInstance3D" parent="SlotMachineBanks/SlotBank2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0.82)
+mesh = SubResource("BoxMesh_neon_sign")
+
+[node name="RouletteTables" type="Node3D" parent="."]
+
+[node name="Table1" type="StaticBody3D" parent="RouletteTables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, -9)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="RouletteTables/Table1"]
+mesh = SubResource("BoxMesh_roulette_table")
+
+[node name="Col" type="CollisionShape3D" parent="RouletteTables/Table1"]
+shape = SubResource("BoxShape3D_roulette_table")
+
+[node name="VIPBooths" type="Node3D" parent="."]
+
+[node name="Booth1" type="StaticBody3D" parent="VIPBooths"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0.6, 12)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="VIPBooths/Booth1"]
+mesh = SubResource("BoxMesh_vip_booth")
+
+[node name="Col" type="CollisionShape3D" parent="VIPBooths/Booth1"]
+shape = SubResource("BoxShape3D_vip_booth")
+
+[node name="Booth2" type="StaticBody3D" parent="VIPBooths"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0.6, 12)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="VIPBooths/Booth2"]
+mesh = SubResource("BoxMesh_vip_booth")
+
+[node name="Col" type="CollisionShape3D" parent="VIPBooths/Booth2"]
+shape = SubResource("BoxShape3D_vip_booth")
+
+[node name="CenterChandelier" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8, 0)
+mesh = SubResource("CylinderMesh_chandelier")
+
+[node name="ChandelierLight" type="OmniLight3D" parent="CenterChandelier"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
+light_color = Color(1.0, 0.85, 0.5, 1)
+light_energy = 3.2
+omni_range = 20.0
+omni_attenuation = 0.8

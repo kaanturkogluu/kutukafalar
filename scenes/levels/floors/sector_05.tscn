@@ -1,0 +1,328 @@
+[gd_scene load_steps=29 format=3 uid="uid://sector_05_datacenter_scene"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_outer_dark"]
+albedo_color = Color(0.08, 0.09, 0.12, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="BoxMesh_outer_dark"]
+material = SubResource("StandardMaterial3D_outer_dark")
+size = Vector3(280, 1, 280)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_outer_dark"]
+size = Vector3(280, 1, 280)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_grid_floor"]
+albedo_color = Color(0.18, 0.22, 0.28, 1)
+roughness = 0.3
+metallic = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_datacenter_floor"]
+material = SubResource("StandardMaterial3D_grid_floor")
+size = Vector3(52, 1, 52)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_datacenter_floor"]
+size = Vector3(52, 1, 52)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_server_wall"]
+albedo_color = Color(0.12, 0.15, 0.2, 1)
+roughness = 0.7
+
+[sub_resource type="BoxMesh" id="BoxMesh_server_wall_z"]
+material = SubResource("StandardMaterial3D_server_wall")
+size = Vector3(52, 6.0, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_server_wall_z"]
+size = Vector3(52, 9.0, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_server_wall_x"]
+material = SubResource("StandardMaterial3D_server_wall")
+size = Vector3(0.8, 6.0, 52)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_server_wall_x"]
+size = Vector3(1.2, 9.0, 52)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_server_rack"]
+albedo_color = Color(0.15, 0.16, 0.19, 1)
+metallic = 0.6
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_server_rack"]
+material = SubResource("StandardMaterial3D_server_rack")
+size = Vector3(1.4, 3.8, 5.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_server_rack"]
+size = Vector3(1.4, 3.8, 5.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cyan_led"]
+albedo_color = Color(0.1, 0.8, 1.0, 1)
+emission_enabled = true
+emission = Color(0.1, 0.8, 1.0, 1)
+emission_energy_multiplier = 4.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_cyan_led_strip"]
+material = SubResource("StandardMaterial3D_cyan_led")
+size = Vector3(0.08, 3.4, 0.1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_violet_led"]
+albedo_color = Color(0.8, 0.2, 1.0, 1)
+emission_enabled = true
+emission = Color(0.8, 0.2, 1.0, 1)
+emission_energy_multiplier = 3.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_violet_led_strip"]
+material = SubResource("StandardMaterial3D_violet_led")
+size = Vector3(0.08, 3.4, 0.1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cooling_unit"]
+albedo_color = Color(0.25, 0.28, 0.32, 1)
+metallic = 0.7
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_cooling_unit"]
+material = SubResource("StandardMaterial3D_cooling_unit")
+size = Vector3(4.0, 4.0, 4.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cooling_unit"]
+size = Vector3(4.0, 4.0, 4.0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cable_tray"]
+albedo_color = Color(0.9, 0.7, 0.1, 1)
+emission_enabled = true
+emission = Color(0.9, 0.7, 0.1, 1)
+emission_energy_multiplier = 1.2
+
+[sub_resource type="BoxMesh" id="BoxMesh_cable_tray"]
+material = SubResource("StandardMaterial3D_cable_tray")
+size = Vector3(48.0, 0.25, 0.6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_terminal_console"]
+material = SubResource("StandardMaterial3D_server_rack")
+size = Vector3(3.2, 1.1, 1.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_terminal_console"]
+size = Vector3(3.2, 1.1, 1.5)
+
+[node name="Sector05_DataCenter" type="Node3D"]
+
+[node name="OuterGround" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="OuterGround"]
+mesh = SubResource("BoxMesh_outer_dark")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="OuterGround"]
+shape = SubResource("BoxShape3D_outer_dark")
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("BoxMesh_datacenter_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("BoxShape3D_datacenter_floor")
+
+[node name="PerimeterWalls" type="Node3D" parent="."]
+
+[node name="WallNorth" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -26)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallNorth"]
+mesh = SubResource("BoxMesh_server_wall_z")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallNorth"]
+shape = SubResource("BoxShape3D_server_wall_z")
+
+[node name="WallSouth" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 26)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallSouth"]
+mesh = SubResource("BoxMesh_server_wall_z")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallSouth"]
+shape = SubResource("BoxShape3D_server_wall_z")
+
+[node name="WallWest" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, 3, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallWest"]
+mesh = SubResource("BoxMesh_server_wall_x")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallWest"]
+shape = SubResource("BoxShape3D_server_wall_x")
+
+[node name="WallEast" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 3, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallEast"]
+mesh = SubResource("BoxMesh_server_wall_x")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallEast"]
+shape = SubResource("BoxShape3D_server_wall_x")
+
+[node name="ServerAisle_Left" type="Node3D" parent="."]
+
+[node name="Rack_L1" type="StaticBody3D" parent="ServerAisle_Left"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 1.9, -10)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="ServerAisle_Left/Rack_L1"]
+mesh = SubResource("BoxMesh_server_rack")
+
+[node name="LED1" type="MeshInstance3D" parent="ServerAisle_Left/Rack_L1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.71, 0, -1.8)
+mesh = SubResource("BoxMesh_cyan_led_strip")
+
+[node name="LED2" type="MeshInstance3D" parent="ServerAisle_Left/Rack_L1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.71, 0, 1.8)
+mesh = SubResource("BoxMesh_violet_led_strip")
+
+[node name="Col" type="CollisionShape3D" parent="ServerAisle_Left/Rack_L1"]
+shape = SubResource("BoxShape3D_server_rack")
+
+[node name="Rack_L2" type="StaticBody3D" parent="ServerAisle_Left"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 1.9, 10)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="ServerAisle_Left/Rack_L2"]
+mesh = SubResource("BoxMesh_server_rack")
+
+[node name="LED1" type="MeshInstance3D" parent="ServerAisle_Left/Rack_L2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.71, 0, -1.8)
+mesh = SubResource("BoxMesh_cyan_led_strip")
+
+[node name="LED2" type="MeshInstance3D" parent="ServerAisle_Left/Rack_L2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.71, 0, 1.8)
+mesh = SubResource("BoxMesh_violet_led_strip")
+
+[node name="Col" type="CollisionShape3D" parent="ServerAisle_Left/Rack_L2"]
+shape = SubResource("BoxShape3D_server_rack")
+
+[node name="Rack_L3" type="StaticBody3D" parent="ServerAisle_Left"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 1.9, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="ServerAisle_Left/Rack_L3"]
+mesh = SubResource("BoxMesh_server_rack")
+
+[node name="LED1" type="MeshInstance3D" parent="ServerAisle_Left/Rack_L3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.71, 0, 0)
+mesh = SubResource("BoxMesh_cyan_led_strip")
+
+[node name="Col" type="CollisionShape3D" parent="ServerAisle_Left/Rack_L3"]
+shape = SubResource("BoxShape3D_server_rack")
+
+[node name="ServerAisle_Right" type="Node3D" parent="."]
+
+[node name="Rack_R1" type="StaticBody3D" parent="ServerAisle_Right"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1.9, -10)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="ServerAisle_Right/Rack_R1"]
+mesh = SubResource("BoxMesh_server_rack")
+
+[node name="LED1" type="MeshInstance3D" parent="ServerAisle_Right/Rack_R1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.71, 0, -1.8)
+mesh = SubResource("BoxMesh_cyan_led_strip")
+
+[node name="LED2" type="MeshInstance3D" parent="ServerAisle_Right/Rack_R1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.71, 0, 1.8)
+mesh = SubResource("BoxMesh_violet_led_strip")
+
+[node name="Col" type="CollisionShape3D" parent="ServerAisle_Right/Rack_R1"]
+shape = SubResource("BoxShape3D_server_rack")
+
+[node name="Rack_R2" type="StaticBody3D" parent="ServerAisle_Right"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1.9, 10)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="ServerAisle_Right/Rack_R2"]
+mesh = SubResource("BoxMesh_server_rack")
+
+[node name="LED1" type="MeshInstance3D" parent="ServerAisle_Right/Rack_R2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.71, 0, -1.8)
+mesh = SubResource("BoxMesh_cyan_led_strip")
+
+[node name="LED2" type="MeshInstance3D" parent="ServerAisle_Right/Rack_R2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.71, 0, 1.8)
+mesh = SubResource("BoxMesh_violet_led_strip")
+
+[node name="Col" type="CollisionShape3D" parent="ServerAisle_Right/Rack_R2"]
+shape = SubResource("BoxShape3D_server_rack")
+
+[node name="Rack_R3" type="StaticBody3D" parent="ServerAisle_Right"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 1.9, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="ServerAisle_Right/Rack_R3"]
+mesh = SubResource("BoxMesh_server_rack")
+
+[node name="LED1" type="MeshInstance3D" parent="ServerAisle_Right/Rack_R3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.71, 0, 0)
+mesh = SubResource("BoxMesh_violet_led_strip")
+
+[node name="Col" type="CollisionShape3D" parent="ServerAisle_Right/Rack_R3"]
+shape = SubResource("BoxShape3D_server_rack")
+
+[node name="CentralCoolingUnit" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="CentralCoolingUnit"]
+mesh = SubResource("BoxMesh_cooling_unit")
+
+[node name="Col" type="CollisionShape3D" parent="CentralCoolingUnit"]
+shape = SubResource("BoxShape3D_cooling_unit")
+
+[node name="CoolingLight" type="OmniLight3D" parent="CentralCoolingUnit"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+light_color = Color(0.2, 0.8, 1.0, 1)
+light_energy = 2.4
+omni_range = 14.0
+
+[node name="ControlConsoles" type="Node3D" parent="."]
+
+[node name="Console1" type="StaticBody3D" parent="ControlConsoles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, -16)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="ControlConsoles/Console1"]
+mesh = SubResource("BoxMesh_terminal_console")
+
+[node name="Col" type="CollisionShape3D" parent="ControlConsoles/Console1"]
+shape = SubResource("BoxShape3D_terminal_console")
+
+[node name="Console2" type="StaticBody3D" parent="ControlConsoles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 16)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="ControlConsoles/Console2"]
+mesh = SubResource("BoxMesh_terminal_console")
+
+[node name="Col" type="CollisionShape3D" parent="ControlConsoles/Console2"]
+shape = SubResource("BoxShape3D_terminal_console")
+
+[node name="OverheadCables" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8, 0)
+mesh = SubResource("BoxMesh_cable_tray")

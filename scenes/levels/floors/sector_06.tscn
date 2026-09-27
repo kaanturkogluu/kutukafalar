@@ -1,0 +1,290 @@
+[gd_scene load_steps=27 format=3 uid="uid://sector_06_quarantine_hospital_scene"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_outer_white"]
+albedo_color = Color(0.85, 0.88, 0.9, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_outer_white"]
+material = SubResource("StandardMaterial3D_outer_white")
+size = Vector3(280, 1, 280)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_outer_white"]
+size = Vector3(280, 1, 280)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hospital_tile"]
+albedo_color = Color(0.92, 0.95, 0.97, 1)
+roughness = 0.2
+metallic = 0.1
+
+[sub_resource type="BoxMesh" id="BoxMesh_hospital_floor"]
+material = SubResource("StandardMaterial3D_hospital_tile")
+size = Vector3(52, 1, 52)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hospital_floor"]
+size = Vector3(52, 1, 52)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_clean_wall"]
+albedo_color = Color(0.88, 0.91, 0.94, 1)
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_hospital_wall_z"]
+material = SubResource("StandardMaterial3D_clean_wall")
+size = Vector3(52, 6.0, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hospital_wall_z"]
+size = Vector3(52, 9.0, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hospital_wall_x"]
+material = SubResource("StandardMaterial3D_clean_wall")
+size = Vector3(0.8, 6.0, 52)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hospital_wall_x"]
+size = Vector3(1.2, 9.0, 52)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stretcher_metal"]
+albedo_color = Color(0.75, 0.78, 0.82, 1)
+metallic = 0.8
+roughness = 0.2
+
+[sub_resource type="BoxMesh" id="BoxMesh_hospital_bed"]
+material = SubResource("StandardMaterial3D_stretcher_metal")
+size = Vector3(2.4, 0.85, 4.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hospital_bed"]
+size = Vector3(2.4, 0.85, 4.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_curtain_teal"]
+albedo_color = Color(0.4, 0.75, 0.8, 0.85)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_triage_curtain"]
+material = SubResource("StandardMaterial3D_curtain_teal")
+size = Vector3(0.2, 2.8, 5.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_triage_curtain"]
+size = Vector3(0.2, 2.8, 5.0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_med_cabinet"]
+albedo_color = Color(0.82, 0.85, 0.88, 1)
+metallic = 0.5
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_med_cabinet"]
+material = SubResource("StandardMaterial3D_med_cabinet")
+size = Vector3(3.6, 2.6, 1.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_med_cabinet"]
+size = Vector3(3.6, 2.6, 1.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xray_light"]
+albedo_color = Color(0.6, 0.9, 1.0, 1)
+emission_enabled = true
+emission = Color(0.6, 0.9, 1.0, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_xray_panel"]
+material = SubResource("StandardMaterial3D_xray_light")
+size = Vector3(3.0, 1.8, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_surgical_lamp"]
+albedo_color = Color(1.0, 1.0, 1.0, 1)
+emission_enabled = true
+emission = Color(1.0, 1.0, 1.0, 1)
+emission_energy_multiplier = 5.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_surgical_lamp"]
+material = SubResource("StandardMaterial3D_surgical_lamp")
+top_radius = 1.2
+bottom_radius = 1.4
+height = 0.35
+
+[node name="Sector06_QuarantineHospital" type="Node3D"]
+
+[node name="OuterGround" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="OuterGround"]
+mesh = SubResource("BoxMesh_outer_white")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="OuterGround"]
+shape = SubResource("BoxShape3D_outer_white")
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("BoxMesh_hospital_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("BoxShape3D_hospital_floor")
+
+[node name="PerimeterWalls" type="Node3D" parent="."]
+
+[node name="WallNorth" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -26)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallNorth"]
+mesh = SubResource("BoxMesh_hospital_wall_z")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallNorth"]
+shape = SubResource("BoxShape3D_hospital_wall_z")
+
+[node name="WallSouth" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 26)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallSouth"]
+mesh = SubResource("BoxMesh_hospital_wall_z")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallSouth"]
+shape = SubResource("BoxShape3D_hospital_wall_z")
+
+[node name="WallWest" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, 3, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallWest"]
+mesh = SubResource("BoxMesh_hospital_wall_x")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallWest"]
+shape = SubResource("BoxShape3D_hospital_wall_x")
+
+[node name="WallEast" type="StaticBody3D" parent="PerimeterWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 3, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="PerimeterWalls/WallEast"]
+mesh = SubResource("BoxMesh_hospital_wall_x")
+
+[node name="Col" type="CollisionShape3D" parent="PerimeterWalls/WallEast"]
+shape = SubResource("BoxShape3D_hospital_wall_x")
+
+[node name="HospitalBeds" type="Node3D" parent="."]
+
+[node name="Bed1" type="StaticBody3D" parent="HospitalBeds"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0.42, -10)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="HospitalBeds/Bed1"]
+mesh = SubResource("BoxMesh_hospital_bed")
+
+[node name="Col" type="CollisionShape3D" parent="HospitalBeds/Bed1"]
+shape = SubResource("BoxShape3D_hospital_bed")
+
+[node name="Curtain1" type="StaticBody3D" parent="HospitalBeds"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.8, 1.4, -10)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="HospitalBeds/Curtain1"]
+mesh = SubResource("BoxMesh_triage_curtain")
+
+[node name="Col" type="CollisionShape3D" parent="HospitalBeds/Curtain1"]
+shape = SubResource("BoxShape3D_triage_curtain")
+
+[node name="Bed2" type="StaticBody3D" parent="HospitalBeds"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0.42, 10)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="HospitalBeds/Bed2"]
+mesh = SubResource("BoxMesh_hospital_bed")
+
+[node name="Col" type="CollisionShape3D" parent="HospitalBeds/Bed2"]
+shape = SubResource("BoxShape3D_hospital_bed")
+
+[node name="Bed3" type="StaticBody3D" parent="HospitalBeds"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.42, -10)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="HospitalBeds/Bed3"]
+mesh = SubResource("BoxMesh_hospital_bed")
+
+[node name="Col" type="CollisionShape3D" parent="HospitalBeds/Bed3"]
+shape = SubResource("BoxShape3D_hospital_bed")
+
+[node name="Curtain2" type="StaticBody3D" parent="HospitalBeds"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.8, 1.4, -10)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="HospitalBeds/Curtain2"]
+mesh = SubResource("BoxMesh_triage_curtain")
+
+[node name="Col" type="CollisionShape3D" parent="HospitalBeds/Curtain2"]
+shape = SubResource("BoxShape3D_triage_curtain")
+
+[node name="Bed4" type="StaticBody3D" parent="HospitalBeds"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.42, 10)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="HospitalBeds/Bed4"]
+mesh = SubResource("BoxMesh_hospital_bed")
+
+[node name="Col" type="CollisionShape3D" parent="HospitalBeds/Bed4"]
+shape = SubResource("BoxShape3D_hospital_bed")
+
+[node name="MedCabinets" type="Node3D" parent="."]
+
+[node name="Cabinet1" type="StaticBody3D" parent="MedCabinets"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, -24.8)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="MedCabinets/Cabinet1"]
+mesh = SubResource("BoxMesh_med_cabinet")
+
+[node name="Col" type="CollisionShape3D" parent="MedCabinets/Cabinet1"]
+shape = SubResource("BoxShape3D_med_cabinet")
+
+[node name="Cabinet2" type="StaticBody3D" parent="MedCabinets"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 24.8)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="MedCabinets/Cabinet2"]
+mesh = SubResource("BoxMesh_med_cabinet")
+
+[node name="Col" type="CollisionShape3D" parent="MedCabinets/Cabinet2"]
+shape = SubResource("BoxShape3D_med_cabinet")
+
+[node name="XRayDisplay" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.2, 2.5, 0)
+mesh = SubResource("BoxMesh_xray_panel")
+
+[node name="CentralSurgicalStation" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="SurgicalBed" type="StaticBody3D" parent="CentralSurgicalStation"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="CentralSurgicalStation/SurgicalBed"]
+mesh = SubResource("BoxMesh_hospital_bed")
+
+[node name="Col" type="CollisionShape3D" parent="CentralSurgicalStation/SurgicalBed"]
+shape = SubResource("BoxShape3D_hospital_bed")
+
+[node name="OverheadSurgicalLamp" type="MeshInstance3D" parent="CentralSurgicalStation"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+mesh = SubResource("CylinderMesh_surgical_lamp")
+
+[node name="SurgicalLight" type="OmniLight3D" parent="CentralSurgicalStation"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.0, 0)
+light_color = Color(0.96, 0.98, 1.0, 1)
+light_energy = 3.5
+omni_range = 16.0
+omni_attenuation = 0.8

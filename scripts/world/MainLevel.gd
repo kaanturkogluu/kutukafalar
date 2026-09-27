@@ -122,9 +122,13 @@ func _notify_peer_level_ready(peer_id: int) -> void:
 		if "current_health" in existing_zombie and existing_zombie.current_health != null:
 			hp_val = float(existing_zombie.current_health)
 		if existing_zombie.name.begins_with("BossZombie"):
-			sync_spawn_boss.rpc_id(peer_id, existing_zombie.name, existing_zombie.global_position, hp_val)
+			var sector = LevelData.get_chapter_for_level(current_floor).get("sector", 1)
+			sync_spawn_boss.rpc_id(peer_id, existing_zombie.name, existing_zombie.global_position, hp_val, sector, speed_val)
 		else:
-			sync_spawn_zombie.rpc_id(peer_id, existing_zombie.name, existing_zombie.global_position, speed_val, hp_val)
+			var z_type = existing_zombie.get("zombie_type")
+			if z_type == null:
+				z_type = "normal"
+			sync_spawn_zombie.rpc_id(peer_id, existing_zombie.name, existing_zombie.global_position, speed_val, hp_val, str(z_type))
 
 	# 4.5) Sahnede zaten mevcut olan yerdeki ganimetleri (pickups) bu oyuncuya doğurt:
 	for existing_pickup in _get_pickups_container().get_children():
@@ -257,12 +261,23 @@ func _spawn_initial_barrels(floor_num: int = 1) -> void:
 				Vector3(0.0, 0.5, 16.0)
 			]
 		_:
-			initial_positions = [
-				Vector3(-6.0, 0.5, -6.0),
-				Vector3(6.0, 0.5, -6.0),
-				Vector3(-8.0, 0.5, 6.0),
-				Vector3(8.0, 0.5, 6.0)
-			]
+			if LevelData.is_boss_level(floor_num):
+				initial_positions = [
+					Vector3(-10.0, 0.5, -10.0),
+					Vector3(10.0, 0.5, -10.0),
+					Vector3(-10.0, 0.5, 10.0),
+					Vector3(10.0, 0.5, 10.0),
+					Vector3(0.0, 0.5, -15.0),
+					Vector3(0.0, 0.5, 15.0)
+				]
+			else:
+				initial_positions = [
+					Vector3(-6.0, 0.5, -6.0),
+					Vector3(6.0, 0.5, -6.0),
+					Vector3(-8.0, 0.5, 6.0),
+					Vector3(8.0, 0.5, 6.0),
+					Vector3(0.0, 0.5, -10.0)
+				]
 	for pos in initial_positions:
 		spawn_barrel(pos)
 
@@ -416,11 +431,22 @@ func _spawn_boss_zombie(player_count: int = 1) -> void:
 	var spawn_pos = Vector3(0, 1.5, -23)
 	if zombie_spawn_points.size() > 0:
 		spawn_pos = zombie_spawn_points[0].global_position
-	var boss_hp: float = 1200.0 * (1.0 + (player_count - 1) * 0.5)
-	sync_spawn_boss.rpc(b_name, spawn_pos, boss_hp)
+	
+	var info = LevelData.get_chapter_for_level(current_floor)
+	var sector = info.get("sector", 1)
+	
+	# Sektör numarasına göre boss canı ve hızı
+	var base_hp: float = 1000.0 + (sector * 450.0)
+	if sector == 11:
+		base_hp = 8000.0 # Kat 99: Final Boss Kutu Şah!
+	
+	var boss_hp: float = base_hp * (1.0 + (player_count - 1) * 0.5)
+	var boss_speed: float = 3.4 + (sector * 0.08)
+	
+	sync_spawn_boss.rpc(b_name, spawn_pos, boss_hp, sector, boss_speed)
 
 @rpc("call_local", "reliable")
-func sync_spawn_boss(b_name: String, pos: Vector3, hp_val: float = 1200.0) -> void:
+func sync_spawn_boss(b_name: String, pos: Vector3, hp_val: float = 1200.0, sector: int = 1, b_speed: float = 3.8) -> void:
 	if enemies_container.has_node(b_name):
 		return
 	var boss_scene = load(BOSS_SCENE_PATH)
@@ -430,6 +456,9 @@ func sync_spawn_boss(b_name: String, pos: Vector3, hp_val: float = 1200.0) -> vo
 		boss.position = pos
 		boss.max_health = hp_val
 		boss.current_health = hp_val
+		boss.speed = b_speed
+		if boss.has_method("setup_boss_sector"):
+			boss.setup_boss_sector(sector)
 		boss.died.connect(_on_zombie_died)
 		enemies_container.add_child(boss, true)
 
@@ -449,7 +478,7 @@ func _spawn_zombie_loop(token: int, player_count: int = 1) -> void:
 		_sync_floor_ui.rpc(current_floor, current_wave, active_zombie_count + zombies_remaining_to_spawn)
 
 @rpc("call_local", "reliable")
-func sync_spawn_zombie(z_name: String, pos: Vector3, speed_val: float, hp_val: float) -> void:
+func sync_spawn_zombie(z_name: String, pos: Vector3, speed_val: float, hp_val: float, z_type: String = "normal") -> void:
 	if enemies_container.has_node(z_name):
 		return
 	var zombie_scene = load(ZOMBIE_SCENE_PATH)
@@ -460,20 +489,39 @@ func sync_spawn_zombie(z_name: String, pos: Vector3, speed_val: float, hp_val: f
 		zombie.speed = speed_val
 		zombie.max_health = hp_val
 		zombie.current_health = hp_val
+		zombie.zombie_type = z_type
+		if zombie.has_method("setup_type") and z_type != "normal":
+			zombie.setup_type(z_type)
 		zombie.died.connect(_on_zombie_died)
 		enemies_container.add_child(zombie, true)
 
 func _spawn_single_zombie() -> void:
 	zombie_id_counter += 1
 	var z_name = "Zombie_" + str(zombie_id_counter)
-	var speed_val = 4.4 + (current_floor * 0.15)
-	var hp_val = 100.0 + (current_floor * 12.0)
+	var speed_val = 4.4 + (current_floor * 0.04)
+	var hp_val = 100.0 + (current_floor * 8.0)
+
+	# Zombi Türü Seçimi (Kat ilerledikçe zenginleşen düşman kadrosu)
+	var z_type = "normal"
+	var roll = randf()
+	if current_floor >= 4:
+		if roll < 0.22:
+			z_type = "runner"
+		elif roll < 0.38:
+			z_type = "toxic"
+		elif roll < 0.52 and current_floor >= 7:
+			z_type = "boomer"
+		elif roll < 0.66 and current_floor >= 10:
+			z_type = "tank"
+	elif current_floor >= 2:
+		if roll < 0.28:
+			z_type = "runner"
 
 	var spawn_pos = Vector3(randf_range(-10, 10), 1.5, randf_range(-10, 10))
 	if zombie_spawn_points.size() > 0:
 		spawn_pos = zombie_spawn_points.pick_random().global_position
 	
-	sync_spawn_zombie.rpc(z_name, spawn_pos, speed_val, hp_val)
+	sync_spawn_zombie.rpc(z_name, spawn_pos, speed_val, hp_val, z_type)
 
 @rpc("call_local", "reliable")
 func sync_despawn_node(container_name: String, node_name: String) -> void:
@@ -637,13 +685,178 @@ func sync_load_floor_environment(floor_num: int) -> void:
 
 	var floor_path = "res://scenes/levels/floors/floor_%02d.tscn" % floor_num
 	if not ResourceLoader.exists(floor_path):
-		floor_path = "res://scenes/levels/floors/floor_01.tscn"
+		var sector_info = LevelData.get_chapter_for_level(floor_num)
+		var sector_num = sector_info.get("sector", 1)
+		var sector_path = "res://scenes/levels/floors/sector_%02d.tscn" % sector_num
+		if ResourceLoader.exists(sector_path):
+			floor_path = sector_path
+		else:
+			floor_path = "res://scenes/levels/floors/floor_01.tscn"
 
 	var scene = load(floor_path)
 	if scene:
 		current_floor_instance = scene.instantiate()
 		floor_container.add_child(current_floor_instance)
 		print("[MainLevel] Kat ortamı başarıyla yüklendi: ", floor_path)
+
+	# Kat atmosferini güncelle (Gökyüzü, Güneş Işığı, Sis, Ortam Parlaklığı)
+	_apply_sector_atmosphere(floor_num)
+
+func _apply_sector_atmosphere(floor_num: int) -> void:
+	var info = LevelData.get_chapter_for_level(floor_num)
+	var sector = info.get("sector", 1)
+	
+	var env_node: WorldEnvironment = get_node_or_null("WorldEnvironment")
+	var dir_light: DirectionalLight3D = get_node_or_null("DirectionalLight3D")
+	if not env_node or not env_node.environment:
+		return
+
+	var env: Environment = env_node.environment
+	var sky_mat: ProceduralSkyMaterial = null
+	if env.sky and env.sky.sky_material is ProceduralSkyMaterial:
+		sky_mat = env.sky.sky_material
+
+	match sector:
+		1: # Kat 1-9: Giriş Lobisi & Sokak - Alacakaranlık
+			if sky_mat:
+				sky_mat.sky_top_color = Color(0.08, 0.1, 0.22, 1)
+				sky_mat.sky_horizon_color = Color(0.64, 0.32, 0.18, 1)
+				sky_mat.ground_bottom_color = Color(0.07, 0.08, 0.1, 1)
+			env.ambient_light_color = Color(0.34, 0.36, 0.44, 1)
+			env.fog_enabled = true
+			env.fog_light_color = Color(0.24, 0.26, 0.35, 1)
+			env.fog_density = 0.009
+			if dir_light:
+				dir_light.light_color = Color(0.95, 0.85, 0.75, 1)
+				dir_light.light_energy = 0.95
+
+		2: # Kat 10-18: Yeraltı Otoparkı & Kazan - Endüstriyel loş & turuncu buhar
+			if sky_mat:
+				sky_mat.sky_top_color = Color(0.04, 0.04, 0.06, 1)
+				sky_mat.sky_horizon_color = Color(0.35, 0.18, 0.08, 1)
+				sky_mat.ground_bottom_color = Color(0.02, 0.02, 0.03, 1)
+			env.ambient_light_color = Color(0.22, 0.18, 0.14, 1)
+			env.fog_enabled = true
+			env.fog_light_color = Color(0.3, 0.18, 0.1, 1)
+			env.fog_density = 0.016
+			if dir_light:
+				dir_light.light_color = Color(0.85, 0.55, 0.3, 1)
+				dir_light.light_energy = 0.35
+
+		3: # Kat 19-27: AVM & Ticari Bölge - Neon Işıltılı Canlı Alışveriş Merkezi
+			if sky_mat:
+				sky_mat.sky_top_color = Color(0.12, 0.15, 0.28, 1)
+				sky_mat.sky_horizon_color = Color(0.85, 0.35, 0.65, 1)
+				sky_mat.ground_bottom_color = Color(0.08, 0.06, 0.12, 1)
+			env.ambient_light_color = Color(0.48, 0.42, 0.55, 1)
+			env.fog_enabled = true
+			env.fog_light_color = Color(0.45, 0.25, 0.4, 1)
+			env.fog_density = 0.003
+			if dir_light:
+				dir_light.light_color = Color(0.95, 0.9, 1.0, 1)
+				dir_light.light_energy = 1.2
+
+		4: # Kat 28-36: Kurumsal Plaza Ofisleri - PIRIL PIRIL GÜN IŞIĞI & MASMAVİ GÖKYÜZÜ
+			if sky_mat:
+				sky_mat.sky_top_color = Color(0.2, 0.55, 0.95, 1)
+				sky_mat.sky_horizon_color = Color(0.78, 0.88, 1.0, 1)
+				sky_mat.ground_bottom_color = Color(0.3, 0.35, 0.4, 1)
+			env.ambient_light_color = Color(0.65, 0.72, 0.85, 1)
+			env.fog_enabled = false
+			if dir_light:
+				dir_light.light_color = Color(1.0, 0.98, 0.92, 1)
+				dir_light.light_energy = 1.45
+
+		5: # Kat 37-45: Siber Veri Merkezi - Elektrik Mavisi & Siberpunk Mor LED
+			if sky_mat:
+				sky_mat.sky_top_color = Color(0.05, 0.08, 0.18, 1)
+				sky_mat.sky_horizon_color = Color(0.2, 0.5, 0.85, 1)
+				sky_mat.ground_bottom_color = Color(0.03, 0.04, 0.08, 1)
+			env.ambient_light_color = Color(0.25, 0.35, 0.55, 1)
+			env.fog_enabled = true
+			env.fog_light_color = Color(0.1, 0.25, 0.45, 1)
+			env.fog_density = 0.005
+			if dir_light:
+				dir_light.light_color = Color(0.5, 0.8, 1.0, 1)
+				dir_light.light_energy = 0.9
+
+		6: # Kat 46-54: Karantina & Sahra Hastanesi - STERİL BEMBEYAZ KLİNİK AYDINLIK
+			if sky_mat:
+				sky_mat.sky_top_color = Color(0.6, 0.7, 0.8, 1)
+				sky_mat.sky_horizon_color = Color(0.85, 0.92, 0.96, 1)
+				sky_mat.ground_bottom_color = Color(0.5, 0.55, 0.6, 1)
+			env.ambient_light_color = Color(0.85, 0.9, 0.95, 1)
+			env.fog_enabled = true
+			env.fog_light_color = Color(0.8, 0.88, 0.92, 1)
+			env.fog_density = 0.002
+			if dir_light:
+				dir_light.light_color = Color(0.96, 0.98, 1.0, 1)
+				dir_light.light_energy = 1.35
+
+		7: # Kat 55-63: Lüks Casino & Eğlence - Altın & Kırmızı Peluş Sıcak Işıklar
+			if sky_mat:
+				sky_mat.sky_top_color = Color(0.14, 0.05, 0.08, 1)
+				sky_mat.sky_horizon_color = Color(0.8, 0.45, 0.15, 1)
+				sky_mat.ground_bottom_color = Color(0.06, 0.02, 0.04, 1)
+			env.ambient_light_color = Color(0.55, 0.38, 0.28, 1)
+			env.fog_enabled = true
+			env.fog_light_color = Color(0.4, 0.2, 0.15, 1)
+			env.fog_density = 0.004
+			if dir_light:
+				dir_light.light_color = Color(1.0, 0.85, 0.55, 1)
+				dir_light.light_energy = 1.25
+
+		8: # Kat 64-72: Botanik Park & Sera - YEMYEŞİL GÜNEŞLİ CENNET BAHÇESİ VAHA
+			if sky_mat:
+				sky_mat.sky_top_color = Color(0.22, 0.6, 0.9, 1)
+				sky_mat.sky_horizon_color = Color(0.8, 0.95, 0.75, 1)
+				sky_mat.ground_bottom_color = Color(0.15, 0.35, 0.12, 1)
+			env.ambient_light_color = Color(0.55, 0.75, 0.5, 1)
+			env.fog_enabled = true
+			env.fog_light_color = Color(0.65, 0.85, 0.6, 1)
+			env.fog_density = 0.003
+			if dir_light:
+				dir_light.light_color = Color(1.0, 0.98, 0.85, 1)
+				dir_light.light_energy = 1.4
+
+		9: # Kat 73-81: Gizli Virüs Laboratuvarı - Fütüristik Teal/Siyan Biyo-Işık
+			if sky_mat:
+				sky_mat.sky_top_color = Color(0.06, 0.12, 0.16, 1)
+				sky_mat.sky_horizon_color = Color(0.15, 0.75, 0.6, 1)
+				sky_mat.ground_bottom_color = Color(0.04, 0.08, 0.1, 1)
+			env.ambient_light_color = Color(0.35, 0.55, 0.55, 1)
+			env.fog_enabled = true
+			env.fog_light_color = Color(0.15, 0.5, 0.45, 1)
+			env.fog_density = 0.005
+			if dir_light:
+				dir_light.light_color = Color(0.7, 1.0, 0.95, 1)
+				dir_light.light_energy = 1.15
+
+		10: # Kat 82-90: Askeri Savunma & Cephanelik - Taktik Projektör & Askeri Siper
+			if sky_mat:
+				sky_mat.sky_top_color = Color(0.08, 0.1, 0.09, 1)
+				sky_mat.sky_horizon_color = Color(0.5, 0.45, 0.25, 1)
+				sky_mat.ground_bottom_color = Color(0.05, 0.07, 0.05, 1)
+			env.ambient_light_color = Color(0.38, 0.4, 0.35, 1)
+			env.fog_enabled = true
+			env.fog_light_color = Color(0.35, 0.35, 0.28, 1)
+			env.fog_density = 0.007
+			if dir_light:
+				dir_light.light_color = Color(1.0, 0.92, 0.78, 1)
+				dir_light.light_energy = 1.1
+
+		11: # Kat 91-99: Penthouse & Açık Çatı Helikopter Pisti - AÇIK GÖKYÜZÜ & ZİRVE GÜN BATIMI
+			if sky_mat:
+				sky_mat.sky_top_color = Color(0.12, 0.08, 0.25, 1)
+				sky_mat.sky_horizon_color = Color(0.95, 0.45, 0.2, 1)
+				sky_mat.ground_bottom_color = Color(0.05, 0.04, 0.08, 1)
+			env.ambient_light_color = Color(0.55, 0.45, 0.55, 1)
+			env.fog_enabled = true
+			env.fog_light_color = Color(0.5, 0.3, 0.35, 1)
+			env.fog_density = 0.004
+			if dir_light:
+				dir_light.light_color = Color(1.0, 0.75, 0.5, 1)
+				dir_light.light_energy = 1.35
 
 @rpc("call_local", "reliable")
 func _sync_floor_ui(floor_num: int, wave_num: int, remaining: int) -> void:
