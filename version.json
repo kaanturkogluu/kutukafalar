@@ -1,6 +1,6 @@
 {
   "version": "v1.2.0",
   "download_url": "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-  "pck_size": 401152,
-  "changelog": "- 3D Canlı Taktik Tim Ana Menüsü: 4 Kutu Kafa sınıfı (Büyücü, Mühendis, Buz Muhafızı, Sıhhiye) kendi taktik renkleri ve silahlarıyla menüde hazır bekliyor.\n- Sınıf Seçiminde Öne Çıkma Animasyonu & Fare İmlecini Takip Eden Dinamik Kafa Hareketi.\n- Tam Ekran, Kenarlıksız (Borderless) ve Pencereli Ekran Ayarları Sistemi (SettingsManager).\n- Modern Yarı Saydam Buzlu Cam (Glassmorphism) Panel Tasarımı.\n- Ses, VSync ve Fare Hassasiyeti Ayarları (Kalıcı Kayıt)."
+  "pck_size": 406560,
+  "changelog": "- The Forest minimalist taktiksel arayüz mimarisi (Tek Oyuncu, Çok Oyunculu, Ayarlar, Çıkış).\n- İkon ve emojilerden arındırılmış, profesyonel oyun hissi veren tipografi ve butonlar.\n- Canlı 3D Taktik Tim & Cephanelik Arka Planı (Dinamik kafa takibi & sınıf öne çıkış animasyonu).\n- Çok Oyunculu: Lobi Kurma, IP ile Katıl ve 8 Haneli Hızlı Oda Kodu ile Katılma desteği.\n- Otomatik arka plan güncelleme kontrolü ve sağ alt köşede zarif sürüm bilgisi."
 }
