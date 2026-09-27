@@ -379,15 +379,26 @@ func _die(is_headshot: bool, attacker_id: int = 1) -> void:
 		var base_chance = 0.15 * (1.0 + luck_bonus)
 		var roll = randf()
 		if roll < base_chance:
-			var w_roll = randf()
-			if w_roll < 0.35:
-				_spawn_pickup("shotgun", 12, global_position + Vector3(0.4, 0, 0.4))
-			elif w_roll < 0.65:
-				_spawn_pickup("uzi", 60, global_position + Vector3(0.4, 0, 0.4))
-			elif w_roll < 0.90:
-				_spawn_pickup("bixi", 80, global_position + Vector3(0.4, 0, 0.4))
+			# Yalnızca mağazadan Altın ile kilidi açılmış silahlar düşer
+			var unlocked_pool: Array[String] = []
+			for w in SaveManager.get_unlocked_weapons():
+				if w != "pistol":
+					unlocked_pool.append(w)
+			
+			if not unlocked_pool.is_empty():
+				var chosen_w = unlocked_pool.pick_random()
+				match chosen_w:
+					"shotgun":
+						_spawn_pickup("shotgun", 12, global_position + Vector3(0.4, 0, 0.4))
+					"uzi":
+						_spawn_pickup("uzi", 60, global_position + Vector3(0.4, 0, 0.4))
+					"bixi":
+						_spawn_pickup("bixi", 80, global_position + Vector3(0.4, 0, 0.4))
+					"rocket":
+						_spawn_pickup("rocket", 3, global_position + Vector3(0.4, 0, 0.4))
 			else:
-				_spawn_pickup("rocket", 3, global_position + Vector3(0.4, 0, 0.4))
+				# Henüz mağazadan özel silah kilidi açılmadıysa ekstra altın bırakır
+				_spawn_pickup("gold", randi_range(10, 20), global_position + Vector3(0.4, 0, 0.4))
 		elif roll < base_chance + 0.05:
 			_spawn_pickup("barrel", 1, global_position + Vector3(-0.4, 0, 0.4))
 		elif roll < base_chance + 0.10:

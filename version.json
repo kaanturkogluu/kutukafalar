@@ -1,6 +1,6 @@
 {
-    "version":  "v1.3.16",
+    "version":  "v1.3.17",
     "download_url":  "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-    "pck_size":  785360,
-    "changelog":  "- Lobi \u0026 Bekleme Odası Revizyonu:\n  * Lobiye Dönüldüğünde Odanın Korunması: Maçtan veya oyun sonundan lobiye dönüldüğünde oda düşmez, tüm takım bekleme odasında kalır.\n  * Çok Oyunculu Kat Seçimi: Oda kurucusu bekleme odasından başlangıç katını dilediği gibi seçebilir, tüm takıma anlık senkronize edilir.\n  * 6 Haneli Davet Kodu: Lobiye katılmak için 6 haneli kompakt davet kodu oluşturuldu.\n  * Tek Tıkla Kopyala: Davet kodunu panoya kopyalayan buton ve görsel geri bildirim eklendi.\n- 5 Taktik Sınıf: Duvarcı ve Mühendis dahil tüm 5 sınıf lobi, 3D önizleme ve oyun içi yetenekleriyle devrede."
+    "pck_size":  793920,
+    "changelog":  "- Lobi İzolasyonu: İstemci oyuncular lobiye döndüğünde diğer oyuncuları oyundan çekmez, yalnızca kendileri ayrılır; odayı yalnızca kurucu çekebilir.\n- Yetenek Ağacı \u0026 Puanlama: Oyun içi [K], duraklatma ve mağazadan ağaç erişimi açıldı; geçmiş katların biriken Biyo-Çekirdekleri hesaba yüklendi ve her kat temizliğinde takıma anlık puan dağıtımı bağlandı.\n- E-Ticaret Karaborsa Mağazası: Kat sonu mağazası ürün rozetleri, sekmeler ve modern vitrinle e-ticaret formatına yükseltildi.\n- Silah Kilit \u0026 Drop Sistemi: Pompalı, Uzi, Bixi ve Roketatar mağazadan Altın ile açıldıktan sonra zombilerden düşmeye başlayacak şekilde mekanikleştirildi."
 }

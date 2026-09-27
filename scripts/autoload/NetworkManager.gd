@@ -191,13 +191,6 @@ func return_to_lobby() -> void:
 	if multiplayer.is_server():
 		is_game_in_progress = false
 		_return_to_lobby_rpc.rpc()
-	else:
-		_request_return_to_lobby.rpc_id(1)
-
-@rpc("any_peer", "reliable")
-func _request_return_to_lobby() -> void:
-	if multiplayer.is_server():
-		return_to_lobby()
 
 @rpc("call_local", "reliable")
 func _return_to_lobby_rpc() -> void:

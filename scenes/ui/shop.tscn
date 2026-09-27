@@ -1,84 +1,108 @@
-[gd_scene load_steps=12 format=3 uid="uid://shop_scene_01"]
+[gd_scene load_steps=14 format=3 uid="uid://shop_scene_01"]
 
 [ext_resource type="Script" path="res://scripts/ui/Shop.gd" id="1_shop"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal"]
-bg_color = Color(0.045, 0.055, 0.08, 0.94)
+bg_color = Color(0.04, 0.05, 0.075, 0.96)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.2, 0.28, 0.38, 0.85)
+border_color = Color(0.2, 0.35, 0.5, 0.7)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.9)
+shadow_size = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_active"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.12, 0.18, 0.28, 0.95)
+border_width_bottom = 3
+border_color = Color(0.3, 0.85, 1, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_normal"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.06, 0.08, 0.12, 0.8)
+border_width_bottom = 1
+border_color = Color(0.2, 0.25, 0.35, 0.5)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+content_margin_left = 14.0
+content_margin_top = 14.0
+content_margin_right = 14.0
+content_margin_bottom = 14.0
+bg_color = Color(0.055, 0.07, 0.1, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 2
+border_color = Color(0.2, 0.3, 0.42, 0.6)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.85)
-shadow_size = 28
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 8
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
-content_margin_left = 16.0
-content_margin_top = 16.0
-content_margin_right = 16.0
-content_margin_bottom = 16.0
-bg_color = Color(0.065, 0.08, 0.11, 0.95)
-border_width_left = 3
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_btn"]
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
+bg_color = Color(0.1, 0.28, 0.2, 0.95)
+border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.2, 0.28, 0.38, 0.8)
+border_color = Color(0.25, 0.85, 0.45, 0.8)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_btn"]
-content_margin_left = 12.0
-content_margin_top = 8.0
-content_margin_right = 12.0
-content_margin_bottom = 8.0
-bg_color = Color(0.1, 0.13, 0.18, 0.9)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.24, 0.34, 0.46, 0.8)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_btn_hover"]
-content_margin_left = 14.0
+content_margin_left = 10.0
 content_margin_top = 8.0
 content_margin_right = 10.0
 content_margin_bottom = 8.0
-bg_color = Color(0.18, 0.14, 0.07, 1)
-border_width_left = 3
+bg_color = Color(0.15, 0.38, 0.25, 1)
+border_width_left = 2
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.95, 0.68, 0.18, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+border_color = Color(0.35, 1, 0.55, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_btn_disabled"]
-content_margin_left = 12.0
+content_margin_left = 10.0
 content_margin_top = 8.0
-content_margin_right = 12.0
+content_margin_right = 10.0
 content_margin_bottom = 8.0
-bg_color = Color(0.06, 0.07, 0.09, 0.5)
+bg_color = Color(0.06, 0.08, 0.1, 0.6)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.16, 0.18, 0.22, 0.3)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+border_color = Color(0.2, 0.24, 0.3, 0.4)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_back"]
 content_margin_left = 16.0
@@ -117,12 +141,12 @@ content_margin_left = 16.0
 content_margin_top = 10.0
 content_margin_right = 16.0
 content_margin_bottom = 10.0
-bg_color = Color(0.12, 0.22, 0.16, 0.95)
+bg_color = Color(0.12, 0.24, 0.16, 0.95)
 border_width_left = 2
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.25, 0.75, 0.45, 0.9)
+border_color = Color(0.25, 0.85, 0.45, 0.9)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -133,12 +157,12 @@ content_margin_left = 18.0
 content_margin_top = 10.0
 content_margin_right = 14.0
 content_margin_bottom = 10.0
-bg_color = Color(0.16, 0.3, 0.22, 1)
+bg_color = Color(0.16, 0.32, 0.22, 1)
 border_width_left = 4
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.35, 0.9, 0.55, 1)
+border_color = Color(0.35, 1, 0.55, 1)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -155,19 +179,19 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.02, 0.03, 0.05, 0.85)
+color = Color(0.015, 0.02, 0.035, 0.88)
 
 [node name="Panel" type="Panel" parent="."]
-custom_minimum_size = Vector2(820, 520)
+custom_minimum_size = Vector2(1060, 620)
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -410.0
-offset_top = -260.0
-offset_right = 410.0
-offset_bottom = 260.0
+offset_left = -530.0
+offset_top = -310.0
+offset_right = 530.0
+offset_bottom = 310.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
@@ -176,151 +200,87 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 26.0
-offset_top = 22.0
-offset_right = -26.0
-offset_bottom = -22.0
+offset_left = 22.0
+offset_top = 18.0
+offset_right = -22.0
+offset_bottom = -18.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 12
 
-[node name="HeaderBox" type="VBoxContainer" parent="Panel/VBoxContainer"]
+[node name="HeaderHBox" type="HBoxContainer" parent="Panel/VBoxContainer"]
 layout_mode = 2
+
+[node name="TitleBox" type="VBoxContainer" parent="Panel/VBoxContainer/HeaderHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 2
 
-[node name="TitleLabel" type="Label" parent="Panel/VBoxContainer/HeaderBox"]
+[node name="TitleLabel" type="Label" parent="Panel/VBoxContainer/HeaderHBox/TitleBox"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.97, 1, 1)
 theme_override_font_sizes/font_size = 20
-text = "ASANSÖR İKMAL VE GELİŞTİRME İSTASYONU"
-horizontal_alignment = 1
+text = "🛒 TAKTİKSEL KARABORSA (OPERASYON İKMAL & SİLAH FABRİKASI)"
 
-[node name="GoldLabel" type="Label" parent="Panel/VBoxContainer/HeaderBox"]
+[node name="SubtitleLabel" type="Label" parent="Panel/VBoxContainer/HeaderHBox/TitleBox"]
+unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.68, 0.18, 0.95)
+theme_override_colors/font_color = Color(0.55, 0.68, 0.85, 1)
+theme_override_font_sizes/font_size = 12
+text = "Kat sonu ikmal kataloğu. Açtığınız silahlar sahada zombilerden düşmeye başlar."
+
+[node name="WalletBox" type="HBoxContainer" parent="Panel/VBoxContainer/HeaderHBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="GoldLabel" type="Label" parent="Panel/VBoxContainer/HeaderHBox/WalletBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.25, 1)
+theme_override_font_sizes/font_size = 15
+text = "💰 KREDİ: 0"
+
+[node name="BioCoresLabel" type="Label" parent="Panel/VBoxContainer/HeaderHBox/WalletBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.95, 1, 1)
 theme_override_font_sizes/font_size = 14
-text = "MEVCUT KREDİ: 0"
-horizontal_alignment = 1
+text = "🧬 BİYO-ÇEKİRDEK: 0"
+
+[node name="CategoryHBox" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TabWeaponsBtn" type="Button" parent="Panel/VBoxContainer/CategoryHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_active")
+text = "🔫 SİLAH FABRİKASI (UNLOCK)"
+
+[node name="TabSuppliesBtn" type="Button" parent="Panel/VBoxContainer/CategoryHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_normal")
+text = "📦 MÜHİMMAT & İKMAL"
+
+[node name="TabPerksBtn" type="Button" parent="Panel/VBoxContainer/CategoryHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_normal")
+text = "⚡ ZIRH & GÜÇLENDİRMELER"
 
 [node name="HSeparator" type="HSeparator" parent="Panel/VBoxContainer"]
 layout_mode = 2
 
-[node name="HBoxCards" type="HBoxContainer" parent="Panel/VBoxContainer"]
+[node name="CardsContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 14
-alignment = 1
-
-[node name="Card1" type="PanelContainer" parent="Panel/VBoxContainer/HBoxCards"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_card")
-
-[node name="VBox" type="VBoxContainer" parent="Panel/VBoxContainer/HBoxCards/Card1"]
-layout_mode = 2
-theme_override_constants/separation = 10
-alignment = 1
-
-[node name="Title" type="Label" parent="Panel/VBoxContainer/HBoxCards/Card1/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.68, 0.18, 1)
-theme_override_font_sizes/font_size = 15
-text = "ZIRH TAKVİYESİ"
-horizontal_alignment = 1
-
-[node name="Desc" type="Label" parent="Panel/VBoxContainer/HBoxCards/Card1/VBox"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_colors/font_color = Color(0.82, 0.86, 0.92, 1)
-theme_override_font_sizes/font_size = 13
-text = "+35 Maksimum Can ve Tam Şifa"
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 2
-
-[node name="BuyButton" type="Button" parent="Panel/VBoxContainer/HBoxCards/Card1/VBox"]
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-theme_override_font_sizes/font_size = 13
-theme_override_styles/normal = SubResource("StyleBoxFlat_card_btn")
-theme_override_styles/hover = SubResource("StyleBoxFlat_card_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_card_btn_hover")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_card_btn_disabled")
-text = "SATIN AL (50 KREDİ)"
-
-[node name="Card2" type="PanelContainer" parent="Panel/VBoxContainer/HBoxCards"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_card")
-
-[node name="VBox" type="VBoxContainer" parent="Panel/VBoxContainer/HBoxCards/Card2"]
-layout_mode = 2
-theme_override_constants/separation = 10
-alignment = 1
-
-[node name="Title" type="Label" parent="Panel/VBoxContainer/HBoxCards/Card2/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.68, 0.18, 1)
-theme_override_font_sizes/font_size = 15
-text = "AĞIR MÜHİMMAT"
-horizontal_alignment = 1
-
-[node name="Desc" type="Label" parent="Panel/VBoxContainer/HBoxCards/Card2/VBox"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_colors/font_color = Color(0.82, 0.86, 0.92, 1)
-theme_override_font_sizes/font_size = 13
-text = "Tüm Silah Hasarı +%25 Artar"
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 2
-
-[node name="BuyButton" type="Button" parent="Panel/VBoxContainer/HBoxCards/Card2/VBox"]
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-theme_override_font_sizes/font_size = 13
-theme_override_styles/normal = SubResource("StyleBoxFlat_card_btn")
-theme_override_styles/hover = SubResource("StyleBoxFlat_card_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_card_btn_hover")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_card_btn_disabled")
-text = "SATIN AL (70 KREDİ)"
-
-[node name="Card3" type="PanelContainer" parent="Panel/VBoxContainer/HBoxCards"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_card")
-
-[node name="VBox" type="VBoxContainer" parent="Panel/VBoxContainer/HBoxCards/Card3"]
-layout_mode = 2
-theme_override_constants/separation = 10
-alignment = 1
-
-[node name="Title" type="Label" parent="Panel/VBoxContainer/HBoxCards/Card3/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.68, 0.18, 1)
-theme_override_font_sizes/font_size = 15
-text = "TAKTIKSEL HIZ"
-horizontal_alignment = 1
-
-[node name="Desc" type="Label" parent="Panel/VBoxContainer/HBoxCards/Card3/VBox"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_colors/font_color = Color(0.82, 0.86, 0.92, 1)
-theme_override_font_sizes/font_size = 13
-text = "Koşma Hızı +%15 Hızlanır"
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 2
-
-[node name="BuyButton" type="Button" parent="Panel/VBoxContainer/HBoxCards/Card3/VBox"]
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-theme_override_font_sizes/font_size = 13
-theme_override_styles/normal = SubResource("StyleBoxFlat_card_btn")
-theme_override_styles/hover = SubResource("StyleBoxFlat_card_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_card_btn_hover")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_card_btn_disabled")
-text = "SATIN AL (45 KREDİ)"
+theme_override_constants/separation = 12
 
 [node name="HBoxActions" type="HBoxContainer" parent="Panel/VBoxContainer"]
 layout_mode = 2
@@ -328,30 +288,33 @@ theme_override_constants/separation = 16
 alignment = 1
 
 [node name="BackToLevelsButton" type="Button" parent="Panel/VBoxContainer/HBoxActions"]
-custom_minimum_size = Vector2(200, 44)
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 42)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_back")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_back_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_back_hover")
-text = "GÖREV TERMİNALİ"
+text = "🗺️ GÖREV TERMİNALİ"
 
 [node name="SkillTreeButton" type="Button" parent="Panel/VBoxContainer/HBoxActions"]
-custom_minimum_size = Vector2(200, 44)
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 42)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.95, 1, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_back")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_back_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_back_hover")
-text = "YETENEK AĞACI [K]"
+text = "🧬 YETENEK AĞACI [K]"
 
 [node name="NextFloorButton" type="Button" parent="Panel/VBoxContainer/HBoxActions"]
-custom_minimum_size = Vector2(250, 44)
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 42)
 layout_mode = 2
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_next")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_next_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_next_hover")
-text = "SONRAKİ SEVİYEYİ BAŞLAT"
+text = "🚀 SONRAKİ SEVİYEYİ BAŞLAT"

@@ -1761,8 +1761,15 @@ func _on_lobby_pressed() -> void:
 	if not is_multiplayer_authority():
 		return
 	if multiplayer.multiplayer_peer != null and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
-		NetworkManager.return_to_lobby()
-		return
+		if multiplayer.is_server():
+			# Yalnızca oda kurucusu (host) tüm takımı lobiye geri çekebilir
+			NetworkManager.return_to_lobby()
+			return
+		else:
+			# Normal oyuncu ayrıldığında diğer oyuncuları oyundan çekmez, yalnızca kendisi çıkar
+			NetworkManager.disconnect_game()
+			get_tree().change_scene_to_file("res://scenes/ui/lobby.tscn")
+			return
 	NetworkManager.disconnect_game()
 	get_tree().change_scene_to_file("res://scenes/ui/lobby.tscn")
 

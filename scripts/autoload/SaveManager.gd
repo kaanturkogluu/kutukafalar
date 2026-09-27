@@ -17,11 +17,13 @@ var total_runs: int = 0
 # --- Kalıcı Yetenek Ağacı ve Meta Para Birimi ---
 var bio_cores: int = 0
 var unlocked_nodes: Array[String] = []
+var unlocked_weapons: Array[String] = ["pistol"]
 
 signal progress_saved
 signal floor_unlocked(new_floor: int)
 signal bio_cores_changed(new_amount: int)
 signal node_unlocked(node_id: String)
+signal weapon_unlocked(weapon_name: String)
 
 func _ready() -> void:
 	load_game()
@@ -29,7 +31,7 @@ func _ready() -> void:
 ## Oyunu diske kaydeder (user://save_data.json)
 func save_game() -> void:
 	var data = {
-		"version": "1.3.13",
+		"version": "1.3.16",
 		"highest_unlocked_floor": highest_unlocked_floor,
 		"last_played_floor": last_played_floor,
 		"selected_start_floor": selected_start_floor,
@@ -40,6 +42,7 @@ func save_game() -> void:
 		"total_runs": total_runs,
 		"bio_cores": bio_cores,
 		"unlocked_nodes": unlocked_nodes,
+		"unlocked_weapons": unlocked_weapons,
 		"saved_at": Time.get_datetime_string_from_system()
 	}
 	
@@ -49,7 +52,7 @@ func save_game() -> void:
 		file.store_string(json_str)
 		file.close()
 		progress_saved.emit()
-		print("[SaveManager] İlerleme kaydedildi: En Yüksek Kat ", highest_unlocked_floor, ", Biyo-Çekirdek: ", bio_cores)
+		print("[SaveManager] İlerleme kaydedildi: En Yüksek Kat ", highest_unlocked_floor, ", Biyo-Çekirdek: ", bio_cores, ", Silahlar: ", unlocked_weapons)
 	else:
 		push_error("[SaveManager] Kayıt dosyası açılamadı: " + str(FileAccess.get_open_error()))
 
@@ -60,6 +63,7 @@ func load_game() -> void:
 		highest_unlocked_floor = 1
 		last_played_floor = 1
 		selected_start_floor = 1
+		unlocked_weapons = ["pistol"]
 		save_game()
 		return
 
@@ -78,6 +82,7 @@ func load_game() -> void:
 		highest_unlocked_floor = 1
 		last_played_floor = 1
 		selected_start_floor = 1
+		unlocked_weapons = ["pistol"]
 		return
 
 	var data = test_json_conv.data
@@ -91,12 +96,33 @@ func load_game() -> void:
 		total_floors_cleared = int(data.get("total_floors_cleared", 0))
 		total_runs = int(data.get("total_runs", 0))
 		bio_cores = int(data.get("bio_cores", 0))
+		
 		var loaded_nodes = data.get("unlocked_nodes", [])
 		unlocked_nodes.clear()
 		if typeof(loaded_nodes) == TYPE_ARRAY:
 			for n in loaded_nodes:
 				unlocked_nodes.append(str(n))
-		print("[SaveManager] Kayıt yüklendi! En Yüksek Kat: ", highest_unlocked_floor, " | Biyo-Çekirdek: ", bio_cores, " | Yetenekler: ", unlocked_nodes.size())
+		
+		var loaded_weapons = data.get("unlocked_weapons", ["pistol"])
+		unlocked_weapons.clear()
+		if typeof(loaded_weapons) == TYPE_ARRAY:
+			for w in loaded_weapons:
+				unlocked_weapons.append(str(w))
+		if not unlocked_weapons.has("pistol"):
+			unlocked_weapons.insert(0, "pistol")
+		
+		# Retroaktif Biyo-Çekirdek düzeltmesi: Eğer oyuncu seviye geçmiş ama puanı 0 görünüyorsa hak ettiği puanları yükle
+		if bio_cores <= 0 and unlocked_nodes.is_empty() and (highest_unlocked_floor > 1 or total_floors_cleared > 0):
+			var retroactive = 0
+			for f in range(2, highest_unlocked_floor + 1):
+				retroactive += (3 if f % 9 == 0 else 1)
+			if total_floors_cleared > 0:
+				retroactive += maxi(1, int(total_floors_cleared / 2))
+			bio_cores = maxi(retroactive, 8)
+			print("[SaveManager] Retroaktif Biyo-Çekirdek hesaplandı ve eklendi: +", bio_cores)
+			save_game()
+
+		print("[SaveManager] Kayıt yüklendi! En Yüksek Kat: ", highest_unlocked_floor, " | Biyo-Çekirdek: ", bio_cores, " | Yetenekler: ", unlocked_nodes.size(), " | Silahlar: ", unlocked_weapons)
 
 ## Yeni kat kilidini açar (Kat temizlendiğinde çağrılır)
 func unlock_floor(target_floor: int) -> bool:
@@ -207,5 +233,27 @@ func reset_progress() -> void:
 	total_floors_cleared = 0
 	bio_cores = 0
 	unlocked_nodes.clear()
+	unlocked_weapons = ["pistol"]
 	save_game()
 	print("[SaveManager] İlerleme sıfırlandı.")
+
+# --- Silah Kilit Açma (Weapon Unlock) Yönetimi ---
+
+func get_unlocked_weapons() -> Array[String]:
+	if not unlocked_weapons.has("pistol"):
+		unlocked_weapons.insert(0, "pistol")
+	return unlocked_weapons
+
+func is_weapon_unlocked(w_name: String) -> bool:
+	if w_name == "pistol":
+		return true
+	return unlocked_weapons.has(w_name)
+
+func unlock_weapon(w_name: String) -> bool:
+	if not unlocked_weapons.has(w_name):
+		unlocked_weapons.append(w_name)
+		weapon_unlocked.emit(w_name)
+		save_game()
+		print("[SaveManager] Yeni silah kilidi açıldı: ", w_name)
+		return true
+	return false

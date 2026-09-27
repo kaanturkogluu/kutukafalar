@@ -598,14 +598,29 @@ func _on_zombie_died(zombie_ref = null, _extra = null) -> void:
 
 func _on_floor_cleared() -> void:
 	var info = LevelData.get_chapter_for_level(current_floor)
+	var is_boss = info.get("is_boss_level", false)
 	print("[Seviye Tamamlandı] Seviye ", current_floor, " (", info["theme"], ") temizlendi! Asansör kapıları açılıyor...")
 	
-	# Kalıcı kayıt sistemini güncelle:
-	SaveManager.record_floor_cleared()
-	SaveManager.unlock_floor(current_floor + 1)
+	# Kat ödülü: Her kat temizlendiğinde +1 Biyo-Çekirdek, her 9. katta / boss'ta +3 Biyo-Çekirdek
+	var reward_cores = 3 if ((current_floor % 9 == 0) or is_boss) else 1
 	
-	_announce_floor_cleared.rpc(info.get("is_boss_level", false))
+	# Tüm oyunculara (Host ve Client'lar) ödül puanlarını dağıt
+	sync_award_floor_cleared.rpc(current_floor, reward_cores)
+	
+	_announce_floor_cleared.rpc(is_boss)
 	elevator.set_elevator_state.rpc(true)
+
+@rpc("call_local", "reliable")
+func sync_award_floor_cleared(floor_num: int, reward_cores: int) -> void:
+	SaveManager.record_floor_cleared()
+	SaveManager.unlock_floor(floor_num + 1)
+	SaveManager.add_bio_cores(reward_cores)
+	print("[Ödül] Kat ", floor_num, " temizlendi! +", reward_cores, " Yetenek Puanı kazanıldı! (Toplam Biyo-Çekirdek: ", SaveManager.get_bio_cores(), ")")
+
+@rpc("any_peer", "call_local", "reliable")
+func sync_unlock_weapon(weapon_name: String) -> void:
+	SaveManager.unlock_weapon(weapon_name)
+	print("[MainLevel] Silah kilit açımı takıma senkronize edildi: ", weapon_name)
 
 func _on_players_entered_elevator() -> void:
 	if not multiplayer.is_server():
