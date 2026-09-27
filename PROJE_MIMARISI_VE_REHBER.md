@@ -156,7 +156,13 @@ Projeyi geliştirirken token tüketimini minimumda tutmak ve hızlı ilerlemek i
     * Zombilerin binaların arkasında veya dar köşelerde takılı kalmasını önlemek için NavMesh hedef güncellemesi ve doğrudan görüş engeli denetimi optimize edildi; zombiler oyunculara daha agresif ve hızlı akmaya başladı.
   * **Yeniden Başlatma İyileştirmesi:**
     * Oyun yeniden başlatıldığında her seferinde Seviye 1'e dönmek yerine en son oynanan mevcut seviyeden başlatma desteği sağlandı.
-  * **Eski Sürümler İçin Derin Kalıntı Temizliği (`AutoUpdater.gd`):**
-    * Önceki sürümlerden (v1.1.0 - v1.1.6) kalan artık `user://KutuKafalar.pck`, `user://*.new`, `user://*.tmp`, `user://*.bak`, `user://*.old` dosyaları ile oyun dizinindeki geçici dosyaları oyun başlangıcında, güncelleme indirilmeden hemen önce ve `apply_update.bat` çalıştığında otomatik temizleyen derin temizlik mimarisi (`_deep_cleanup_residuals`) devreye alındı.
+* [x] **Faz 12: Sıfırdan Temiz ve Kararlı Otomatik Güncelleyici (AutoUpdater v2):**
+  * **Tek Doğruluk Kaynağı (`res://version.json`):** Sürüm karmaşasını bitirmek için kodlardaki tüm statik sürüm metinleri kaldırıldı; oyun başlangıçta `res://version.json` dosyasını okuyarak kendi sürümünü dinamik belirler (`AutoUpdater.get_current_version()`).
+  * **Godot PCK Dışa Aktarma Filtresi:** `export_presets.cfg` dosyasına `include_filter="*.json"` eklenerek `version.json` dosyasının her derlemede otomatik olarak `.pck` içine paketlenmesi sağlandı.
+  * **Semantik Sürüm Doğrulaması (SemVer):** String eşitliği yerine matematiksel `Major.Minor.Patch` karşılaştırıcısı devreye alındı. Yalnızca sunucudaki sürüm yerel sürümden büyükse güncelleme uyarısı çıkarılır; format uyumsuzlukları ve döngüler engellendi.
+  * **GitHub CDN Önbellek Koruması:** GitHub sunucularının eski sürüm yanıtı dönmesini engellemek için isteklere zaman damgası (`?t=timestamp`) ve `no-cache` başlıkları eklendi.
+  * **PID Takipli Windows Dosya Değiştirici (`apply_update.cmd`):** Eski bat dosyasındaki çökme yaratan `timeout` komutu kaldırıldı. Yeni betik `tasklist /fi "PID eq %PID%"` ile oyunun kapandığını doğrular, `ping 127.0.0.1` ile güvenli bekleme döngüsü yapar ve yeni PCK dosyasını hatasız kopyalayarak oyunu yeniden başlatır.
+  * **Otomatik Derleme & Yayınlama Senkronizasyonu (`build_release.ps1`):** Derleme esnasında üretilen PCK dosyasının boyutu anında hesaplanıp `version.json` içerisine yazılır, hem `builds/` klasörüne hem de ilk kurulum ZIP'ine otomatik eklenir. Geliştiricinin sadece `git add` ve `git push` yapması yeterlidir.
+
 
 

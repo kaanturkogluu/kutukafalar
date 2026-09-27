@@ -137,9 +137,10 @@ res://
   - `set_elevator_state` must be `@rpc("call_local", "reliable")` so door openings and signs synchronize across all client screens even if the host dies.
   - `_check_all_players_inside()` must filter only LIVING players (`p.current_health > 0 and not p.get("is_dead")`).
 - **AutoUpdater & Windows File Locks:**
-  - Always download update PCK files to `user://` (`OS.get_user_data_dir()`) to avoid program directory permission errors.
-  - `apply_update.bat` must implement a retry loop (`:wait_loop` up to 20 seconds) before replacing `KutuKafalar.pck` to prevent Windows file-sharing lock violations (`Error 32`).art.
-  - When teammates reach the elevator, dead players are revived via `revive.rpc()`, resetting camera transforms and collisions cleanly.
+  - Always download update PCK files to `user://update_download.pck` (`OS.get_user_data_dir()`) to avoid permission errors.
+  - Single source of truth for version is `res://version.json`, packed into PCK via `include_filter="*.json"`.
+  - Windows update applier script (`apply_update.cmd`) uses `tasklist /fi "PID eq %PID%"` to wait for the Godot process to exit completely, followed by `ping 127.0.0.1 -n 2 >nul` retry loop for atomic file swapping without stdin crashes.
+  - Surcharged GitHub CDN queries must append `?t=<timestamp>` to prevent caching stale version.json.
 
 ## 11. Level Progression & Thematic Environment Architecture
 - **11 Chapters & 99 Levels Data Model (`LevelData`):**

@@ -75,10 +75,17 @@ func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	
 	if version_label:
-		var v_str = AutoUpdater.CURRENT_VERSION
+		var v_str = AutoUpdater.get_current_version()
 		if not v_str.begins_with("v"):
 			v_str = "v" + v_str
 		version_label.text = v_str
+		version_label.mouse_filter = Control.MOUSE_FILTER_STOP
+		version_label.tooltip_text = "Güncellemeleri denetlemek için tıklayın"
+		version_label.gui_input.connect(func(event: InputEvent):
+			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+				version_label.text = v_str + " (Denetleniyor...)"
+				AutoUpdater.check_for_updates()
+		)
 	
 	# Sınıf Açılır Menülerini Doldur (İkonsuz / Ciddi Taktiksel İsimler)
 	_setup_class_options()
@@ -586,8 +593,11 @@ func _on_update_available(version_tag: String, changelog: String, _url: String, 
 	update_overlay.visible = true
 
 func _on_update_not_available(_ver: String) -> void:
-	# Sessiz kontrol, kullanıcıyı rahatsız etmiyoruz
-	pass
+	if version_label:
+		var v_str = AutoUpdater.get_current_version()
+		if not v_str.begins_with("v"):
+			v_str = "v" + v_str
+		version_label.text = v_str
 
 func _on_start_update_pressed() -> void:
 	start_update_btn.disabled = true
@@ -598,9 +608,14 @@ func _on_start_update_pressed() -> void:
 	update_progress_text.text = "İndiriliyor... %0"
 	AutoUpdater.start_download()
 
-func _on_download_progress(percent: float, _downloaded: int, _total: int) -> void:
+func _on_download_progress(percent: float, downloaded: int, total: int) -> void:
 	update_progress_bar.value = percent
-	update_progress_text.text = "İndiriliyor... %" + str(int(percent))
+	var dl_kb = maxi(0, int(downloaded / 1024))
+	var tot_kb = maxi(0, int(total / 1024))
+	if tot_kb > 0:
+		update_progress_text.text = "İndiriliyor... %%%d (%d KB / %d KB)" % [int(percent), dl_kb, tot_kb]
+	else:
+		update_progress_text.text = "İndiriliyor... %%%d" % int(percent)
 
 func _on_download_completed() -> void:
 	update_progress_bar.value = 100
