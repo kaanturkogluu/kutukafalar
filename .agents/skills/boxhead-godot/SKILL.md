@@ -145,12 +145,40 @@ res://
   - Windows update applier script (`apply_update.cmd`) uses `tasklist /fi "PID eq %PID%"` to wait for the Godot process to exit completely, followed by `ping 127.0.0.1 -n 2 >nul` retry loop for atomic file swapping without stdin crashes.
   - Surcharged GitHub CDN queries must append `?t=<timestamp>` to prevent caching stale version.json.
 
-## 11. Level Progression & Thematic Environment Architecture
-- **11 Chapters & 99 Levels Data Model (`LevelData`):**
-  - Mapped directly from `leveller`: Chapters 1-11 each hold 9 levels (e.g. Chapter 1: Level 1–9 "Terk Edilmiş Mahalle", Chapter 2: Level 10–18 "Şehir Merkezi").
-  - Final level of each chapter (e.g. Level 9 Wave 3) triggers the Chapter Boss (`BossZombie` / "Mahalle Şefi" 1200 HP).
-- **Cul-de-sac Abandoned Neighborhood Design:**
-  - 52x52m circular asphalt roadway with central park island roundabout, houses, storefronts, boarded windows, streetlights (`OmniLight3D`), dumpsters, and twilight procedural sky.
-- **Destructible Car Wrecks (`CarWreck.gd` & `car_wreck.tscn`):**
-  - Group `barrels` & `destructibles` so hitscan, rockets, and barrel explosions all damage it.
-  - 150 HP health pool with red warning light countdown before 7.5m radius 350-damage explosion, leaving behind a permanent burnt metal cover.
+## 11. Level Progression, 99 Floors & Thematic Sector Architecture
+- **11 Sectors & 99 Floors Data Model (`LevelData.gd`):**
+  - Mapped directly from the mega tower climbing scheme: Sectors 1-11 each hold 9 floors (Floors 1–99).
+  - Every 9th floor (Levels 9, 18, 27, 36, 45, 54, 63, 72, 81, 90, 99) triggers the Sector Boss.
+- **Dynamic Modular Floor Loading (`FloorContainer` in `MainLevel.gd`):**
+  - Floors are loaded dynamically into `FloorContainer` via `sync_load_floor_environment.rpc(floor_num)` to avoid scene reloading and keep multiplayer peers connected.
+  - Hierarchy check: `res://scenes/levels/floors/floor_%02d.tscn` (Floor-specific if present, e.g. Floors 1-9) -> `res://scenes/levels/floors/sector_%02d.tscn` (Sector-level fallback for remaining floors) -> `floor_01.tscn`.
+  - Old floor entities are cleared prior to loading via `sync_clear_all_entities.rpc()`.
+- **Dynamic Atmosphere & Lighting Switching (`_apply_sector_atmosphere`):**
+  - Prevents player visual fatigue and darkness claustrophobia by dramatically altering `WorldEnvironment` and `DirectionalLight3D` per sector:
+    - *Sector 1 (1–9):* Twilight street & atrium.
+    - *Sector 2 (10–18):* Industrial amber gloom & steam.
+    - *Sector 3 (19–27):* Vibrant neon shopping plaza.
+    - *Sector 4 (28–36):* **Crisp sunny daytime & bright azure sky** (zero fog, high noon sunlight).
+    - *Sector 5 (37–45):* Electric cyan & violet cyber server racks.
+    - *Sector 6 (46–54):* **Sterile bright white hospital fluorescent lighting**.
+    - *Sector 7 (55–63):* Royal gold, red velvet & glowing neon casino.
+    - *Sector 8 (64–72):* **Lush green tropical greenhouse oasis & pond bridge** with bright natural sunlight.
+    - *Sector 9 (73–81):* High-tech bioluminescent teal lab.
+    - *Sector 10 (82–90):* Fortified military defense compound & searchlights.
+    - *Sector 11 (91–99):* **Open-air rooftop helipad & storm sunset summit** with evacuation rescue chopper.
+
+## 12. Enemy Variants, Sector Bosses & Persistent Save System
+- **Enemy Variants (`ZombieAI.gd` - `setup_type(type)`):**
+  - `normal`: Balanced speed (4.4) and HP (100).
+  - `runner`: High speed (6.5+), lower HP (72%), agile frame, fiery glowing eyes.
+  - `tank`: Heavy armor, 2.6x HP, 1.35x scale, high damage (32), gunmetal tint.
+  - `toxic`: Neon green bio-hazard glow. Triggers poisonous area burst on death.
+  - `boomer`: Carrying pulsating explosive pack. Detonates when within 2.2m of players or on death for 45 area damage.
+- **Sector Boss Customization (`setup_boss_sector(sector)`):**
+  - Scales dynamically from 1.4x (Sector 1: Mahalle Şefi) up to 2.2x colossal size for Sector 11 (Kat 99: Kutu Şah / The Apocalypse King with 8000 HP).
+  - Distinct materials, eye emissions, speeds, and attack damages per sector.
+- **Persistent Save System (`SaveManager.gd` Autoload):**
+  - Saves to `user://save_data.json` with versioning and validation.
+  - Tracks: `highest_unlocked_floor` (1 to 99), `total_kills`, `total_boss_kills`, `total_gold_earned`, `total_floors_cleared`, `total_runs`.
+  - When a floor is cleared in `_on_floor_cleared()`: automatically calls `SaveManager.record_floor_cleared()` and `SaveManager.unlock_floor(current_floor + 1)`.
+  - `LevelSelect.gd` queries `SaveManager.get_highest_unlocked_floor()` and enables sector switching across all 11 sectors.

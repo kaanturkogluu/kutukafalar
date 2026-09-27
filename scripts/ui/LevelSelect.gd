@@ -1,10 +1,11 @@
 extends CanvasLayer
 
-# --- Profesyonel Taktiksel Seviye Seçim Penceresi (No Icons, Sleek Modern Grid) ---
+# --- Profesyonel Taktiksel Seviye Seçim Penceresi (11 Sektör & 99 Kat Desteği) ---
 signal level_start_requested(target_level: int)
 signal shop_requested
 
 @onready var panel: Panel = $Panel
+@onready var header_box: VBoxContainer = $Panel/VBoxContainer/HeaderBox
 @onready var chapter_title: Label = $Panel/VBoxContainer/HeaderBox/ChapterTitle
 @onready var completed_label: Label = $Panel/VBoxContainer/HeaderBox/CompletedLabel
 @onready var grid_container: GridContainer = $Panel/VBoxContainer/GridContainer
@@ -14,35 +15,14 @@ signal shop_requested
 @onready var shop_button: Button = $Panel/VBoxContainer/HBoxActions/ShopButton
 
 var current_completed_level: int = 1
-var selected_level: int = 2
-var max_unlocked_level: int = 2
+var selected_level: int = 1
+var max_unlocked_level: int = 1
+var current_viewed_sector: int = 1
 var level_buttons: Dictionary = {} # level_num -> Button
 
-# Seviye isimleri (Profesyonel taktiksel başlıklar - Emojisiz)
-const LEVEL_SUBTITLES: Dictionary = {
-	1: "SOKAK GİRİŞİ",
-	2: "KAVŞAK DEVRİYESİ",
-	3: "PARK ALANI",
-	4: "KUZEY ÇIKMAZI",
-	5: "BARİKAT HATTI",
-	6: "EVLER BÖLGESİ",
-	7: "BAKKAL VİTRİNİ",
-	8: "DAR GEÇİTLER",
-	9: "MAHALLE ŞEFİ [BOSS]"
-}
-
-# Taktiksel İstihbarat ve Görev Detayları
-const LEVEL_DESCRIPTIONS: Dictionary = {
-	1: "Mahallenin girişindeki ilk zombi dalgalarını temizleyin. Temel hareket ve nişan alma becerilerini test edin.",
-	2: "Dört yol ağzında devriye görevi. Zombiler her iki caddeden aynı anda yaklaşacak. Çapraz ateşe dikkat edin.",
-	3: "Geniş park alanında çatışma. Açık alanda hareketli kalarak zombi sürüsünü arkanızda toplayın.",
-	4: "Kuzey çıkmazı barikatları. Dar koridorda patlayıcı varilleri kullanarak kalabalık grupları yok edin.",
-	5: "Savunma hattı testi. Hızlı zombi koşucuları ön saflarda hücuma kalkacak. Mesafenizi koruyun.",
-	6: "Terk edilmiş evler arası devriye. Binaların arasından çıkan pusulara karşı arkanızı kollayın.",
-	7: "Yağmalanmış bakkal etrafında çatışma. Hurda araçları ve siperleri kullanarak zombi akınını kırın.",
-	8: "Bölüm Şefi öncesi son dar geçitler. Yoğun zombi hücumu bekleniyor, mühimmatı tasarruflu harcayın.",
-	9: "Mahalle Şefi sahneye iniyor! Yüksek can ve ezici saldırı gücüne sahip. Varilleri stratejik patlatın."
-}
+var sector_nav_box: HBoxContainer = null
+var prev_sector_btn: Button = null
+var next_sector_btn: Button = null
 
 func _ready() -> void:
 	visible = false
@@ -50,15 +30,51 @@ func _ready() -> void:
 		start_button.pressed.connect(_on_start_pressed)
 	if shop_button:
 		shop_button.pressed.connect(_on_shop_pressed)
+	_setup_sector_navigation()
+
+func _setup_sector_navigation() -> void:
+	if not header_box:
+		return
+	
+	sector_nav_box = HBoxContainer.new()
+	sector_nav_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	sector_nav_box.theme_override_constants.set("separation", 16)
+	
+	prev_sector_btn = Button.new()
+	prev_sector_btn.text = "◀ ÖNCEKİ SEKTÖR"
+	prev_sector_btn.custom_minimum_size = Vector2(160, 32)
+	prev_sector_btn.pressed.connect(_on_prev_sector_pressed)
+	
+	next_sector_btn = Button.new()
+	next_sector_btn.text = "SONRAKİ SEKTÖR ▶"
+	next_sector_btn.custom_minimum_size = Vector2(160, 32)
+	next_sector_btn.pressed.connect(_on_next_sector_pressed)
+	
+	sector_nav_box.add_child(prev_sector_btn)
+	sector_nav_box.add_child(next_sector_btn)
+	header_box.add_child(sector_nav_box)
+
+func _on_prev_sector_pressed() -> void:
+	if current_viewed_sector > 1:
+		current_viewed_sector -= 1
+		_build_level_grid()
+
+func _on_next_sector_pressed() -> void:
+	if current_viewed_sector < 11:
+		current_viewed_sector += 1
+		_build_level_grid()
 
 func open_level_window(completed_lvl: int, p_max_unlocked: int = -1) -> void:
 	current_completed_level = completed_lvl
 	if p_max_unlocked > 0:
 		max_unlocked_level = p_max_unlocked
 	else:
-		max_unlocked_level = max(max_unlocked_level, completed_lvl + 1)
+		max_unlocked_level = max(SaveManager.get_highest_unlocked_floor(), completed_lvl + 1)
 	
-	selected_level = clamp(completed_lvl + 1, 1, 9)
+	selected_level = clampi(completed_lvl + 1, 1, 99)
+	var info = LevelData.get_chapter_for_level(selected_level)
+	current_viewed_sector = info.get("sector", 1)
+	
 	visible = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_build_level_grid()
@@ -72,19 +88,27 @@ func _build_level_grid() -> void:
 	if not grid_container:
 		return
 	
-	# Eski butonları temizle
 	for child in grid_container.get_children():
 		child.queue_free()
 	level_buttons.clear()
 	
-	var info = LevelData.get_chapter_for_level(selected_level)
+	current_viewed_sector = clampi(current_viewed_sector, 1, 11)
+	var sector_data = LevelData.SECTORS[current_viewed_sector - 1]
+	var min_lvl: int = sector_data["min_level"]
+	var max_lvl: int = sector_data["max_level"]
+	
 	if chapter_title:
-		chapter_title.text = "SEKTÖR %d: %s" % [info.get("sector", 1), str(info.get("sector_name", info.get("theme", "GİRİŞ"))).to_upper()]
+		chapter_title.text = "SEKTÖR %d / 11: %s (KAT %02d - %02d)" % [current_viewed_sector, str(sector_data.get("theme", "")).to_upper(), min_lvl, max_lvl]
 	if completed_label:
-		completed_label.text = "ASANSÖR HEDEFİ: KAT %02d // TAHLİYEYE KALAN: %d KAT" % [selected_level, max(0, 99 - selected_level)]
+		completed_label.text = "EN YÜKSEK AÇIK KAT: %02d // TAHLİYEYE KALAN: %d KAT" % [max_unlocked_level, max(0, 99 - max_unlocked_level)]
+	
+	if prev_sector_btn:
+		prev_sector_btn.disabled = (current_viewed_sector <= 1)
+	if next_sector_btn:
+		next_sector_btn.disabled = (current_viewed_sector >= 11)
 
-	# 1'den 9'a kadar seviye grid kartları oluştur (3x3 Yan Yana Grid)
-	for lvl in range(1, 10):
+	# Bu sektörün 9 katlık grid kartlarını oluştur (3x3 Yan Yana Grid)
+	for lvl in range(min_lvl, max_lvl + 1):
 		var btn = Button.new()
 		btn.custom_minimum_size = Vector2(236, 72)
 		btn.focus_mode = Control.FOCUS_NONE
@@ -93,8 +117,8 @@ func _build_level_grid() -> void:
 		var is_locked = lvl > max_unlocked_level
 		btn.disabled = is_locked
 		
-		# Buton tıklandığında seviyeyi seç
-		btn.pressed.connect(func(): _select_level(lvl))
+		var target_lvl = lvl
+		btn.pressed.connect(func(): _select_level(target_lvl))
 		
 		grid_container.add_child(btn)
 		level_buttons[lvl] = btn
@@ -105,15 +129,14 @@ func _select_level(lvl: int) -> void:
 		return
 	selected_level = lvl
 	_update_details()
-	# Tüm butonların stillerini ve seçili durum metinlerini güncelle
 	for l in level_buttons.keys():
 		_style_button(level_buttons[l], l)
 
 func _style_button(btn: Button, lvl: int) -> void:
 	var is_completed = lvl <= current_completed_level
 	var is_locked = lvl > max_unlocked_level
-	var is_boss = (lvl % 9 == 0)
-	var subtitle = LevelData.FLOOR_NAMES.get(lvl, LEVEL_SUBTITLES.get(lvl, "KAT " + str(lvl))).to_upper()
+	var is_boss = LevelData.is_boss_level(lvl)
+	var subtitle = LevelData.FLOOR_NAMES.get(lvl, "KAT " + str(lvl)).to_upper()
 	
 	var status_text = "AÇIK"
 	if lvl == selected_level:
@@ -130,7 +153,6 @@ func _style_button(btn: Button, lvl: int) -> void:
 
 	btn.text = "KAT %02d: %s\n[ %s ]" % [lvl, subtitle, status_text]
 	
-	# Temel Normal Stil
 	var normal_sb = StyleBoxFlat.new()
 	normal_sb.corner_radius_top_left = 6
 	normal_sb.corner_radius_top_right = 6
@@ -141,11 +163,9 @@ func _style_button(btn: Button, lvl: int) -> void:
 	normal_sb.content_margin_left = 10
 	normal_sb.content_margin_right = 10
 	
-	# Hover Stili
 	var hover_sb = normal_sb.duplicate() as StyleBoxFlat
 
 	if lvl == selected_level:
-		# Aktif Seçili Kart: Kehribar (Amber) Taktiksel Çerçeve
 		normal_sb.bg_color = Color(0.13, 0.10, 0.05, 0.95)
 		normal_sb.border_color = Color(0.95, 0.68, 0.18, 1.0)
 		normal_sb.border_width_left = 3
@@ -163,7 +183,6 @@ func _style_button(btn: Button, lvl: int) -> void:
 		btn.add_theme_color_override("font_color", Color(1.0, 0.95, 0.8))
 		btn.add_theme_color_override("font_hover_color", Color(1.0, 1.0, 1.0))
 	elif is_completed:
-		# Tamamlanmış Görev: Koyu Taktiksel Zümrüt Yeşili
 		normal_sb.bg_color = Color(0.06, 0.11, 0.08, 0.9)
 		normal_sb.border_color = Color(0.2, 0.48, 0.3, 0.9)
 		normal_sb.border_width_left = 2
@@ -181,7 +200,6 @@ func _style_button(btn: Button, lvl: int) -> void:
 		btn.add_theme_color_override("font_color", Color(0.7, 0.92, 0.76))
 		btn.add_theme_color_override("font_hover_color", Color(0.9, 1.0, 0.94))
 	elif is_locked:
-		# Kilitli Görev: Sönük Grafit Gri
 		normal_sb.bg_color = Color(0.05, 0.06, 0.08, 0.6)
 		normal_sb.border_color = Color(0.16, 0.18, 0.22, 0.4)
 		normal_sb.border_width_left = 1
@@ -191,7 +209,6 @@ func _style_button(btn: Button, lvl: int) -> void:
 		hover_sb = normal_sb
 		btn.add_theme_color_override("font_disabled_color", Color(0.36, 0.4, 0.46))
 	else:
-		# Açık Görev (Sıradaki veya Oynanabilir)
 		if is_boss:
 			normal_sb.bg_color = Color(0.18, 0.07, 0.08, 0.95)
 			normal_sb.border_color = Color(0.75, 0.22, 0.25, 0.9)
@@ -224,23 +241,25 @@ func _style_button(btn: Button, lvl: int) -> void:
 
 func _update_details() -> void:
 	var info = LevelData.get_chapter_for_level(selected_level)
-	var subtitle = LEVEL_SUBTITLES.get(selected_level, "SEVİYE " + str(selected_level))
-	var desc = LEVEL_DESCRIPTIONS.get(selected_level, "Zombi sürüleri açık sokak aralıklarından hücum edecek.")
+	var subtitle = LevelData.FLOOR_NAMES.get(selected_level, "KAT " + str(selected_level)).to_upper()
 	
 	if detail_title:
 		if info.get("is_boss_level", false):
-			detail_title.text = "GÖREV DOSYASI // SEVİYE %02d: %s [BOSS TEHLİKESİ]" % [selected_level, subtitle]
+			detail_title.text = "GÖREV DOSYASI // KAT %02d: %s [BOSS TEHLİKESİ]" % [selected_level, subtitle]
 			detail_title.modulate = Color(1.0, 0.35, 0.35)
 		else:
-			detail_title.text = "GÖREV DOSYASI // SEVİYE %02d: %s" % [selected_level, subtitle]
+			detail_title.text = "GÖREV DOSYASI // KAT %02d: %s" % [selected_level, subtitle]
 			detail_title.modulate = Color(0.35, 0.85, 1.0)
 	
 	if detail_desc:
-		detail_desc.text = desc
+		if info.get("is_boss_level", false):
+			detail_desc.text = "⚠️ DİKKAT: %s bu katta bekliyor! Yüksek can ve ezici saldırı gücü. Varilleri ve siperleri koordineli kullanın." % str(info.get("boss_name", "SEKTÖR BOSS'U")).to_upper()
+		else:
+			detail_desc.text = "Sektör %d: %s. Zombi sürüleri açık koridor ve aralıklardan hücum edecek. Hedef: Asansörü açıp bir sonraki kata tırmanın." % [info.get("sector", 1), str(info.get("theme", ""))]
 	
 	if start_button:
 		if multiplayer.is_server():
-			start_button.text = "SEVİYE %02d BAŞLAT" % selected_level
+			start_button.text = "KAT %02d BAŞLAT" % selected_level
 			start_button.disabled = false
 		else:
 			start_button.text = "ODA SAHİBİNİN SEVİYEYİ SEÇMESİ BEKLENİYOR..."

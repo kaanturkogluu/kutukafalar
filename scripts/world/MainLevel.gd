@@ -558,6 +558,11 @@ func _on_zombie_died(zombie_ref = null, _extra = null) -> void:
 func _on_floor_cleared() -> void:
 	var info = LevelData.get_chapter_for_level(current_floor)
 	print("[Seviye Tamamlandı] Seviye ", current_floor, " (", info["theme"], ") temizlendi! Asansör kapıları açılıyor...")
+	
+	# Kalıcı kayıt sistemini güncelle:
+	SaveManager.record_floor_cleared()
+	SaveManager.unlock_floor(current_floor + 1)
+	
 	_announce_floor_cleared.rpc(info.get("is_boss_level", false))
 	elevator.set_elevator_state.rpc(true)
 
@@ -579,7 +584,8 @@ func _on_players_entered_elevator() -> void:
 @rpc("call_local", "reliable")
 func _open_level_select_ui(completed_lvl: int) -> void:
 	if level_select_ui:
-		level_select_ui.open_level_window(completed_lvl)
+		var max_unlocked = SaveManager.get_highest_unlocked_floor()
+		level_select_ui.open_level_window(completed_lvl, max_unlocked)
 
 @rpc("call_local", "reliable")
 func _close_level_select_ui() -> void:

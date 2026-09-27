@@ -163,11 +163,28 @@ Projeyi geliştirirken token tüketimini minimumda tutmak ve hızlı ilerlemek i
   * **GitHub CDN Önbellek Koruması:** GitHub sunucularının eski sürüm yanıtı dönmesini engellemek için isteklere zaman damgası (`?t=timestamp`) ve `no-cache` başlıkları eklendi.
   * **PID Takipli Windows Dosya Değiştirici (`apply_update.cmd`):** Eski bat dosyasındaki çökme yaratan `timeout` komutu kaldırıldı. Yeni betik `tasklist /fi "PID eq %PID%"` ile oyunun kapandığını doğrular, `ping 127.0.0.1` ile güvenli bekleme döngüsü yapar ve yeni PCK dosyasını hatasız kopyalayarak oyunu yeniden başlatır.
   * **Otomatik Derleme & Yayınlama Senkronizasyonu (`build_release.ps1`):** Derleme esnasında üretilen PCK dosyasının boyutu anında hesaplanıp `version.json` içerisine yazılır, hem `builds/` klasörüne hem de ilk kurulum ZIP'ine otomatik eklenir. Geliştiricinin sadece `git add` ve `git push` yapması yeterlidir.
-* [x] **Faz 13: Asansör Çok Oyunculu Senkronizasyonu & Oda Sahibi Yetkili Seviye Geçişi:**
-  * **İstemci Işınlanma RPC'si (`teleport_to.rpc`):** Godot multiplayer mimarisinde her istemci kendi `position` yetkisine (multiplayer authority) sahip olduğu için sunucunun doğrudan `position` ataması istemcilerde geçersiz kalıyordu. `FPSController.gd` içine `@rpc func teleport_to(pos)` eklenerek yeni seviyede tüm oyuncuların haritaya güvenle taşınması sağlandı.
-  * **Asansör Kapısının Oyuncuların Yüzüne Kapanması Engellendi:** Seviye başlatıldığında kapının anında kilitlenmesi kaldırıldı; oyuncuların asansörden haritaya rahatça çıkması için 2.5 saniyelik güvenlik payı verildi.
-  * **Yalnızca Oda Sahibi Seviye Başlatabilir:** `Shop.gd` ve `LevelSelect.gd` arayüzlerinde sonraki seviyeye geçiş butonları istemciler için kilitlendi ("ODA SAHİBİ BEKLENİYOR..."). Sunucu tarafında `multiplayer.get_remote_sender_id()` kontrolü eklenerek sadece lobi sahibinin seviyeyi başlatabilmesi güvenceye alındı.
-  * **Asansör Tetikleyici Mükerrer Geçiş Önlemi (`has_triggered_transition`):** Asansör içi oyuncu sayımında debouncing eklenerek arayüzlerin peş peşe birden fazla açılması engellendi.
+* [x] **Faz 14: 99 Kat Kule Tırmanışı, Dinamik Atmosferler, 11 Sektör Haritası, Yeni Zombi Türleri, Sektör Bossları & Kalıcı Kayıt Sistemi (v1.3.9):**
+  * **11 Sektör & 99 Katın Tamamı Aktif (`FloorContainer` & Modüler Yükleme):**
+    * Oyun artık 99 katlık mega kule konseptine tam uyumlu. Kat 1'den Kat 99'a kadar asansörle kesintisiz geçiş ve seviye seçimi sağlandı.
+    * Sahnede sahne değişiminden kaynaklı bağlantı kopmalarını önlemek için `FloorContainer` modüler dinamik yükleme mimarisi kuruldu (`sync_load_floor_environment`).
+    * Kat 01–09 için birebir özel mimarili katlar (`floor_01.tscn` - `floor_09.tscn`), Kat 10–99 için ise sektör bazlı zengin haritalar (`sector_02.tscn` - `sector_11.tscn`) otomatik çağrılır.
+  * **Ferahlatıcı Dinamik Atmosfer & Işıklandırma Döngüsü (`_apply_sector_atmosphere`):**
+    * Oyuncuların sürekli karanlıkta boğulmasını engellemek için her sektörde gökyüzü (`WorldEnvironment`), sis ve güneş ışığı (`DirectionalLight3D`) kökten değişir:
+      * *Sektör 4 (Kurumsal Plaza):* Pırıl pırıl gün ışığı, masmavi açık gökyüzü, sıfır sis, panoramik camlar.
+      * *Sektör 6 (Karantina Hastanesi):* Bembeyaz parlak steril klinik florasan aydınlatması.
+      * *Sektör 8 (Botanik Sera):* Yemyeşil vaha, gölet, ahşap köprü, palmiyeler ve canlı doğal güneş ışığı.
+      * *Sektör 3 & 7 (AVM & Casino):* Canlı neon renkler, altın yaldız ve kristal avize ışıltıları.
+      * *Sektör 11 (Açık Çatı):* 99. katta açık hava, devasa helikopter pisti, kurtarma helikopteri ve ufuk gün batımı.
+  * **Yeni Zombi Türleri (`setup_type`):**
+    * **Koşucu Zombi (Runner):** %45 daha hızlı (6.6+), çevik ve zayıf yapılı, kor turuncu gözler.
+    * **Zırhlı Tank Zombi (Tank):** 2.6x can, 1.35x cüsse, 32 vurma hasarı, koyu çelik zırh kaplama.
+    * **Zehirli Zombi (Toxic):** Biyo-tehlike neon yeşili ışıma, öldüğünde etrafına asit saçan zehirli patlama bırakır.
+    * **Patlayıcı Zombi (Boomer):** Oyuncuların dibine (2.2m) geldiğinde veya öldürüldüğünde patlayarak 45 alan hasarı verir.
+  * **11 Özel Sektör Boss'u (`setup_boss_sector`):**
+    * Her sektörün son katında (Kat 9, 18, 27, 36, 45, 54, 63, 72, 81, 90, 99) o sektörün temasına uygun can, hız, renk ve boyuta sahip boss doğar. Kat 99'da devasa 2.2x boyutunda, obsidyen zırhlı ve 8000 HP cana sahip **Kutu Şah (The Apocalypse King)** yer alır.
+  * **Kalıcı Kayıt Sistemi (`SaveManager.gd` - `user://save_data.json`):**
+    * Oyuncunun ulaştığı en yüksek kat (`highest_unlocked_floor`), toplam öldürme, boss öldürme, toplanan altın ve tamamlanan kat sayıları diske JSON olarak kaydedilir.
+    * Kat temizlendiğinde bir sonraki kat kilidi otomatik açılır ve `LevelSelect.gd` arayüzünde 11 sektör arasında (◀ Önceki Sektör / Sonraki Sektör ▶) gezinilerek açılmış tüm katlara anında girilebilir.
 
 
 
