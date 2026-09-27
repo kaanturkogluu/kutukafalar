@@ -58,6 +58,12 @@ var headshot_count: int = 0
 
 # Envanter: Patlayıcı Variller (G Tuşu)
 var barrel_count: int = 3
+
+# Duvarcı Sınıfı Duvar Sistemi
+var wall_count: int = 10
+var max_wall_count: int = 10
+var wall_regen_timer: float = 0.0
+const WALL_REGEN_INTERVAL: float = 5.0
 const BARREL_SCENE_PATH = "res://scenes/interactables/barrel_red.tscn"
 const ROCKET_SCENE_PATH = "res://scenes/weapons/rocket.tscn"
 const HIT_EFFECT_PATH = "res://scenes/weapons/hit_effect.tscn"
@@ -426,6 +432,17 @@ func _physics_process(delta: float) -> void:
 			_update_combo_hud()
 	_update_combo_hud()
 
+	# Duvarcı için 5 saniyede bir duvar stack yenileme
+	if player_class == "Engineer":
+		if wall_count < max_wall_count:
+			wall_regen_timer += delta
+			if wall_regen_timer >= WALL_REGEN_INTERVAL:
+				wall_regen_timer = 0.0
+				wall_count = min(max_wall_count, wall_count + 1)
+				_update_wall_hud()
+		else:
+			wall_regen_timer = 0.0
+
 	# YALNIZCA fare kilitliyken ateş et, tekme at ve varil koy (Arayüzde tıklarken ateş etmeyi engeller)
 	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		if is_multiplayer_authority():
@@ -702,7 +719,9 @@ func _register_kill_streak() -> void:
 
 func _on_spell_updated(tac_pct: float, ult_pct: float) -> void:
 	if is_multiplayer_authority():
-		if tactical_bar:
+		if player_class == "Engineer":
+			_update_wall_hud()
+		elif tactical_bar:
 			tactical_bar.value = tac_pct * 100.0
 		if ult_bar and ult_label:
 			ult_bar.value = ult_pct
@@ -712,6 +731,51 @@ func _on_spell_updated(tac_pct: float, ult_pct: float) -> void:
 			else:
 				ult_label.text = "[Q] ULTİ: %" + str(int(ult_pct))
 				ult_label.modulate = Color(0.85, 0.85, 0.85)
+
+func _update_wall_hud() -> void:
+	if not is_multiplayer_authority():
+		return
+	if player_class == "Engineer":
+		if tactical_bar:
+			tactical_bar.value = (float(wall_count) / float(max_wall_count)) * 100.0
+		var tac_label = hud.get_node_or_null("SpellContainer/TacticalBox/TacticalLabel")
+		if tac_label:
+			tac_label.text = "[E] DUVAR: %d/%d" % [wall_count, max_wall_count]
+			if wall_count <= 0:
+				tac_label.modulate = Color(1.0, 0.35, 0.35)
+			else:
+				tac_label.modulate = Color(0.4, 0.9, 1.0)
+
+## Duvar Yerleştirme (Duvarcı Sınıfı - E Tuşu)
+func try_place_wall() -> void:
+	if is_dead or is_in_shop or (pause_menu and pause_menu.visible):
+		return
+	if wall_count <= 0:
+		SoundManager.play_sfx("empty")
+		_show_weapon_notice("🧱 DUVAR TÜKENDİ! (5 sn içinde yenilenir)")
+		return
+	
+	wall_count -= 1
+	_update_wall_hud()
+	SoundManager.play_sfx("switch")
+	
+	var forward = -transform.basis.z
+	forward.y = 0
+	forward = forward.normalized()
+	
+	var wall_pos = global_position + forward * 2.2
+	wall_pos.y = global_position.y
+	var wall_rot_y = rotation.y
+	
+	_request_spawn_wall.rpc_id(1, wall_pos, wall_rot_y)
+	_show_weapon_notice("🧱 DUVAR YERLEŞTİRİLDİ (%d/%d)" % [wall_count, max_wall_count])
+
+@rpc("any_peer", "call_local", "reliable")
+func _request_spawn_wall(pos: Vector3, rot_y: float) -> void:
+	if multiplayer.is_server():
+		var main_level = get_tree().current_scene
+		if main_level and main_level.has_method("spawn_wall"):
+			main_level.spawn_wall(pos, rot_y)
 
 func _update_combo_hud() -> void:
 	if is_multiplayer_authority() and multiplier_label and combo_bar:
@@ -1435,6 +1499,9 @@ func reset_to_default_loadout(spawn_pos: Vector3 = Vector3.ZERO) -> void:
 	fire_timer = 0.0
 	kick_timer = 0.0
 	barrel_count = 3
+	wall_count = max_wall_count
+	wall_regen_timer = 0.0
+	_update_wall_hud()
 	_reset_revive_state()
 	
 	# Varsayılan başlangıç tabancası ve mühimmatı
@@ -1631,7 +1698,7 @@ func _refresh_scoreboard() -> void:
 		lbl_cls.custom_minimum_size = Vector2(110, 0)
 		match p.player_class:
 			"Pyromancer": lbl_cls.text = "BÜYÜCÜ"
-			"Engineer": lbl_cls.text = "MÜHENDİS"
+			"Engineer": lbl_cls.text = "DUVARCI"
 			"Cryomancer": lbl_cls.text = "BUZCU"
 			"Medic": lbl_cls.text = "SIHHİYE"
 			_: lbl_cls.text = p.player_class.to_upper()

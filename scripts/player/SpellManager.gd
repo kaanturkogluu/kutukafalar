@@ -35,6 +35,9 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("spell_tactical"):
 		if player and player.has_method("is_targeting_downed_teammate") and player.is_targeting_downed_teammate():
 			pass
+		elif player_class == "Engineer":
+			if player and player.has_method("try_place_wall"):
+				player.try_place_wall()
 		else:
 			cast_tactical()
 
@@ -117,10 +120,21 @@ func _request_cast_spell(spell_type: String, pos: Vector3, dir: Vector3, extra_y
 	
 	if spell_type == "medic_overdrive":
 		var players = player.get_tree().get_nodes_in_group("players")
+		var p_container = player.get_tree().current_scene.find_child("Players", true, false)
+		if p_container:
+			for c in p_container.get_children():
+				if c is CharacterBody3D and not players.has(c):
+					players.append(c)
+
+		var revived_count = 0
 		for p in players:
-			if p.has_method("heal"):
-				p.heal(p.max_health)
-			elif p.has_method("take_damage"):
-				p.current_health = p.max_health
-				p._update_hud()
-		print("[Sıhhiye Ulti] Tüm takımın canı tamamen yenilendi!")
+			if is_instance_valid(p):
+				if p.get("is_dead"):
+					p.revive.rpc(p.max_health, p.global_position)
+					revived_count += 1
+				elif p.has_method("heal"):
+					p.heal(p.max_health)
+				elif p.has_method("take_damage"):
+					p.current_health = p.max_health
+					p._update_hud()
+		print("[Sıhhiye Ulti] Tüm takımın canı yenilendi! Canlandırılan ölü takım arkadaşı sayısı: ", revived_count)

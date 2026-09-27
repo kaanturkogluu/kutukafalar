@@ -6,6 +6,7 @@ const ZOMBIE_SCENE_PATH: String = "res://scenes/enemies/zombie.tscn"
 const BOSS_SCENE_PATH: String = "res://scenes/enemies/boss_zombie.tscn"
 const BARREL_SCENE_PATH: String = "res://scenes/interactables/barrel_red.tscn"
 const PICKUP_SCENE_PATH: String = "res://scenes/interactables/pickup.tscn"
+const WALL_SCENE_PATH: String = "res://scenes/interactables/wall.tscn"
 
 @onready var players_container: Node3D = $Players
 @onready var enemies_container: Node3D = $Enemies
@@ -28,6 +29,7 @@ var active_zombie_count: int = 0
 var zombie_id_counter: int = 0
 var barrel_id_counter: int = 0
 var pickup_id_counter: int = 0
+var wall_id_counter: int = 0
 var wave_loop_token: int = 0
 var initial_barrels_spawned: bool = false
 var peers_ready: Dictionary = {}
@@ -41,6 +43,14 @@ func _get_pickups_container() -> Node3D:
 			pickups_container.name = "Pickups"
 			add_child(pickups_container)
 	return pickups_container
+
+func _get_walls_container() -> Node3D:
+	var walls_container = get_node_or_null("Walls")
+	if walls_container == null or not is_instance_valid(walls_container):
+		walls_container = Node3D.new()
+		walls_container.name = "Walls"
+		add_child(walls_container)
+	return walls_container
 
 @onready var floor_label: Label = $WaveUI/WaveInfo/FloorLabel
 @onready var wave_label: Label = $WaveUI/WaveInfo/WaveLabel
@@ -187,6 +197,26 @@ func spawn_barrel(pos: Vector3) -> void:
 	barrel_id_counter += 1
 	var b_name = "Barrel_" + str(barrel_id_counter)
 	sync_spawn_barrel.rpc(b_name, pos)
+
+func spawn_wall(pos: Vector3, rot_y: float) -> void:
+	if not multiplayer.is_server():
+		return
+	wall_id_counter += 1
+	var w_name = "Wall_" + str(wall_id_counter)
+	sync_spawn_wall.rpc(w_name, pos, rot_y)
+
+@rpc("call_local", "reliable")
+func sync_spawn_wall(w_name: String, pos: Vector3, rot_y: float) -> void:
+	var container = _get_walls_container()
+	if container.has_node(w_name):
+		return
+	var wall_scene = load(WALL_SCENE_PATH)
+	if wall_scene:
+		var wall = wall_scene.instantiate()
+		wall.name = w_name
+		wall.position = pos
+		wall.rotation.y = rot_y
+		container.add_child(wall, true)
 
 func spawn_pickup(p_type: String, p_amount: int, pos: Vector3) -> void:
 	if not multiplayer.is_server():
@@ -604,6 +634,8 @@ func sync_clear_all_entities() -> void:
 	for child in barrels_container.get_children():
 		child.queue_free()
 	for child in _get_pickups_container().get_children():
+		child.queue_free()
+	for child in _get_walls_container().get_children():
 		child.queue_free()
 	var pickups = get_tree().get_nodes_in_group("pickups")
 	for p in pickups:

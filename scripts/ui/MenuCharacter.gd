@@ -35,7 +35,7 @@ const CLASS_CONFIG: Dictionary = {
 		"weapon_rot": Vector3(deg_to_rad(-10), deg_to_rad(-15), deg_to_rad(10))
 	},
 	"Engineer": {
-		"title": "MÜHENDİS",
+		"title": "DUVARCI",
 		"body_color": Color(0.90, 0.54, 0.12),
 		"accent_color": Color(1.0, 0.75, 0.15),
 		"vest_color": Color(0.22, 0.20, 0.18),

@@ -27,7 +27,7 @@ func _create_player_pool() -> void:
 ## Tüm ses efektlerini saf matematiksel dalga formlarıyla üret
 func _generate_all_sounds() -> void:
 	var sample_rate = 22050
-	var sound_names = ["pistol", "shotgun", "uzi", "bixi", "rocket", "switch", "empty", "pickup"]
+	var sound_names = ["pistol", "shotgun", "uzi", "bixi", "rocket", "switch", "empty", "pickup", "zombie_growl", "zombie_attack", "zombie_hurt", "zombie_die"]
 	
 	for s_name in sound_names:
 		var dur = 0.2
@@ -36,6 +36,10 @@ func _generate_all_sounds() -> void:
 		elif s_name == "bixi": dur = 0.16
 		elif s_name == "rocket": dur = 0.50
 		elif s_name == "switch" or s_name == "empty": dur = 0.08
+		elif s_name == "zombie_growl": dur = 0.55
+		elif s_name == "zombie_attack": dur = 0.22
+		elif s_name == "zombie_hurt": dur = 0.16
+		elif s_name == "zombie_die": dur = 0.38
 		
 		var total_samples = int(dur * sample_rate)
 		var bytes = PackedByteArray()
@@ -90,6 +94,36 @@ func _generate_all_sounds() -> void:
 					elif prog > 0.25: freq = 659.25
 					var env = exp(-prog * 6.0)
 					sample = sin(t * freq * TAU) * env * 0.65
+				"zombie_growl":
+					# Ürpertici zombi hırıltısı ve nefes (Gargling low frequency growl)
+					var env = sin(prog * PI) * exp(-prog * 1.2)
+					var f_base = lerp(120.0, 70.0, prog)
+					var gargle = 1.0 + 0.4 * sin(t * 22.0 * TAU)
+					var tone = sin(t * f_base * TAU * gargle)
+					var rasp = randf_range(-0.55, 0.55) * sin(t * (f_base * 0.5) * TAU)
+					sample = (tone * 0.6 + rasp * 0.4) * env
+				"zombie_attack":
+					# Zombi pençe savurma / hırlama saldırı sesi
+					var env = exp(-prog * 11.0)
+					var f_base = lerp(260.0, 85.0, prog * prog)
+					var tone = sin(t * f_base * TAU)
+					var noise = randf_range(-1.0, 1.0) * exp(-prog * 14.0)
+					sample = (tone * 0.45 + noise * 0.55) * env
+				"zombie_hurt":
+					# Zombi hasar iniltisi / vuruş tepkisi
+					var env = exp(-prog * 16.0)
+					var f_base = lerp(170.0, 60.0, prog)
+					var tone = sin(t * f_base * TAU)
+					var crunch = randf_range(-0.8, 0.8) * exp(-prog * 20.0)
+					sample = (tone * 0.5 + crunch * 0.5) * env
+				"zombie_die":
+					# Zombi ölüm çöküş hırıltısı (Death rattle)
+					var env = (1.0 - prog) * exp(-prog * 1.8)
+					var f_base = lerp(130.0, 42.0, prog)
+					var tone = sin(t * f_base * TAU)
+					var gargle = sin(t * 16.0 * TAU) * 0.25
+					var noise = randf_range(-0.7, 0.7) * (1.0 - prog)
+					sample = (tone * 0.5 + gargle * 0.2 + noise * 0.3) * env
 			
 			sample = clamp(sample, -1.0, 1.0)
 			bytes.encode_s16(i * 2, int(sample * 30000.0))

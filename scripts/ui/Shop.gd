@@ -101,6 +101,7 @@ func _generate_offers() -> void:
 		{"type": "barrels", "title": "VARİL İKMALİ", "desc": "+3 Patlayıcı Varil Kapasitesi", "cost": base_cost - 15, "bought": false},
 		{"type": "cooldown", "title": "BÜYÜ ODAKLANMASI", "desc": "Taktiksel Büyü Bekleme Süresi -2.5 sn", "cost": base_cost + 25, "bought": false},
 		{"type": "droprate", "title": "GANİMET ŞANSI", "desc": "Zombilerden Mühimmat ve Silah Düşme Şansı +%50 Artar", "cost": base_cost + 10, "bought": false},
+		{"type": "wall_stack", "title": "BARİKAT YÜKSELTMESİ", "desc": "+5 Maksimum Duvar Kapasitesi ve Anında Duvar Dolumu", "cost": base_cost - 10, "bought": false},
 		{"type": "bixi", "title": "BİXİ (PKM) AĞIR MAKİNELİ", "desc": "Yüksek Mermi Kapasiteli Tam Otomatik Ağır Makineli (+120 Mermi)", "cost": base_cost + 40, "bought": false}
 	]
 	pool.shuffle()
@@ -132,6 +133,12 @@ func _buy_card(index: int) -> void:
 			local_player.stat_firerate_mult += 0.20
 		"barrels":
 			local_player.barrel_count += 3
+		"wall_stack":
+			if local_player.get("max_wall_count") != null:
+				local_player.max_wall_count += 5
+				local_player.wall_count = local_player.max_wall_count
+				if local_player.has_method("_update_wall_hud"):
+					local_player._update_wall_hud()
 		"cooldown":
 			if local_player.spell_manager:
 				local_player.spell_manager.tactical_cooldown = max(5.0, local_player.spell_manager.tactical_cooldown - 2.5)

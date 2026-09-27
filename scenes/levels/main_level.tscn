@@ -1,10 +1,10 @@
-[gd_scene load_steps=42 format=3 uid="uid://cx4j12a7v8w2q"]
+[gd_scene format=3 uid="uid://cx4j12a7v8w2q"]
 
-[ext_resource type="Script" path="res://scripts/world/MainLevel.gd" id="1_level"]
-[ext_resource type="PackedScene" uid="uid://elevator_scene_01" path="res://scenes/levels/elevator.tscn" id="2_elev"]
-[ext_resource type="PackedScene" uid="uid://shop_scene_01" path="res://scenes/ui/shop.tscn" id="3_shop"]
-[ext_resource type="PackedScene" uid="uid://car_wreck_scene_01" path="res://scenes/interactables/car_wreck.tscn" id="4_car"]
-[ext_resource type="PackedScene" uid="uid://level_select_scene_01" path="res://scenes/ui/level_select.tscn" id="5_lvlselect"]
+[ext_resource type="Script" uid="uid://o7fyhbfc0odc" path="res://scripts/world/MainLevel.gd" id="1_level"]
+[ext_resource type="PackedScene" path="res://scenes/levels/elevator.tscn" id="2_elev"]
+[ext_resource type="PackedScene" path="res://scenes/ui/shop.tscn" id="3_shop"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/car_wreck.tscn" id="4_car"]
+[ext_resource type="PackedScene" path="res://scenes/ui/level_select.tscn" id="5_lvlselect"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_twilight"]
 sky_top_color = Color(0.08, 0.1, 0.22, 1)
@@ -58,13 +58,13 @@ roughness = 0.9
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_roundabout"]
 material = SubResource("StandardMaterial3D_park")
-top_radius = 5.5
-bottom_radius = 5.8
-height = 0.35
+top_radius = 5.7
+bottom_radius = 5.85
+height = 0.05
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_roundabout"]
-height = 0.35
-radius = 5.8
+height = 0.05
+radius = 5.85
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_brick"]
 albedo_color = Color(0.52, 0.22, 0.18, 1)
@@ -72,9 +72,6 @@ roughness = 0.8
 
 [sub_resource type="BoxMesh" id="BoxMesh_house1"]
 material = SubResource("StandardMaterial3D_brick")
-size = Vector3(14, 7, 9)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_house1"]
 size = Vector3(14, 7, 9)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_roof"]
@@ -92,6 +89,9 @@ roughness = 0.75
 [sub_resource type="BoxMesh" id="BoxMesh_woodplank"]
 material = SubResource("StandardMaterial3D_wood")
 size = Vector3(2.2, 1.4, 0.25)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_house1"]
+size = Vector3(14, 7, 9)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_store"]
 albedo_color = Color(0.35, 0.42, 0.48, 1)
@@ -126,9 +126,6 @@ top_radius = 0.08
 bottom_radius = 0.12
 height = 4.2
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_pole"]
-size = Vector3(0.3, 4.2, 0.3)
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lantern"]
 albedo_color = Color(1, 0.9, 0.6, 1)
 emission_enabled = true
@@ -138,6 +135,9 @@ emission_energy_multiplier = 3.5
 [sub_resource type="BoxMesh" id="BoxMesh_lantern"]
 material = SubResource("StandardMaterial3D_lantern")
 size = Vector3(0.4, 0.4, 0.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pole"]
+size = Vector3(0.3, 4.2, 0.3)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dumpster"]
 albedo_color = Color(0.18, 0.32, 0.22, 1)
@@ -155,21 +155,18 @@ size = Vector3(2.4, 1.4, 1.4)
 material = SubResource("StandardMaterial3D_wood")
 size = Vector3(52, 2.2, 0.3)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_perimeter_boundary_ns"]
+size = Vector3(54, 8, 1)
+
 [sub_resource type="BoxMesh" id="BoxMesh_perimeter_fence_half"]
 material = SubResource("StandardMaterial3D_wood")
 size = Vector3(24.5, 2.2, 0.3)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_perimeter_boundary_ns"]
-size = Vector3(54, 8.0, 1.0)
-
 [sub_resource type="BoxShape3D" id="BoxShape3D_perimeter_boundary_half"]
-size = Vector3(24.5, 8.0, 1.0)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_perimeter_boundary_ew"]
-size = Vector3(1.0, 8.0, 54)
+size = Vector3(24.5, 8, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_behind_elevator"]
-size = Vector3(6.0, 8.0, 1.0)
+size = Vector3(6, 8, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_city_tower"]
 albedo_color = Color(0.1, 0.12, 0.17, 1)
@@ -182,12 +179,6 @@ emission_enabled = true
 emission = Color(1, 0.85, 0.4, 1)
 emission_energy_multiplier = 2.2
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_city_windows_cyan"]
-albedo_color = Color(0.35, 0.8, 1, 1)
-emission_enabled = true
-emission = Color(0.25, 0.75, 1, 1)
-emission_energy_multiplier = 2.0
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_red_beacon"]
 albedo_color = Color(1, 0.15, 0.1, 1)
 emission_enabled = true
@@ -198,434 +189,439 @@ emission_energy_multiplier = 4.0
 material = SubResource("StandardMaterial3D_red_beacon")
 size = Vector3(0.5, 0.5, 0.5)
 
-[node name="MainLevel" type="Node3D"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_city_windows_cyan"]
+albedo_color = Color(0.35, 0.8, 1, 1)
+emission_enabled = true
+emission = Color(0.25, 0.75, 1, 1)
+emission_energy_multiplier = 2.0
+
+[node name="MainLevel" type="Node3D" unique_id=1920925052]
 script = ExtResource("1_level")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=99273695]
 environment = SubResource("Environment_twilight")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=466444542]
 transform = Transform3D(0.866, -0.353, 0.353, 0, 0.707, 0.707, -0.5, -0.612, 0.612, 0, 20, 0)
 light_color = Color(0.95, 0.85, 0.75, 1)
 light_energy = 0.95
 shadow_enabled = true
 
-[node name="Players" type="Node3D" parent="."]
+[node name="Players" type="Node3D" parent="." unique_id=677106762]
 
-[node name="Enemies" type="Node3D" parent="."]
+[node name="Enemies" type="Node3D" parent="." unique_id=992309944]
 
-[node name="Barrels" type="Node3D" parent="."]
+[node name="Barrels" type="Node3D" parent="." unique_id=1497767625]
 
-[node name="Pickups" type="Node3D" parent="."]
+[node name="Pickups" type="Node3D" parent="." unique_id=856976646]
 
-[node name="DefaultCamera" type="Camera3D" parent="."]
+[node name="DefaultCamera" type="Camera3D" parent="." unique_id=360815080]
 transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 22, 18)
 current = true
 
-[node name="Elevator" parent="." instance=ExtResource("2_elev")]
+[node name="Elevator" parent="." unique_id=1845719623 instance=ExtResource("2_elev")]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 27.85)
 
-[node name="ShopUI" parent="." instance=ExtResource("3_shop")]
+[node name="ShopUI" parent="." unique_id=119889234 instance=ExtResource("3_shop")]
 
-[node name="LevelSelectUI" parent="." instance=ExtResource("5_lvlselect")]
+[node name="LevelSelectUI" parent="." unique_id=1929311260 instance=ExtResource("5_lvlselect")]
 
-[node name="SpawnPoints" type="Node3D" parent="."]
+[node name="SpawnPoints" type="Node3D" parent="." unique_id=186115927]
 
-[node name="SpawnPoint1" type="Marker3D" parent="SpawnPoints"]
+[node name="SpawnPoint1" type="Marker3D" parent="SpawnPoints" unique_id=1577049881]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1.2, -2.5)
 
-[node name="SpawnPoint2" type="Marker3D" parent="SpawnPoints"]
+[node name="SpawnPoint2" type="Marker3D" parent="SpawnPoints" unique_id=1532374512]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1.2, -2.5)
 
-[node name="SpawnPoint3" type="Marker3D" parent="SpawnPoints"]
+[node name="SpawnPoint3" type="Marker3D" parent="SpawnPoints" unique_id=935631759]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1.2, 2.5)
 
-[node name="SpawnPoint4" type="Marker3D" parent="SpawnPoints"]
+[node name="SpawnPoint4" type="Marker3D" parent="SpawnPoints" unique_id=5924750]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1.2, 2.5)
 
-[node name="ZombieSpawnPoints" type="Node3D" parent="."]
+[node name="ZombieSpawnPoints" type="Node3D" parent="." unique_id=49068701]
 
-[node name="ZSpawn_NorthAlley_West" type="Marker3D" parent="ZombieSpawnPoints"]
+[node name="ZSpawn_NorthAlley_West" type="Marker3D" parent="ZombieSpawnPoints" unique_id=1392535172]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 1.2, -15.5)
 
-[node name="ZSpawn_NorthAlley_East" type="Marker3D" parent="ZombieSpawnPoints"]
+[node name="ZSpawn_NorthAlley_East" type="Marker3D" parent="ZombieSpawnPoints" unique_id=1532184523]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 1.2, -15.5)
 
-[node name="ZSpawn_NorthAvenue" type="Marker3D" parent="ZombieSpawnPoints"]
+[node name="ZSpawn_NorthAvenue" type="Marker3D" parent="ZombieSpawnPoints" unique_id=1723865316]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, -14.5)
 
-[node name="ZSpawn_WestSideStreet" type="Marker3D" parent="ZombieSpawnPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, 1.2, -4.0)
+[node name="ZSpawn_WestSideStreet" type="Marker3D" parent="ZombieSpawnPoints" unique_id=25940636]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, 1.2, -4)
 
-[node name="ZSpawn_EastSideStreet" type="Marker3D" parent="ZombieSpawnPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.5, 1.2, -4.0)
+[node name="ZSpawn_EastSideStreet" type="Marker3D" parent="ZombieSpawnPoints" unique_id=1798777082]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.5, 1.2, -4)
 
-[node name="ZSpawn_SouthWest" type="Marker3D" parent="ZombieSpawnPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.0, 1.2, 13.0)
+[node name="ZSpawn_SouthWest" type="Marker3D" parent="ZombieSpawnPoints" unique_id=299172019]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 1.2, 13)
 
-[node name="ZSpawn_SouthEast" type="Marker3D" parent="ZombieSpawnPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.0, 1.2, 13.0)
+[node name="ZSpawn_SouthEast" type="Marker3D" parent="ZombieSpawnPoints" unique_id=1043279570]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1.2, 13)
 
-[node name="Environment" type="Node3D" parent="."]
+[node name="Environment" type="Node3D" parent="." unique_id=800130812]
 
-[node name="OuterTerrain" type="StaticBody3D" parent="Environment"]
+[node name="OuterTerrain" type="StaticBody3D" parent="Environment" unique_id=603189319]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.7, 0)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/OuterTerrain"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/OuterTerrain" unique_id=373787896]
 mesh = SubResource("BoxMesh_outer_ground")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/OuterTerrain"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/OuterTerrain" unique_id=1080393082]
 shape = SubResource("BoxShape3D_outer_ground")
 
-[node name="AsphaltGround" type="StaticBody3D" parent="Environment"]
+[node name="AsphaltGround" type="StaticBody3D" parent="Environment" unique_id=149194519]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/AsphaltGround"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/AsphaltGround" unique_id=1548111879]
 mesh = SubResource("BoxMesh_asphalt")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/AsphaltGround"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/AsphaltGround" unique_id=1019998865]
 shape = SubResource("BoxShape3D_ground")
 
-[node name="RoundaboutIsland" type="StaticBody3D" parent="Environment"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+[node name="RoundaboutIsland" type="StaticBody3D" parent="Environment" unique_id=1642524851]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/RoundaboutIsland"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/RoundaboutIsland" unique_id=895531780]
 mesh = SubResource("CylinderMesh_roundabout")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/RoundaboutIsland"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/RoundaboutIsland" unique_id=178628536]
 shape = SubResource("CylinderShape3D_roundabout")
 
-[node name="House_North" type="StaticBody3D" parent="Environment"]
+[node name="House_North" type="StaticBody3D" parent="Environment" unique_id=899448508]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, -21)
 
-[node name="Body" type="MeshInstance3D" parent="Environment/House_North"]
+[node name="Body" type="MeshInstance3D" parent="Environment/House_North" unique_id=556031224]
 mesh = SubResource("BoxMesh_house1")
 
-[node name="Roof" type="MeshInstance3D" parent="Environment/House_North"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.0, 0)
+[node name="Roof" type="MeshInstance3D" parent="Environment/House_North" unique_id=855258775]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
 mesh = SubResource("BoxMesh_roof")
 
-[node name="BoardedWindow" type="MeshInstance3D" parent="Environment/House_North"]
+[node name="BoardedWindow" type="MeshInstance3D" parent="Environment/House_North" unique_id=1520073131]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, -0.5, 4.6)
 mesh = SubResource("BoxMesh_woodplank")
 
-[node name="BoardedWindow2" type="MeshInstance3D" parent="Environment/House_North"]
+[node name="BoardedWindow2" type="MeshInstance3D" parent="Environment/House_North" unique_id=1441793580]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, -0.5, 4.6)
 mesh = SubResource("BoxMesh_woodplank")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/House_North"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/House_North" unique_id=1231325724]
 shape = SubResource("BoxShape3D_house1")
 
-[node name="Store_NorthWest" type="StaticBody3D" parent="Environment"]
-transform = Transform3D(0.819152, 0, 0.573576, 0, 1, 0, -0.573576, 0, 0.819152, -17, 3.0, -14)
+[node name="Store_NorthWest" type="StaticBody3D" parent="Environment" unique_id=1252235971]
+transform = Transform3D(0.819152, 0, 0.573576, 0, 1, 0, -0.573576, 0, 0.819152, -17, 3, -14)
 
-[node name="Body" type="MeshInstance3D" parent="Environment/Store_NorthWest"]
+[node name="Body" type="MeshInstance3D" parent="Environment/Store_NorthWest" unique_id=659317031]
 mesh = SubResource("BoxMesh_store")
 
-[node name="Roof" type="MeshInstance3D" parent="Environment/Store_NorthWest"]
+[node name="Roof" type="MeshInstance3D" parent="Environment/Store_NorthWest" unique_id=1697385226]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4, 0)
 mesh = SubResource("BoxMesh_roof")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Store_NorthWest"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Store_NorthWest" unique_id=965381382]
 shape = SubResource("BoxShape3D_store")
 
-[node name="House_NorthEast" type="StaticBody3D" parent="Environment"]
+[node name="House_NorthEast" type="StaticBody3D" parent="Environment" unique_id=441574689]
 transform = Transform3D(0.819152, 0, -0.573576, 0, 1, 0, 0.573576, 0, 0.819152, 17, 3.25, -14)
 
-[node name="Body" type="MeshInstance3D" parent="Environment/House_NorthEast"]
+[node name="Body" type="MeshInstance3D" parent="Environment/House_NorthEast" unique_id=1248062154]
 mesh = SubResource("BoxMesh_house2")
 
-[node name="Roof" type="MeshInstance3D" parent="Environment/House_NorthEast"]
+[node name="Roof" type="MeshInstance3D" parent="Environment/House_NorthEast" unique_id=1870015993]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.7, 0)
 mesh = SubResource("BoxMesh_roof")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/House_NorthEast"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/House_NorthEast" unique_id=1714853543]
 shape = SubResource("BoxShape3D_house2")
 
-[node name="House_West" type="StaticBody3D" parent="Environment"]
+[node name="House_West" type="StaticBody3D" parent="Environment" unique_id=1585584377]
 transform = Transform3D(0.0871557, 0, 0.996195, 0, 1, 0, -0.996195, 0, 0.0871557, -21, 3.25, 4)
 
-[node name="Body" type="MeshInstance3D" parent="Environment/House_West"]
+[node name="Body" type="MeshInstance3D" parent="Environment/House_West" unique_id=2059361144]
 mesh = SubResource("BoxMesh_house2")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/House_West"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/House_West" unique_id=1748514707]
 shape = SubResource("BoxShape3D_house2")
 
-[node name="House_East" type="StaticBody3D" parent="Environment"]
+[node name="House_East" type="StaticBody3D" parent="Environment" unique_id=1266447818]
 transform = Transform3D(-0.0871557, 0, -0.996195, 0, 1, 0, 0.996195, 0, -0.0871557, 21, 3.5, 4)
 
-[node name="Body" type="MeshInstance3D" parent="Environment/House_East"]
+[node name="Body" type="MeshInstance3D" parent="Environment/House_East" unique_id=1612938755]
 mesh = SubResource("BoxMesh_house1")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/House_East"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/House_East" unique_id=692057330]
 shape = SubResource("BoxShape3D_house1")
 
-[node name="StreetLight1" type="StaticBody3D" parent="Environment"]
+[node name="StreetLight1" type="StaticBody3D" parent="Environment" unique_id=410669311]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, 2.1, -8.5)
 
-[node name="Pole" type="MeshInstance3D" parent="Environment/StreetLight1"]
+[node name="Pole" type="MeshInstance3D" parent="Environment/StreetLight1" unique_id=314445293]
 mesh = SubResource("CylinderMesh_pole")
 
-[node name="Lantern" type="MeshInstance3D" parent="Environment/StreetLight1"]
+[node name="Lantern" type="MeshInstance3D" parent="Environment/StreetLight1" unique_id=597598189]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0)
 mesh = SubResource("BoxMesh_lantern")
 
-[node name="Light" type="OmniLight3D" parent="Environment/StreetLight1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+[node name="Light" type="OmniLight3D" parent="Environment/StreetLight1" unique_id=805358265]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 light_color = Color(1, 0.88, 0.58, 1)
 light_energy = 3.0
 omni_range = 10.0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/StreetLight1"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/StreetLight1" unique_id=1929490419]
 shape = SubResource("BoxShape3D_pole")
 
-[node name="StreetLight2" type="StaticBody3D" parent="Environment"]
+[node name="StreetLight2" type="StaticBody3D" parent="Environment" unique_id=959056199]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, 2.1, -8.5)
 
-[node name="Pole" type="MeshInstance3D" parent="Environment/StreetLight2"]
+[node name="Pole" type="MeshInstance3D" parent="Environment/StreetLight2" unique_id=110837770]
 mesh = SubResource("CylinderMesh_pole")
 
-[node name="Lantern" type="MeshInstance3D" parent="Environment/StreetLight2"]
+[node name="Lantern" type="MeshInstance3D" parent="Environment/StreetLight2" unique_id=1887648133]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0)
 mesh = SubResource("BoxMesh_lantern")
 
-[node name="Light" type="OmniLight3D" parent="Environment/StreetLight2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+[node name="Light" type="OmniLight3D" parent="Environment/StreetLight2" unique_id=2014298096]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 light_color = Color(1, 0.88, 0.58, 1)
 light_energy = 3.0
 omni_range = 10.0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/StreetLight2"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/StreetLight2" unique_id=790425336]
 shape = SubResource("BoxShape3D_pole")
 
-[node name="StreetLight3" type="StaticBody3D" parent="Environment"]
+[node name="StreetLight3" type="StaticBody3D" parent="Environment" unique_id=2111843340]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, 2.1, 8.5)
 
-[node name="Pole" type="MeshInstance3D" parent="Environment/StreetLight3"]
+[node name="Pole" type="MeshInstance3D" parent="Environment/StreetLight3" unique_id=762360784]
 mesh = SubResource("CylinderMesh_pole")
 
-[node name="Lantern" type="MeshInstance3D" parent="Environment/StreetLight3"]
+[node name="Lantern" type="MeshInstance3D" parent="Environment/StreetLight3" unique_id=1560361331]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0)
 mesh = SubResource("BoxMesh_lantern")
 
-[node name="Light" type="OmniLight3D" parent="Environment/StreetLight3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+[node name="Light" type="OmniLight3D" parent="Environment/StreetLight3" unique_id=332842219]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 light_color = Color(1, 0.88, 0.58, 1)
 light_energy = 3.0
 omni_range = 10.0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/StreetLight3"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/StreetLight3" unique_id=1648156554]
 shape = SubResource("BoxShape3D_pole")
 
-[node name="StreetLight4" type="StaticBody3D" parent="Environment"]
+[node name="StreetLight4" type="StaticBody3D" parent="Environment" unique_id=814591377]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, 2.1, 8.5)
 
-[node name="Pole" type="MeshInstance3D" parent="Environment/StreetLight4"]
+[node name="Pole" type="MeshInstance3D" parent="Environment/StreetLight4" unique_id=582544891]
 mesh = SubResource("CylinderMesh_pole")
 
-[node name="Lantern" type="MeshInstance3D" parent="Environment/StreetLight4"]
+[node name="Lantern" type="MeshInstance3D" parent="Environment/StreetLight4" unique_id=910356706]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0)
 mesh = SubResource("BoxMesh_lantern")
 
-[node name="Light" type="OmniLight3D" parent="Environment/StreetLight4"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+[node name="Light" type="OmniLight3D" parent="Environment/StreetLight4" unique_id=845193852]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 light_color = Color(1, 0.88, 0.58, 1)
 light_energy = 3.0
 omni_range = 10.0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/StreetLight4"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/StreetLight4" unique_id=1666922362]
 shape = SubResource("BoxShape3D_pole")
 
-[node name="Dumpster1" type="StaticBody3D" parent="Environment"]
+[node name="Dumpster1" type="StaticBody3D" parent="Environment" unique_id=2124238490]
 transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -13.5, 0.7, -9.5)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/Dumpster1"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/Dumpster1" unique_id=190021168]
 mesh = SubResource("BoxMesh_dumpster")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Dumpster1"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Dumpster1" unique_id=1297446670]
 shape = SubResource("BoxShape3D_dumpster")
 
-[node name="Dumpster2" type="StaticBody3D" parent="Environment"]
+[node name="Dumpster2" type="StaticBody3D" parent="Environment" unique_id=1305481757]
 transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 14, 0.7, 10.5)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/Dumpster2"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/Dumpster2" unique_id=1004812913]
 mesh = SubResource("BoxMesh_dumpster")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Dumpster2"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Dumpster2" unique_id=1081156043]
 shape = SubResource("BoxShape3D_dumpster")
 
-[node name="PerimeterFences" type="Node3D" parent="Environment"]
+[node name="PerimeterFences" type="Node3D" parent="Environment" unique_id=2079401516]
 
-[node name="Fence_North" type="StaticBody3D" parent="Environment/PerimeterFences"]
+[node name="Fence_North" type="StaticBody3D" parent="Environment/PerimeterFences" unique_id=1516220056]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, -25.8)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/PerimeterFences/Fence_North"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/PerimeterFences/Fence_North" unique_id=1650325597]
 mesh = SubResource("BoxMesh_perimeter_fence_long")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/PerimeterFences/Fence_North"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/PerimeterFences/Fence_North" unique_id=333391317]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.9, 0)
 shape = SubResource("BoxShape3D_perimeter_boundary_ns")
 
-[node name="Fence_South_Left" type="StaticBody3D" parent="Environment/PerimeterFences"]
+[node name="Fence_South_Left" type="StaticBody3D" parent="Environment/PerimeterFences" unique_id=1238484865]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.25, 1.1, 25.8)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/PerimeterFences/Fence_South_Left"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/PerimeterFences/Fence_South_Left" unique_id=298236701]
 mesh = SubResource("BoxMesh_perimeter_fence_half")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/PerimeterFences/Fence_South_Left"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/PerimeterFences/Fence_South_Left" unique_id=838857238]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.9, 0)
 shape = SubResource("BoxShape3D_perimeter_boundary_half")
 
-[node name="Fence_South_Right" type="StaticBody3D" parent="Environment/PerimeterFences"]
+[node name="Fence_South_Right" type="StaticBody3D" parent="Environment/PerimeterFences" unique_id=1650661933]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.25, 1.1, 25.8)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/PerimeterFences/Fence_South_Right"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/PerimeterFences/Fence_South_Right" unique_id=1631038635]
 mesh = SubResource("BoxMesh_perimeter_fence_half")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/PerimeterFences/Fence_South_Right"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/PerimeterFences/Fence_South_Right" unique_id=434845930]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.9, 0)
 shape = SubResource("BoxShape3D_perimeter_boundary_half")
 
-[node name="Boundary_Behind_Elevator" type="StaticBody3D" parent="Environment/PerimeterFences"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.0, 30.5)
+[node name="Boundary_Behind_Elevator" type="StaticBody3D" parent="Environment/PerimeterFences" unique_id=511301539]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 30.5)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/PerimeterFences/Boundary_Behind_Elevator"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/PerimeterFences/Boundary_Behind_Elevator" unique_id=597137377]
 shape = SubResource("BoxShape3D_behind_elevator")
 
-[node name="Fence_West" type="StaticBody3D" parent="Environment/PerimeterFences"]
+[node name="Fence_West" type="StaticBody3D" parent="Environment/PerimeterFences" unique_id=1445993971]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -25.8, 1.1, 0)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/PerimeterFences/Fence_West"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/PerimeterFences/Fence_West" unique_id=1498841486]
 mesh = SubResource("BoxMesh_perimeter_fence_long")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/PerimeterFences/Fence_West"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/PerimeterFences/Fence_West" unique_id=2087370084]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.9, 0)
 shape = SubResource("BoxShape3D_perimeter_boundary_ns")
 
-[node name="Fence_East" type="StaticBody3D" parent="Environment/PerimeterFences"]
+[node name="Fence_East" type="StaticBody3D" parent="Environment/PerimeterFences" unique_id=1525410859]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 25.8, 1.1, 0)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/PerimeterFences/Fence_East"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/PerimeterFences/Fence_East" unique_id=244788834]
 mesh = SubResource("BoxMesh_perimeter_fence_long")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/PerimeterFences/Fence_East"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/PerimeterFences/Fence_East" unique_id=583654538]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.9, 0)
 shape = SubResource("BoxShape3D_perimeter_boundary_ns")
 
-[node name="DistantCity" type="Node3D" parent="Environment"]
+[node name="DistantCity" type="Node3D" parent="Environment" unique_id=1013988164]
 
-[node name="Skyscraper_Central" type="MeshInstance3D" parent="Environment/DistantCity"]
+[node name="Skyscraper_Central" type="MeshInstance3D" parent="Environment/DistantCity" unique_id=1788682751]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 26, -72)
 mesh = SubResource("BoxMesh_house1")
 
-[node name="TowerCore" type="CSGBox3D" parent="Environment/DistantCity"]
+[node name="TowerCore" type="CSGBox3D" parent="Environment/DistantCity" unique_id=391007646]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 28, -75)
 size = Vector3(18, 56, 18)
 material = SubResource("StandardMaterial3D_city_tower")
 
-[node name="WindowBands" type="CSGBox3D" parent="Environment/DistantCity/TowerCore"]
+[node name="WindowBands" type="CSGBox3D" parent="Environment/DistantCity/TowerCore" unique_id=79604073]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0.1)
 size = Vector3(18.2, 34, 18.2)
 material = SubResource("StandardMaterial3D_city_windows")
 
-[node name="Antenna" type="CSGBox3D" parent="Environment/DistantCity/TowerCore"]
+[node name="Antenna" type="CSGBox3D" parent="Environment/DistantCity/TowerCore" unique_id=1522619093]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 33, 0)
 size = Vector3(0.6, 12, 0.6)
 material = SubResource("StandardMaterial3D_pole")
 
-[node name="BeaconLightMesh" type="MeshInstance3D" parent="Environment/DistantCity/TowerCore/Antenna"]
+[node name="BeaconLightMesh" type="MeshInstance3D" parent="Environment/DistantCity/TowerCore/Antenna" unique_id=1255420868]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 0)
 mesh = SubResource("BoxMesh_beacon")
 
-[node name="TowerWest1" type="CSGBox3D" parent="Environment/DistantCity"]
+[node name="TowerWest1" type="CSGBox3D" parent="Environment/DistantCity" unique_id=1215811956]
 transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -28, 20, -65)
 size = Vector3(14, 40, 14)
 material = SubResource("StandardMaterial3D_city_tower")
 
-[node name="Windows" type="CSGBox3D" parent="Environment/DistantCity/TowerWest1"]
+[node name="Windows" type="CSGBox3D" parent="Environment/DistantCity/TowerWest1" unique_id=403897278]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0.1)
 size = Vector3(14.2, 24, 14.2)
 material = SubResource("StandardMaterial3D_city_windows_cyan")
 
-[node name="TowerWest2" type="CSGBox3D" parent="Environment/DistantCity"]
+[node name="TowerWest2" type="CSGBox3D" parent="Environment/DistantCity" unique_id=17585449]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -54, 16, -58)
 size = Vector3(16, 32, 16)
 material = SubResource("StandardMaterial3D_city_tower")
 
-[node name="Windows" type="CSGBox3D" parent="Environment/DistantCity/TowerWest2"]
+[node name="Windows" type="CSGBox3D" parent="Environment/DistantCity/TowerWest2" unique_id=995385808]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0.1)
 size = Vector3(16.2, 20, 16.2)
 material = SubResource("StandardMaterial3D_city_windows")
 
-[node name="TowerEast1" type="CSGBox3D" parent="Environment/DistantCity"]
+[node name="TowerEast1" type="CSGBox3D" parent="Environment/DistantCity" unique_id=771611422]
 transform = Transform3D(0.939693, 0, -0.34202, 0, 1, 0, 0.34202, 0, 0.939693, 28, 24, -68)
 size = Vector3(16, 48, 16)
 material = SubResource("StandardMaterial3D_city_tower")
 
-[node name="Windows" type="CSGBox3D" parent="Environment/DistantCity/TowerEast1"]
+[node name="Windows" type="CSGBox3D" parent="Environment/DistantCity/TowerEast1" unique_id=1058645703]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0.1)
 size = Vector3(16.2, 30, 16.2)
 material = SubResource("StandardMaterial3D_city_windows")
 
-[node name="Antenna" type="CSGBox3D" parent="Environment/DistantCity/TowerEast1"]
+[node name="Antenna" type="CSGBox3D" parent="Environment/DistantCity/TowerEast1" unique_id=1353237485]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 28, 0)
 size = Vector3(0.5, 10, 0.5)
 material = SubResource("StandardMaterial3D_pole")
 
-[node name="BeaconLightMesh" type="MeshInstance3D" parent="Environment/DistantCity/TowerEast1/Antenna"]
+[node name="BeaconLightMesh" type="MeshInstance3D" parent="Environment/DistantCity/TowerEast1/Antenna" unique_id=454367793]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
 mesh = SubResource("BoxMesh_beacon")
 
-[node name="TowerEast2" type="CSGBox3D" parent="Environment/DistantCity"]
+[node name="TowerEast2" type="CSGBox3D" parent="Environment/DistantCity" unique_id=987455873]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, 18, -60)
 size = Vector3(17, 36, 17)
 material = SubResource("StandardMaterial3D_city_tower")
 
-[node name="Windows" type="CSGBox3D" parent="Environment/DistantCity/TowerEast2"]
+[node name="Windows" type="CSGBox3D" parent="Environment/DistantCity/TowerEast2" unique_id=612437520]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0.1)
 size = Vector3(17.2, 22, 17.2)
 material = SubResource("StandardMaterial3D_city_windows_cyan")
 
-[node name="ApartmentBlockWest" type="CSGBox3D" parent="Environment/DistantCity"]
+[node name="ApartmentBlockWest" type="CSGBox3D" parent="Environment/DistantCity" unique_id=2095255464]
 transform = Transform3D(0.996195, 0, 0.0871557, 0, 1, 0, -0.0871557, 0, 0.996195, -62, 12, -4)
 size = Vector3(15, 24, 34)
 material = SubResource("StandardMaterial3D_city_tower")
 
-[node name="Windows" type="CSGBox3D" parent="Environment/DistantCity/ApartmentBlockWest"]
+[node name="Windows" type="CSGBox3D" parent="Environment/DistantCity/ApartmentBlockWest" unique_id=1307150928]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0.1)
 size = Vector3(15.2, 16, 34.2)
 material = SubResource("StandardMaterial3D_city_windows")
 
-[node name="ApartmentBlockEast" type="CSGBox3D" parent="Environment/DistantCity"]
+[node name="ApartmentBlockEast" type="CSGBox3D" parent="Environment/DistantCity" unique_id=738014963]
 transform = Transform3D(0.996195, 0, -0.0871557, 0, 1, 0, 0.0871557, 0, 0.996195, 62, 12, -4)
 size = Vector3(15, 24, 34)
 material = SubResource("StandardMaterial3D_city_tower")
 
-[node name="Windows" type="CSGBox3D" parent="Environment/DistantCity/ApartmentBlockEast"]
+[node name="Windows" type="CSGBox3D" parent="Environment/DistantCity/ApartmentBlockEast" unique_id=505869011]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0.1)
 size = Vector3(15.2, 16, 34.2)
 material = SubResource("StandardMaterial3D_city_windows")
 
-[node name="Vehicles" type="Node3D" parent="."]
+[node name="Vehicles" type="Node3D" parent="." unique_id=618684643]
 
-[node name="VanWreck_Center" parent="Vehicles" instance=ExtResource("4_car")]
-transform = Transform3D(0.906308, 0, 0.422618, 0, 1, 0, -0.422618, 0, 0.906308, 0, 0.35, 0)
+[node name="VanWreck_Center" parent="Vehicles" unique_id=1290531083 instance=ExtResource("4_car")]
+transform = Transform3D(0.906308, 0, 0.422618, 0, 1, 0, -0.422618, 0, 0.906308, 0, -0.15581754, 0)
 car_type = "van"
 car_color = Color(0.45, 0.48, 0.52, 1)
 
-[node name="Sedan_East" parent="Vehicles" instance=ExtResource("4_car")]
+[node name="Sedan_East" parent="Vehicles" unique_id=81062740 instance=ExtResource("4_car")]
 transform = Transform3D(0.819152, 0, -0.573576, 0, 1, 0, 0.573576, 0, 0.819152, 11, 0, -5)
-car_type = "sedan"
 car_color = Color(0.22, 0.42, 0.72, 1)
 
-[node name="Taxi_West" parent="Vehicles" instance=ExtResource("4_car")]
+[node name="Taxi_West" parent="Vehicles" unique_id=1114888142 instance=ExtResource("4_car")]
 transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, -11.5, 0, 5)
 car_type = "taxi"
 car_color = Color(0.88, 0.72, 0.15, 1)
 
-[node name="WaveUI" type="CanvasLayer" parent="."]
+[node name="WaveUI" type="CanvasLayer" parent="." unique_id=190715354]
 
-[node name="WaveInfo" type="VBoxContainer" parent="WaveUI"]
+[node name="WaveInfo" type="VBoxContainer" parent="WaveUI" unique_id=1024940950]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
@@ -636,7 +632,7 @@ offset_bottom = 110.0
 grow_horizontal = 2
 mouse_filter = 2
 
-[node name="FloorLabel" type="Label" parent="WaveUI/WaveInfo"]
+[node name="FloorLabel" type="Label" parent="WaveUI/WaveInfo" unique_id=639757813]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
@@ -645,7 +641,7 @@ theme_override_font_sizes/font_size = 18
 text = "🏚️ BÖLÜM 1: TERK EDİLMİŞ MAHALLE"
 horizontal_alignment = 1
 
-[node name="WaveLabel" type="Label" parent="WaveUI/WaveInfo"]
+[node name="WaveLabel" type="Label" parent="WaveUI/WaveInfo" unique_id=1897947715]
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
@@ -653,7 +649,7 @@ theme_override_font_sizes/font_size = 20
 text = "SEVİYE 1 / 9 | DALGA: 1 / 3"
 horizontal_alignment = 1
 
-[node name="EnemiesLabel" type="Label" parent="WaveUI/WaveInfo"]
+[node name="EnemiesLabel" type="Label" parent="WaveUI/WaveInfo" unique_id=244452089]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
@@ -662,7 +658,7 @@ theme_override_font_sizes/font_size = 15
 text = "KALAN DÜŞMAN: ..."
 horizontal_alignment = 1
 
-[node name="BossNoticeLabel" type="Label" parent="WaveUI"]
+[node name="BossNoticeLabel" type="Label" parent="WaveUI" unique_id=1284948011]
 visible = false
 anchors_preset = 8
 anchor_left = 0.5
@@ -675,7 +671,6 @@ offset_right = 300.0
 offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(1, 0.15, 0.15, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8

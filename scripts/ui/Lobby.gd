@@ -156,7 +156,7 @@ func _input(event: InputEvent) -> void:
 func _setup_class_options() -> void:
 	var classes = [
 		{"name": "Ateş Uzmanı (Pyromancer)", "code": "Pyromancer", "id": 0},
-		{"name": "Mühendis (Vortex Alanı)", "code": "Engineer", "id": 1},
+		{"name": "Duvarcı (Taktiksel Barikat)", "code": "Engineer", "id": 1},
 		{"name": "Buz Muhafızı (Kriyojenik)", "code": "Cryomancer", "id": 2},
 		{"name": "Sıhhiye (Şifa & Destek)", "code": "Medic", "id": 3}
 	]
@@ -196,7 +196,7 @@ func _get_class_code_from_index(index: int) -> String:
 func _get_class_display_title(class_code: String) -> String:
 	match class_code:
 		"Pyromancer": return "ATEŞ UZMANI"
-		"Engineer": return "MÜHENDİS"
+		"Engineer": return "DUVARCI"
 		"Cryomancer": return "BUZ MUHAFIZI"
 		"Medic": return "SIHHİYE"
 		_: return class_code.to_upper()

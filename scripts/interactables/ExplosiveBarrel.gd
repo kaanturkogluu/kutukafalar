@@ -80,11 +80,18 @@ func _detonate() -> void:
 			var dist_factor = clamp(1.0 - (dist / explosion_radius), 0.2, 1.0)
 			var damage_to_deal = explosion_damage * dist_factor
 
+			# Oyuncu hasarı (Varil patlaması oyuncuya da ciddi zarar verir)
+			if collider.is_in_group("players") and collider.has_method("take_damage"):
+				var player_dmg = clamp(damage_to_deal * 0.28, 20.0, 75.0)
+				collider.take_damage(player_dmg)
 			# Zombi hasarı
-			if collider.is_in_group("enemies") and collider.has_method("take_damage"):
+			elif collider.is_in_group("enemies") and collider.has_method("take_damage"):
 				collider.take_damage(damage_to_deal, false, global_position)
 			# Zincirleme Varil Patlaması!
 			elif collider.is_in_group("barrels") and collider.has_method("take_damage"):
 				collider.take_damage(damage_to_deal, false, global_position)
+			# Barikat Duvarı Hasarı
+			elif collider.is_in_group("walls") and collider.has_method("take_damage"):
+				collider.take_damage(damage_to_deal)
 
 	queue_free()

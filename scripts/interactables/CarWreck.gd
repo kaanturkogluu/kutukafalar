@@ -180,5 +180,7 @@ func _detonate() -> void:
 				collider.take_damage(damage_to_deal, false, global_position)
 			elif collider.is_in_group("players") and collider.has_method("take_damage"):
 				collider.take_damage(damage_to_deal * 0.4) # Dost hasarı azaltılmış
+			elif collider.is_in_group("walls") and collider.has_method("take_damage"):
+				collider.take_damage(damage_to_deal)
 
 		car_exploded.emit(self)

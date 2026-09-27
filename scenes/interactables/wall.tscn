@@ -1,0 +1,50 @@
+[gd_scene load_steps=8 format=3 uid="uid://wall_barricade_01"]
+
+[ext_resource type="Script" path="res://scripts/interactables/Wall.gd" id="1_wall"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall"]
+size = Vector3(2.4, 1.4, 0.45)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_brick"]
+albedo_color = Color(0.55, 0.28, 0.22, 1)
+roughness = 0.85
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall"]
+material = SubResource("StandardMaterial3D_brick")
+size = Vector3(2.4, 1.4, 0.45)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cap"]
+albedo_color = Color(0.42, 0.44, 0.46, 1)
+roughness = 0.7
+
+[sub_resource type="BoxMesh" id="BoxMesh_cap"]
+material = SubResource("StandardMaterial3D_cap")
+size = Vector3(2.46, 0.12, 0.50)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_wall"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+
+[node name="Wall" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 7
+script = ExtResource("1_wall")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+shape = SubResource("BoxShape3D_wall")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+mesh = SubResource("BoxMesh_wall")
+
+[node name="ConcreteCap" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.38, 0)
+mesh = SubResource("BoxMesh_cap")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_wall")

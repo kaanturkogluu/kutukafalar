@@ -16,6 +16,7 @@ var is_dead: bool = false
 var slow_factor: float = 1.0
 var slow_timer: float = 0.0
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
+var growl_timer: float = randf_range(3.0, 7.0)
 
 const GIBS_SCENE_PATH = "res://scenes/effects/cube_gibs.tscn"
 
@@ -116,6 +117,12 @@ func _physics_process(delta: float) -> void:
 		return
 
 	attack_timer -= delta
+	growl_timer -= delta
+	if growl_timer <= 0:
+		growl_timer = randf_range(7.0, 16.0)
+		if target_player and is_instance_valid(target_player) and global_position.distance_to(target_player.global_position) < 22.0:
+			SoundManager.play_3d_sfx("zombie_growl", global_position, 0.18, -6.0)
+
 	if slow_timer > 0:
 		slow_timer -= delta
 		if slow_timer <= 0:
@@ -140,10 +147,25 @@ func _physics_process(delta: float) -> void:
 		# Mesafe kontrolü: Kovalama mı, Saldırı mı?
 		var vert_diff = abs(global_position.y - target_player.global_position.y)
 		var move_speed = speed * slow_factor
-		if distance > 1.3 or vert_diff > 1.6:
+		if distance > 1.7 or vert_diff > 1.9:
 			# Zombi havadaysa veya oyuncudan çok uzaktaysa yaklaşmalı
 			var direction = diff.normalized()
 			
+			# Barikat Duvarı Kontrolü (Zombiler duvara vurup kırabilir)
+			var blocking_wall = _check_blocking_wall(direction)
+			if blocking_wall and is_instance_valid(blocking_wall):
+				velocity.x = 0
+				velocity.z = 0
+				if attack_timer <= 0:
+					_attack_wall(blocking_wall)
+					attack_timer = attack_rate
+				move_and_slide()
+				return
+
+			# Engel ve kaldırım tırmanma (Kaldırımlardan ve alçak engellerden zıplama)
+			if is_on_floor() and is_on_wall() and (target_player.global_position.y >= global_position.y - 0.2):
+				velocity.y = 3.4
+
 			# Duvarlara ve ev köşelerine takılmayı engelleme (Wall Slide & Obstacle Deflection)
 			if is_on_wall():
 				var wall_n = get_wall_normal()
@@ -196,8 +218,30 @@ func _attack_player(player: CharacterBody3D) -> void:
 		player.take_damage(attack_damage)
 		_trigger_attack_anim.rpc()
 
+func _check_blocking_wall(dir: Vector3) -> Node:
+	if is_on_wall():
+		for i in range(get_slide_collision_count()):
+			var col = get_slide_collision(i)
+			var collider = col.get_collider()
+			if collider and collider.is_in_group("walls") and not collider.get("is_destroyed"):
+				return collider
+	var space = get_world_3d().direct_space_state
+	var ray = PhysicsRayQueryParameters3D.create(global_position + Vector3.UP * 0.7, global_position + Vector3.UP * 0.7 + dir * 1.4, 1)
+	var res = space.intersect_ray(ray)
+	if res and res.collider and res.collider.is_in_group("walls") and not res.collider.get("is_destroyed"):
+		return res.collider
+	return null
+
+func _attack_wall(wall: Node) -> void:
+	if is_dead:
+		return
+	if is_instance_valid(wall) and wall.has_method("take_damage"):
+		wall.take_damage(attack_damage)
+		_trigger_attack_anim.rpc()
+
 @rpc("call_local", "unreliable")
 func _trigger_attack_anim() -> void:
+	SoundManager.play_3d_sfx("zombie_attack", global_position, 0.1, -1.0)
 	if torso_node:
 		var tw = create_tween()
 		tw.tween_property(torso_node, "rotation:x", 0.52, 0.08)
@@ -220,6 +264,7 @@ static func _get_zombie_hurt_mat() -> StandardMaterial3D:
 
 @rpc("call_local", "unreliable")
 func _flash_hurt() -> void:
+	SoundManager.play_3d_sfx("zombie_hurt", global_position, 0.12, -3.5)
 	var meshes = find_children("*", "MeshInstance3D")
 	var h_mat = _get_zombie_hurt_mat()
 	for m in meshes:
@@ -268,6 +313,7 @@ const PICKUP_SCENE_PATH = "res://scenes/interactables/pickup.tscn"
 
 @rpc("call_local", "reliable")
 func _die(is_headshot: bool, attacker_id: int = 1) -> void:
+	SoundManager.play_3d_sfx("zombie_die", global_position, 0.12, -2.0)
 	if is_dead and not multiplayer.is_server() and not visible:
 		return
 	is_dead = true
