@@ -14,6 +14,10 @@ const GAME_SCENE_PATH: String = "res://scenes/levels/main_level.tscn"
 @onready var single_panel: PanelContainer = %SingleplayerPanel
 @onready var single_name_input: LineEdit = %SingleNameInput
 @onready var single_class_option: OptionButton = %SingleClassOption
+@onready var single_floor_option: OptionButton = %SingleFloorOption
+@onready var single_resume_btn: Button = %SingleResumeBtn
+@onready var single_floor1_btn: Button = %SingleFloor1Btn
+@onready var floor_progress_label: Label = %FloorProgressLabel
 @onready var single_start_btn: Button = %SingleStartBtn
 @onready var single_back_btn: Button = %SingleBackBtn
 
@@ -99,6 +103,12 @@ func _ready() -> void:
 	# Tek Oyunculu Butonları
 	single_start_btn.pressed.connect(_on_single_start_pressed)
 	single_back_btn.pressed.connect(_show_main_nav)
+	if single_floor_option:
+		single_floor_option.item_selected.connect(_on_single_floor_selected)
+	if single_resume_btn:
+		single_resume_btn.pressed.connect(_on_single_resume_pressed)
+	if single_floor1_btn:
+		single_floor1_btn.pressed.connect(_on_single_floor1_pressed)
 	
 	# Çok Oyunculu Butonları
 	host_btn.pressed.connect(_on_host_pressed)
@@ -214,6 +224,7 @@ func _show_single_panel() -> void:
 	single_panel.visible = true
 	multi_panel.visible = false
 	room_panel.visible = false
+	_refresh_singleplayer_floors()
 
 func _show_multi_panel() -> void:
 	main_nav.visible = false
@@ -259,7 +270,52 @@ func _on_nav_settings_pressed() -> void:
 func _on_nav_quit_pressed() -> void:
 	get_tree().quit()
 
-# --- Tek Oyunculu Başlatma ---
+# --- Tek Oyunculu Başlatma ve Kat Seçimi ---
+
+func _refresh_singleplayer_floors() -> void:
+	if not single_floor_option:
+		return
+	single_floor_option.clear()
+	var max_unlocked = SaveManager.get_highest_unlocked_floor()
+	var last_played = SaveManager.get_last_played_floor()
+	var current_start = SaveManager.get_starting_floor()
+	
+	for f in range(1, max_unlocked + 1):
+		var fname = LevelData.FLOOR_NAMES.get(f, "Kat " + str(f))
+		var is_boss = LevelData.is_boss_level(f)
+		var item_text = "KAT %02d: %s" % [f, fname]
+		if is_boss:
+			item_text += " [BOSS]"
+		if f == last_played:
+			item_text += " ★ (Son Kalınan)"
+		single_floor_option.add_item(item_text, f)
+	
+	var select_idx = 0
+	for i in range(single_floor_option.item_count):
+		if single_floor_option.get_item_id(i) == current_start:
+			select_idx = i
+			break
+	single_floor_option.select(select_idx)
+	
+	if single_resume_btn:
+		single_resume_btn.text = "🔄 Son Kat (%02d)" % last_played
+	
+	if floor_progress_label:
+		var sector_num = LevelData.get_chapter_for_level(max_unlocked).get("sector", 1)
+		floor_progress_label.text = "🏆 En Yüksek Açık: Kat %02d / 99 (Sektör %d)" % [max_unlocked, sector_num]
+
+func _on_single_floor_selected(index: int) -> void:
+	var floor_id = single_floor_option.get_item_id(index)
+	SaveManager.set_starting_floor(floor_id)
+
+func _on_single_resume_pressed() -> void:
+	var last_floor = SaveManager.get_last_played_floor()
+	SaveManager.set_starting_floor(last_floor)
+	_refresh_singleplayer_floors()
+
+func _on_single_floor1_pressed() -> void:
+	SaveManager.set_starting_floor(1)
+	_refresh_singleplayer_floors()
 
 func _on_single_start_pressed() -> void:
 	var player_name = single_name_input.text.strip_edges()
@@ -269,8 +325,13 @@ func _on_single_start_pressed() -> void:
 	var chosen_class = _get_class_code_from_index(single_class_option.selected)
 	NetworkManager.local_player_info["class"] = chosen_class
 	
+	var chosen_floor = SaveManager.get_starting_floor()
+	if single_floor_option and single_floor_option.selected >= 0:
+		chosen_floor = single_floor_option.get_selected_id()
+		SaveManager.set_starting_floor(chosen_floor)
+	
 	single_start_btn.disabled = true
-	single_start_btn.text = "BAŞLATILIYOR..."
+	single_start_btn.text = "KAT %02d BAŞLATILIYOR..." % chosen_floor
 	
 	# Tek oyuncu için yerel host başlatılır ve doğrudan sahne açılır
 	var err = NetworkManager.create_game(player_name, 7000)

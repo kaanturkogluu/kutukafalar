@@ -65,6 +65,11 @@ var current_floor_instance: Node3D = null
 
 func _ready() -> void:
 	add_to_group("main_level")
+	if multiplayer.is_server():
+		current_floor = SaveManager.get_starting_floor()
+		SaveManager.set_last_played_floor(current_floor)
+		SaveManager.record_run_started()
+		print("[MainLevel] Oyun başlatıldı! Başlangıç Katı: ", current_floor)
 	if floor_container and floor_container.get_child_count() > 0:
 		current_floor_instance = floor_container.get_child(0)
 	if elevator:
@@ -148,7 +153,7 @@ func _notify_peer_level_ready(peer_id: int) -> void:
 		
 		# 1 saniye sonra 1. Dalgayı Başlat
 		get_tree().create_timer(1.0).timeout.connect(func():
-			if current_wave == 1 and current_floor == 1 and not is_wave_in_progress:
+			if current_wave == 1 and not is_wave_in_progress:
 				_start_next_wave()
 		)
 

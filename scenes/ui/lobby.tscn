@@ -200,7 +200,7 @@ text = "ÇIKIŞ"
 [node name="SingleplayerPanel" type="PanelContainer" parent="MenuContainer"]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(380, 310)
+custom_minimum_size = Vector2(400, 480)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_glass")
 
@@ -248,6 +248,42 @@ text = "SINIF SEÇİMİ"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 38)
 layout_mode = 2
+
+[node name="FloorLabel" type="Label" parent="MenuContainer/SingleplayerPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.72, 0.25, 1)
+theme_override_font_sizes/font_size = 12
+text = "BAŞLANGIÇ KATI (Kaldığın Yer)"
+
+[node name="SingleFloorOption" type="OptionButton" parent="MenuContainer/SingleplayerPanel/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+
+[node name="QuickFloorButtons" type="HBoxContainer" parent="MenuContainer/SingleplayerPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SingleResumeBtn" type="Button" parent="MenuContainer/SingleplayerPanel/Margin/VBox/QuickFloorButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+text = "🔄 Son Kalınan Kat"
+
+[node name="SingleFloor1Btn" type="Button" parent="MenuContainer/SingleplayerPanel/Margin/VBox/QuickFloorButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+text = "1️⃣ Kat 1'den Başla"
+
+[node name="FloorProgressLabel" type="Label" parent="MenuContainer/SingleplayerPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.75, 0.65, 1)
+theme_override_font_sizes/font_size = 11
+text = "🏆 En Yüksek Açık Kat: Kat 01"
 
 [node name="Spacer" type="Control" parent="MenuContainer/SingleplayerPanel/Margin/VBox"]
 layout_mode = 2

@@ -62,4 +62,3 @@ func _ready():
 	
 	print('=== ALL 5 MECHANIC TESTS PASSED PERFECTLY! ===')
 	get_tree().quit(0)
-
