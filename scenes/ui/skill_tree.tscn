@@ -87,7 +87,7 @@ corner_radius_bottom_left = 6
 corner_radius_bottom_right = 6
 
 [node name="SkillTreeUI" type="CanvasLayer"]
-layer = 12
+layer = 25
 script = ExtResource("1_st")
 
 [node name="ModalBackdrop" type="ColorRect" parent="."]

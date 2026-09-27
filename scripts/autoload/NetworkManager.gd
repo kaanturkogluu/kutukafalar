@@ -25,6 +25,7 @@ var local_player_info: Dictionary = {
 	"is_host": false
 }
 var is_game_in_progress: bool = false
+var should_open_multiplayer_menu: bool = false
 
 # --- Yerel Ağ (LAN) Keşif Değişkenleri ---
 var lan_broadcaster: PacketPeerUDP = null
@@ -144,19 +145,17 @@ func start_game() -> void:
 	if not multiplayer.is_server():
 		return
 	is_game_in_progress = true
-	stop_lan_broadcasting()
+	# LAN yayınını devam ettir ki düşen oyuncular veya yeni katılacaklar odayı görüp katılabilsin
 	_start_game_rpc.rpc()
 
 # --- Ağ Sinyal Yakalayıcıları ---
 
 func _on_peer_connected(id: int) -> void:
 	print("[NetworkManager] Yeni peer bağlandı, ID: ", id)
-	# Eğer sunucuysak ve oyun zaten başlamışsa geç katılımı engelle
-	if multiplayer.is_server():
-		if is_game_in_progress:
-			print("[NetworkManager] Oyun devam ettiği için gelen bağlantı reddedildi: ", id)
-			_reject_connection.rpc_id(id, "Oyun şu anda devam ediyor! Lütfen bitmesini bekleyin.")
-			return
+	# Eğer sunucuysak ve oyun zaten başlamışsa oyuncuyu doğrudan oyuna alıyoruz (Ölü/İzleyici olarak doğacak)
+	if multiplayer.is_server() and is_game_in_progress:
+		print("[NetworkManager] Oyun devam ediyor, geç bağlanan oyuncu oyuna yönlendiriliyor: ", id)
+		_start_game_rpc.rpc_id(id)
 	
 	# Bilgilerimizi yeni bağlanan sunucuya/oyuncuya tanıtıyoruz
 	_register_player.rpc_id(id, local_player_info)
@@ -274,7 +273,7 @@ func stop_lan_discovery() -> void:
 	print("[NetworkManager] LAN lobi araması durduruldu.")
 
 func _send_lan_broadcast() -> void:
-	if not multiplayer.is_server() or is_game_in_progress:
+	if not multiplayer.is_server():
 		return
 	if not lan_broadcaster:
 		lan_broadcaster = PacketPeerUDP.new()
@@ -318,7 +317,7 @@ func _poll_lan_listener() -> void:
 		var parsed = JSON.parse_string(pkt_str)
 		if typeof(parsed) == TYPE_DICTIONARY and parsed.get("app") == "kutukafalar":
 			# Eğer sunucu bizsek kendi kendimizi listeye eklemeyelim
-			if multiplayer.is_server() and (sender_ip == "127.0.0.1" or sender_ip == _get_local_ip()):
+			if multiplayer.has_multiplayer_peer() and multiplayer.is_server() and (sender_ip == "127.0.0.1" or sender_ip == _get_local_ip()):
 				continue
 			var target_ip = sender_ip
 			if target_ip.is_empty():

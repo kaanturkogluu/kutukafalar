@@ -228,8 +228,11 @@ func _ready() -> void:
 	# Otomatik Güncelleyici Sinyalleri
 	_setup_autoupdater()
 	
-	# Panel görünümü: Eğer önceden aktif bir oda varsa odaya dön, yoksa ana menüyü aç
-	if multiplayer.multiplayer_peer != null and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED and NetworkManager.players.size() > 0:
+	# Panel görünümü: Eğer oyun içinden lobiye dönüldüyse çok oyunculu ara yüzünü aç, önceden aktif bir oda varsa odaya dön, yoksa ana menüyü aç
+	if NetworkManager.should_open_multiplayer_menu:
+		NetworkManager.should_open_multiplayer_menu = false
+		_show_multi_panel()
+	elif multiplayer.multiplayer_peer != null and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED and NetworkManager.players.size() > 0:
 		_show_room_panel()
 		_refresh_player_list()
 		_update_room_buttons()

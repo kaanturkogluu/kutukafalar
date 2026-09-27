@@ -118,8 +118,17 @@ func _notify_peer_level_ready(peer_id: int) -> void:
 	
 	# 2) Bu yeni oyuncunun kendi karakterini doğur ve HERKESE bildir:
 	if not players_container.has_node(str(peer_id)):
-		var spawn_pos = _get_spawn_position(peer_id)
+		var is_late_join = (peer_id != 1 and (is_wave_in_progress or current_wave > 1 or initial_barrels_spawned))
+		var spawn_pos = Vector3(0, 1.2, 0) if is_late_join else _get_spawn_position(peer_id)
 		sync_spawn_player.rpc(peer_id, spawn_pos)
+		
+		# Eğer devam eden oyuna sonradan katılmışsa, ölü olarak merkezde doğar ve takım arkadaşlarını izlemeye başlar
+		if is_late_join:
+			get_tree().create_timer(0.25).timeout.connect(func():
+				var new_p = players_container.get_node_or_null(str(peer_id))
+				if new_p and is_instance_valid(new_p) and new_p.has_method("die"):
+					new_p.die.rpc()
+			)
 	
 	# 3) Sahnede zaten mevcut olan varilleri bu oyuncuya doğurt:
 	for existing_barrel in barrels_container.get_children():

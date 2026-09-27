@@ -278,7 +278,7 @@ func _create_product_card(item: Dictionary) -> PanelContainer:
 	card.add_theme_stylebox_override("panel", card_style)
 	
 	var vbox = VBoxContainer.new()
-	vbox.theme_override_constants.set("separation", 8)
+	vbox.add_theme_constant_override("separation", 8)
 	
 	# 1. Kategori / Özellik Rozeti
 	var badge_lbl = Label.new()
@@ -347,8 +347,10 @@ func _create_product_card(item: Dictionary) -> PanelContainer:
 	if is_weapon:
 		if is_unlocked:
 			# Silah zaten açık; mermisi azalmışsa mermi alma fırsatı sun
-			var current_ammo = local_player.weapon_ammo_dict.get(item.get("id"), 0) if local_player else 0
-			var max_ammo = local_player.WEAPON_MAX_AMMO.get(item.get("id"), 100) if local_player else 100
+			var current_ammo = local_player.weapon_ammo_dict.get(item.get("id"), 0) if (local_player and "weapon_ammo_dict" in local_player) else 0
+			var max_ammo = 100
+			if local_player and "WEAPON_MAX_AMMO" in local_player:
+				max_ammo = local_player.WEAPON_MAX_AMMO.get(item.get("id"), 100)
 			if current_ammo < max_ammo:
 				buy_btn.text = "📦 CEPHANE AL (35 💰)"
 				buy_btn.disabled = (player_gold < 35)

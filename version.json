@@ -1,6 +1,6 @@
 {
-    "version":  "v1.3.18",
+    "version":  "v1.3.19",
     "download_url":  "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-    "pck_size":  803712,
-    "changelog":  "- Otomatik Yerel Ağ (LAN) Keşfi: Çok oyunculu sekmesinde yerel ağdaki (WiFi / Ethernet / Localhost) açık lobiler otomatik taranır ve listelenir.\n- Tek Tıkla Lobiye Katılma: IP veya davet kodu girmeden listedeki odaya doğrudan \u0027KATIL\u0027 butonuyla anında bağlanma imkanı.\n- Çoklu Sekme Arayüzü: Yerel Lobiler, Davet Kodu ve Manuel IP seçenekleri şık sekmeler halinde birleştirildi."
+    "pck_size":  804912,
+    "changelog":  "- Izleyici Kamerasi Duzeltildi: Olum ekraninda takim arkadaslari artik arkasindan takip edilir.\n- Zombi Yuruyus Duzeltmesi: Multiplayer\u0027da zombilerin geri geri yurumeleri duzeltildi.\n- Muhendis Tareti Duzenlendi: Dosta ates engellendi, duvar arkasi atis ve sinirsiz ulti sarj etme bug\u0027i kaldirildi.\n- Devam Eden Oyuna Katilma \u0026 Lobi: Devam eden oyuna girildiginde merkezde olu dogup arkadaslarini izleme, oyundan cikinca dogrudan cok oyunculu lobi listesine donme eklendi.\n- Magaza ve Yetenek Agaci Katmani: Bos magaza hatasi giderildi, yetenek agaci artik magaza ve asansorun onunde aciliyor."
 }

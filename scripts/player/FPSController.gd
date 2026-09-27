@@ -461,7 +461,7 @@ func _physics_process(delta: float) -> void:
 				_cycle_spectator_target(1)
 			
 			if spectator_target and is_instance_valid(spectator_target):
-				var target_cam_pos = spectator_target.global_position + Vector3(0, 2.2, 0) - spectator_target.transform.basis.z * 3.2
+				var target_cam_pos = spectator_target.global_position + Vector3(0, 2.2, 0) + spectator_target.transform.basis.z * 3.2
 				camera.global_position = camera.global_position.lerp(target_cam_pos, 10.0 * delta)
 				camera.look_at(spectator_target.global_position + Vector3(0, 1.2, 0), Vector3.UP)
 		return
@@ -1290,11 +1290,6 @@ func record_kill(is_headshot: bool = false) -> void:
 			_update_barrel_hud()
 			_show_weapon_notice("💥 YIKIM BONUSU: +1 Ücretsiz Varil!")
 	
-	# Ulti şarjına katkı
-	if spell_manager and spell_manager.has_method("add_ultimate_charge"):
-		var ult_mult = ProgressionManager.get_stat("ult_charge_mult", 1.0)
-		spell_manager.add_ultimate_charge(2.5 * ult_mult)
-	
 	_register_kill_streak()
 	if is_multiplayer_authority():
 		sync_player_stats.rpc(gold, kill_count, headshot_count)
@@ -1427,7 +1422,7 @@ func _start_spectating() -> void:
 	camera.top_level = true
 	camera.current = true
 	if spectator_target and is_instance_valid(spectator_target):
-		camera.global_position = spectator_target.global_position + Vector3(0, 2.2, 0) - spectator_target.transform.basis.z * 3.2
+		camera.global_position = spectator_target.global_position + Vector3(0, 2.2, 0) + spectator_target.transform.basis.z * 3.2
 		camera.look_at(spectator_target.global_position + Vector3(0, 1.2, 0), Vector3.UP)
 	_update_spectator_hud()
 
@@ -1454,7 +1449,7 @@ func _cycle_spectator_target(direction: int = 1) -> void:
 		spectator_target = living[next_index]
 	
 	if spectator_target and is_instance_valid(spectator_target):
-		camera.global_position = spectator_target.global_position + Vector3(0, 2.2, 0) - spectator_target.transform.basis.z * 3.2
+		camera.global_position = spectator_target.global_position + Vector3(0, 2.2, 0) + spectator_target.transform.basis.z * 3.2
 		camera.look_at(spectator_target.global_position + Vector3(0, 1.2, 0), Vector3.UP)
 	
 	_update_spectator_hud()
@@ -1760,6 +1755,7 @@ func _on_restart_pressed() -> void:
 func _on_lobby_pressed() -> void:
 	if not is_multiplayer_authority():
 		return
+	NetworkManager.should_open_multiplayer_menu = true
 	if multiplayer.multiplayer_peer != null and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
 		if multiplayer.is_server():
 			# Yalnızca oda kurucusu (host) tüm takımı lobiye geri çekebilir

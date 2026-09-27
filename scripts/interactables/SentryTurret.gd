@@ -82,11 +82,26 @@ func _find_best_target() -> void:
 	var enemies = get_tree().get_nodes_in_group("enemies")
 	var closest_dist = attack_range
 	var best: Node3D = null
+	var space = get_world_3d().direct_space_state
+	var muzzle_pos = muzzle_node.global_position if muzzle_node else (global_position + Vector3.UP * 0.8)
 	
 	for e in enemies:
-		if is_instance_valid(e) and not e.get("is_dead"):
-			var d = global_position.distance_to(e.global_position)
+		if is_instance_valid(e) and not e.get("is_dead") and not e.is_in_group("players"):
+			var e_pos = e.global_position + Vector3.UP * 0.8
+			var d = muzzle_pos.distance_to(e_pos)
 			if d < closest_dist:
+				# Görüş Hattı (Line of Sight) Kontrolü - Duvar ve takım arkadaşlarının arkasına ateş etmez
+				if space:
+					var ray = PhysicsRayQueryParameters3D.create(muzzle_pos, e_pos, 7)
+					ray.exclude = [self.get_rid()]
+					var hit = space.intersect_ray(ray)
+					if hit and hit.collider:
+						# Eğer araya bir oyuncu girmişse dost ateşini önlemek için hedef alma
+						if hit.collider.is_in_group("players"):
+							continue
+						# Eğer araya düşman dışında başka bir engel (duvar vb.) girmişse hedef alma
+						if hit.collider != e and not hit.collider.is_in_group("enemies"):
+							continue
 				closest_dist = d
 				best = e
 	
@@ -105,11 +120,14 @@ func _aim_idle() -> void:
 		sensor_mesh.material_override = sensor_idle_mat
 
 func _shoot_at_target(target_pos: Vector3, enemy_ref: Node3D) -> void:
+	if not is_instance_valid(enemy_ref) or enemy_ref.is_in_group("players"):
+		return
+	
 	_sync_fire.rpc(target_pos)
 	
-	# Sunucuda zombiye hasar ver
-	if is_instance_valid(enemy_ref) and enemy_ref.has_method("take_damage"):
-		enemy_ref.take_damage(damage_per_bullet, false, target_pos, 1)
+	# Sunucuda zombiye hasar ver (attacker_id = -1 verilerek taretin ultiyi bedava/sonsuz şarjlaması engellenir)
+	if enemy_ref.has_method("take_damage"):
+		enemy_ref.take_damage(damage_per_bullet, false, target_pos, -1)
 
 @rpc("call_local", "unreliable")
 func _sync_fire(target_pos: Vector3) -> void:

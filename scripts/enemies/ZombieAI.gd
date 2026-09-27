@@ -147,10 +147,11 @@ func _physics_process(delta: float) -> void:
 		diff.y = 0 # Yükseklik farkını yok say
 		var distance = diff.length()
 
-		# Oyuncuya doğru dön
+		# Oyuncuya doğru dön (Modelin ön yüzü +Z olduğu için PI eklenerek yüzü hedefe çevrilir)
 		if diff.length_squared() > 0.01:
 			var look_target = global_position + diff
 			look_at(look_target, Vector3.UP)
+			rotation.y += PI
 			rotation.x = 0
 			rotation.z = 0
 
