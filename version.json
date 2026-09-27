@@ -1,6 +1,6 @@
 {
     "version":  "v1.3.20",
     "download_url":  "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-    "pck_size":  814336,
+    "pck_size":  815856,
     "changelog":  "- Yetenek Agaci Duzeltildi: SkillTree render hatasi giderildi, artik tum dallar ve dugumler dogru gozukuyor.\n- Magaza Dengelendi (99 Kat): Fiyatlar kat sayisina gore artar, perk\u0027ler max stack sinirli ve katlanarak pahalilasir.\n- Hasar Perk\u0027i Kaldirildi: \u0027+%25 genel hasar\u0027 perki kaldirildi; zombiler artik tek mermiyle olmez.\n- Silah Yukseltme Sistemi: Sahip olunan her silah icin ayri Hasar/Atis Hizi/Sarjor yukseltmesi (max 10 kademe, +%2 artis).\n- Hiz Perki Dengelendi: Kosma hizi artisi %18\u0027den %6\u0027ya dusuruldu, max 4 alim."
 }
