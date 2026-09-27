@@ -42,6 +42,12 @@ var stat_damage_mult: float = 1.0
 var stat_firerate_mult: float = 1.0
 var stat_drop_luck: float = 0.0 # Zombi ganimet düşürme şansı çarpanı
 
+# Silaha özel yükseltmeler (Mağaza'dan alınan per-weapon upgrade'ler)
+# { "pistol": 1.06, "uzi": 1.08, ... }  (başlangıçta 1.0)
+var weapon_damage_mults: Dictionary = {"pistol": 1.0, "shotgun": 1.0, "uzi": 1.0, "bixi": 1.0, "rocket": 1.0}
+var weapon_firerate_mults: Dictionary = {"pistol": 1.0, "shotgun": 1.0, "uzi": 1.0, "bixi": 1.0, "rocket": 1.0}
+var weapon_ammo_cap_overrides: Dictionary = {}  # { "uzi": 150, ... } - custom cap from upgrades
+
 # Ekonomi
 var gold: int = 0
 
@@ -618,23 +624,27 @@ func _shoot() -> void:
 
 	match current_weapon:
 		"pistol":
-			fire_timer = 0.22 / stat_firerate_mult
-			_fire_bullet(38.0 * stat_damage_mult, Vector3.ZERO)
+			var w_fr = weapon_firerate_mults.get("pistol", 1.0)
+			fire_timer = 0.22 / (stat_firerate_mult * w_fr)
+			_fire_bullet(38.0 * stat_damage_mult * weapon_damage_mults.get("pistol", 1.0), Vector3.ZERO)
 		"uzi":
-			fire_timer = 0.08 / stat_firerate_mult
+			var w_fr = weapon_firerate_mults.get("uzi", 1.0)
+			fire_timer = 0.08 / (stat_firerate_mult * w_fr)
 			var spread = Vector3(randf_range(-0.02, 0.02), randf_range(-0.02, 0.02), 0)
-			_fire_bullet(25.0 * stat_damage_mult, spread)
+			_fire_bullet(25.0 * stat_damage_mult * weapon_damage_mults.get("uzi", 1.0), spread)
 			weapon_ammo_dict["uzi"] = max(0, weapon_ammo_dict.get("uzi", 0) - 1)
 		"bixi":
-			fire_timer = 0.10 / stat_firerate_mult
+			var w_fr = weapon_firerate_mults.get("bixi", 1.0)
+			fire_timer = 0.10 / (stat_firerate_mult * w_fr)
 			var spread = Vector3(randf_range(-0.022, 0.022), randf_range(-0.022, 0.022), 0)
-			_fire_bullet(34.0 * stat_damage_mult, spread)
+			_fire_bullet(34.0 * stat_damage_mult * weapon_damage_mults.get("bixi", 1.0), spread)
 			weapon_ammo_dict["bixi"] = max(0, weapon_ammo_dict.get("bixi", 0) - 1)
 		"shotgun":
-			fire_timer = 0.65 / stat_firerate_mult
+			var w_fr = weapon_firerate_mults.get("shotgun", 1.0)
+			fire_timer = 0.65 / (stat_firerate_mult * w_fr)
 			for i in range(6):
 				var spread = Vector3(randf_range(-0.06, 0.06), randf_range(-0.06, 0.06), 0)
-				_fire_bullet(22.0 * stat_damage_mult, spread)
+				_fire_bullet(22.0 * stat_damage_mult * weapon_damage_mults.get("shotgun", 1.0), spread)
 			weapon_ammo_dict["shotgun"] = max(0, weapon_ammo_dict.get("shotgun", 0) - 1)
 		"rocket":
 			fire_timer = 0.90 / stat_firerate_mult

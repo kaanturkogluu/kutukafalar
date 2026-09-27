@@ -179,7 +179,7 @@ func _populate_tree() -> void:
 		var col_vbox = VBoxContainer.new()
 		col_vbox.custom_minimum_size = Vector2(148, 0)
 		col_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		col_vbox.theme_override_constants.set("separation", 14)
+		col_vbox.add_theme_constant_override("separation", 14)
 		col_vbox.alignment = BoxContainer.ALIGNMENT_BEGIN
 		
 		# Sütun Başlık Kartı
@@ -211,7 +211,7 @@ func _populate_tree() -> void:
 		
 		# Sütundaki Düğümler
 		var nodes_list_vbox = VBoxContainer.new()
-		nodes_list_vbox.theme_override_constants.set("separation", 16)
+		nodes_list_vbox.add_theme_constant_override("separation", 16)
 		nodes_list_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
 		
 		for node_id in branch["nodes"]:

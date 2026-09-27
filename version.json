@@ -1,6 +1,6 @@
 {
-    "version":  "v1.3.19",
+    "version":  "v1.3.20",
     "download_url":  "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-    "pck_size":  804912,
-    "changelog":  "- Izleyici Kamerasi Duzeltildi: Olum ekraninda takim arkadaslari artik arkasindan takip edilir.\n- Zombi Yuruyus Duzeltmesi: Multiplayer\u0027da zombilerin geri geri yurumeleri duzeltildi.\n- Muhendis Tareti Duzenlendi: Dosta ates engellendi, duvar arkasi atis ve sinirsiz ulti sarj etme bug\u0027i kaldirildi.\n- Devam Eden Oyuna Katilma \u0026 Lobi: Devam eden oyuna girildiginde merkezde olu dogup arkadaslarini izleme, oyundan cikinca dogrudan cok oyunculu lobi listesine donme eklendi.\n- Magaza ve Yetenek Agaci Katmani: Bos magaza hatasi giderildi, yetenek agaci artik magaza ve asansorun onunde aciliyor."
+    "pck_size":  814336,
+    "changelog":  "- Yetenek Agaci Duzeltildi: SkillTree render hatasi giderildi, artik tum dallar ve dugumler dogru gozukuyor.\n- Magaza Dengelendi (99 Kat): Fiyatlar kat sayisina gore artar, perk\u0027ler max stack sinirli ve katlanarak pahalilasir.\n- Hasar Perk\u0027i Kaldirildi: \u0027+%25 genel hasar\u0027 perki kaldirildi; zombiler artik tek mermiyle olmez.\n- Silah Yukseltme Sistemi: Sahip olunan her silah icin ayri Hasar/Atis Hizi/Sarjor yukseltmesi (max 10 kademe, +%2 artis).\n- Hiz Perki Dengelendi: Kosma hizi artisi %18\u0027den %6\u0027ya dusuruldu, max 4 alim."
 }
