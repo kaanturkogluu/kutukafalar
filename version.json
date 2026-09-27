@@ -1,6 +1,6 @@
 {
   "version": "v1.2.0",
   "download_url": "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-  "pck_size": 414512,
-  "changelog": "- Taktiksel Askeri Üs & Cephanelik: Arka duvar raflarında dizili silahlar (Roketatar, Bixi, Pompalı, Uzi, Tabancalar).\n- Komuta Konsolları & Bilgisayarlar: Parıldayan taktik radar ve yeşil telemetri ekranları, sunucu kulesi ve durum LED'leri.\n- Mühimmat & Mermiler: Yerde ve tezgahlarda saçılmış pirinç kovanlar, mühimmat sandıkları ve şarjörler.\n- Engelsiz Üs Tabelası: [ BÖLGE 01 // TAKTİK OPERASYON MERKEZİ ] kolon engelinden kurtarılarak arkadan aydınlatmalı tabela paneliyle yukarı taşındı.\n- Menü Alt Boşluk İyileştirmesi: Kompakt panel ve başlık yerleşimiyle ekranın alt kısmında ferah ve dengeli boşluk sağlandı.\n- Karakter Başlıkları: Emojilerden arındırılmış ciddi taktiksel unvanlar (Ateş Uzmanı, Mühendis, Buz Muhafızı, Sıhhiye).\n- Sağ alt köşede düzeltilmiş sürüm gösterimi (v1.2.0)."
+  "pck_size": 425200,
+  "changelog": "- Yeni Düşük Poligonlu (Low-Poly) İnsansı Zombi Modeli: Kambur duruş, açık alt çene, dişler, çökük göz çukurları, yırtık gri-mavi gömlek ve yamalı pantolon.\n- Prosedürel Zombi Yürüyüş & Saldırı Animasyonları: Sendeleyen yürüyüş, kollarla pençeleme, çene ve kafa seğirmesi.\n- Taktiksel Askeri Üs & Cephanelik Arka Planı: Duvar silah rafları, taktik komuta konsolları ve yerlerde pirinç kovanlar.\n- Menü Alt Boşluk İyileştirmesi ve Engelsiz Operasyon Merkezi Tabelası."
 }

@@ -25,7 +25,11 @@ if (-not (Test-Path $GodotExe)) {
 
 Write-Host "1. Derleme klasörleri hazırlanıyor..." -ForegroundColor Yellow
 if (Test-Path $GameDir) {
-    Remove-Item -Path $GameDir -Recurse -Force
+    try {
+        Remove-Item -Path $GameDir -Recurse -Force -ErrorAction Stop
+    } catch {
+        Write-Host "   (Oyun açık olduğu için klasör silinmedi, mevcut klasör kullanılıyor)" -ForegroundColor DarkGray
+    }
 }
 New-Item -ItemType Directory -Path $GameDir -Force | Out-Null
 
@@ -38,7 +42,12 @@ if (-not (Test-Path $PckOut)) {
 }
 
 Write-Host "3. KutuKafalar.exe oluşturuluyor..." -ForegroundColor Yellow
-Copy-Item -Path $GodotExe -Destination (Join-Path $GameDir "KutuKafalar.exe") -Force
+$TargetExe = Join-Path $GameDir "KutuKafalar.exe"
+try {
+    Copy-Item -Path $GodotExe -Destination $TargetExe -Force -ErrorAction Stop
+} catch {
+    Write-Host "   (KutuKafalar.exe çalışır durumda, mevcut exe korundu)" -ForegroundColor DarkGray
+}
 
 Write-Host "4. GitHub Releases için standalone KutuKafalar.pck kopyalanıyor..." -ForegroundColor Yellow
 Copy-Item -Path $PckOut -Destination $StandalonePck -Force

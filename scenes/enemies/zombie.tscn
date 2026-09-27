@@ -1,24 +1,154 @@
-[gd_scene load_steps=8 format=3 uid="uid://zombie_scene_01"]
+[gd_scene load_steps=24 format=3 uid="uid://zombie_scene_01"]
 
 [ext_resource type="Script" path="res://scripts/enemies/ZombieAI.gd" id="1_zombie"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_zombie"]
-size = Vector3(0.7, 1.8, 0.7)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_zbody"]
-albedo_color = Color(0.9, 0.9, 0.92, 1)
-roughness = 0.6
-
-[sub_resource type="BoxMesh" id="BoxMesh_zbody"]
-material = SubResource("StandardMaterial3D_zbody")
-size = Vector3(0.7, 0.9, 0.5)
-
-[sub_resource type="BoxMesh" id="BoxMesh_zhead"]
-material = SubResource("StandardMaterial3D_zbody")
-size = Vector3(0.5, 0.5, 0.5)
+size = Vector3(0.7, 1.7, 0.8)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_headshot"]
-size = Vector3(0.55, 0.55, 0.55)
+size = Vector3(0.5, 0.5, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_skin"]
+albedo_color = Color(0.66, 0.72, 0.63, 1)
+roughness = 0.85
+metallic = 0.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_shirt"]
+albedo_color = Color(0.38, 0.46, 0.52, 1)
+roughness = 0.75
+metallic = 0.05
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_shirt_torn"]
+albedo_color = Color(0.31, 0.38, 0.44, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pants"]
+albedo_color = Color(0.44, 0.36, 0.28, 1)
+roughness = 0.82
+metallic = 0.04
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_patch"]
+albedo_color = Color(0.52, 0.44, 0.35, 1)
+roughness = 0.88
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_shoe"]
+albedo_color = Color(0.28, 0.24, 0.20, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_socket"]
+albedo_color = Color(0.12, 0.12, 0.11, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pupil"]
+albedo_color = Color(0.88, 0.88, 0.82, 1)
+roughness = 0.3
+emission_enabled = true
+emission = Color(0.5, 0.5, 0.45, 1)
+emission_energy_multiplier = 0.4
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mouth"]
+albedo_color = Color(0.08, 0.04, 0.04, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_teeth"]
+albedo_color = Color(0.86, 0.84, 0.75, 1)
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_pelvis"]
+material = SubResource("StandardMaterial3D_pants")
+size = Vector3(0.40, 0.20, 0.26)
+
+[sub_resource type="BoxMesh" id="BoxMesh_thigh"]
+material = SubResource("StandardMaterial3D_pants")
+size = Vector3(0.15, 0.36, 0.15)
+
+[sub_resource type="BoxMesh" id="BoxMesh_patch"]
+material = SubResource("StandardMaterial3D_patch")
+size = Vector3(0.11, 0.11, 0.03)
+
+[sub_resource type="BoxMesh" id="BoxMesh_calf"]
+material = SubResource("StandardMaterial3D_pants")
+size = Vector3(0.13, 0.36, 0.13)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bare_ankle"]
+material = SubResource("StandardMaterial3D_skin")
+size = Vector3(0.10, 0.08, 0.10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_foot"]
+material = SubResource("StandardMaterial3D_shoe")
+size = Vector3(0.14, 0.08, 0.23)
+
+[sub_resource type="BoxMesh" id="BoxMesh_chest"]
+material = SubResource("StandardMaterial3D_shirt")
+size = Vector3(0.48, 0.44, 0.30)
+
+[sub_resource type="BoxMesh" id="BoxMesh_waist"]
+material = SubResource("StandardMaterial3D_shirt")
+size = Vector3(0.42, 0.24, 0.26)
+
+[sub_resource type="BoxMesh" id="BoxMesh_shirt_fringe"]
+material = SubResource("StandardMaterial3D_shirt_torn")
+size = Vector3(0.10, 0.07, 0.03)
+
+[sub_resource type="BoxMesh" id="BoxMesh_chest_rip"]
+material = SubResource("StandardMaterial3D_skin")
+size = Vector3(0.12, 0.14, 0.03)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sleeve"]
+material = SubResource("StandardMaterial3D_shirt")
+size = Vector3(0.16, 0.14, 0.16)
+
+[sub_resource type="BoxMesh" id="BoxMesh_arm_flesh"]
+material = SubResource("StandardMaterial3D_skin")
+size = Vector3(0.11, 0.28, 0.11)
+
+[sub_resource type="BoxMesh" id="BoxMesh_forearm"]
+material = SubResource("StandardMaterial3D_skin")
+size = Vector3(0.09, 0.28, 0.09)
+
+[sub_resource type="BoxMesh" id="BoxMesh_palm"]
+material = SubResource("StandardMaterial3D_skin")
+size = Vector3(0.08, 0.06, 0.05)
+
+[sub_resource type="BoxMesh" id="BoxMesh_claw"]
+material = SubResource("StandardMaterial3D_skin")
+size = Vector3(0.022, 0.065, 0.025)
+
+[sub_resource type="BoxMesh" id="BoxMesh_neck"]
+material = SubResource("StandardMaterial3D_skin")
+size = Vector3(0.16, 0.18, 0.16)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cranium"]
+material = SubResource("StandardMaterial3D_skin")
+size = Vector3(0.34, 0.32, 0.32)
+
+[sub_resource type="BoxMesh" id="BoxMesh_brow"]
+material = SubResource("StandardMaterial3D_skin")
+size = Vector3(0.32, 0.07, 0.08)
+
+[sub_resource type="BoxMesh" id="BoxMesh_socket"]
+material = SubResource("StandardMaterial3D_socket")
+size = Vector3(0.075, 0.075, 0.03)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pupil"]
+material = SubResource("StandardMaterial3D_pupil")
+size = Vector3(0.032, 0.032, 0.02)
+
+[sub_resource type="BoxMesh" id="BoxMesh_nose"]
+material = SubResource("StandardMaterial3D_socket")
+size = Vector3(0.045, 0.055, 0.025)
+
+[sub_resource type="BoxMesh" id="BoxMesh_mouth_cavity"]
+material = SubResource("StandardMaterial3D_mouth")
+size = Vector3(0.17, 0.12, 0.10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_teeth"]
+material = SubResource("StandardMaterial3D_teeth")
+size = Vector3(0.12, 0.025, 0.02)
+
+[sub_resource type="BoxMesh" id="BoxMesh_jaw"]
+material = SubResource("StandardMaterial3D_skin")
+size = Vector3(0.22, 0.10, 0.19)
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_zombie"]
 properties/0/path = NodePath(".:position")
@@ -34,27 +164,224 @@ collision_mask = 7
 script = ExtResource("1_zombie")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0.06)
 shape = SubResource("BoxShape3D_zombie")
 
-[node name="Visuals" type="Node3D" parent="."]
-
-[node name="BodyMesh" type="MeshInstance3D" parent="Visuals"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
-mesh = SubResource("BoxMesh_zbody")
-
-[node name="HeadMesh" type="MeshInstance3D" parent="Visuals"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0)
-mesh = SubResource("BoxMesh_zhead")
-
 [node name="HeadshotArea" type="Area3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.38, 0.28)
 collision_layer = 4
 collision_mask = 0
 monitoring = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="HeadshotArea"]
 shape = SubResource("BoxShape3D_headshot")
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="Hips" type="Node3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+
+[node name="PelvisMesh" type="MeshInstance3D" parent="Visuals/Hips"]
+mesh = SubResource("BoxMesh_pelvis")
+
+[node name="LegL" type="Node3D" parent="Visuals/Hips"]
+transform = Transform3D(1, 0, 0, 0, 0.951, 0.309, 0, -0.309, 0.951, -0.14, -0.04, 0.02)
+
+[node name="ThighMeshL" type="MeshInstance3D" parent="Visuals/Hips/LegL"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.16, 0)
+mesh = SubResource("BoxMesh_thigh")
+
+[node name="PatchL" type="MeshInstance3D" parent="Visuals/Hips/LegL"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.28, 0.08)
+mesh = SubResource("BoxMesh_patch")
+
+[node name="CalfPivotL" type="Node3D" parent="Visuals/Hips/LegL"]
+transform = Transform3D(1, 0, 0, 0, 0.866, -0.5, 0, 0.5, 0.866, 0, -0.34, 0.02)
+
+[node name="CalfMeshL" type="MeshInstance3D" parent="Visuals/Hips/LegL/CalfPivotL"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.16, 0)
+mesh = SubResource("BoxMesh_calf")
+
+[node name="BareAnkleL" type="MeshInstance3D" parent="Visuals/Hips/LegL/CalfPivotL"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.32, 0)
+mesh = SubResource("BoxMesh_bare_ankle")
+
+[node name="FootL" type="MeshInstance3D" parent="Visuals/Hips/LegL/CalfPivotL"]
+transform = Transform3D(1, 0, 0, 0, 0.966, 0.259, 0, -0.259, 0.966, 0, -0.36, 0.05)
+mesh = SubResource("BoxMesh_foot")
+
+[node name="LegR" type="Node3D" parent="Visuals/Hips"]
+transform = Transform3D(1, 0, 0, 0, 0.985, -0.174, 0, 0.174, 0.985, 0.14, -0.04, -0.04)
+
+[node name="ThighMeshR" type="MeshInstance3D" parent="Visuals/Hips/LegR"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.16, 0)
+mesh = SubResource("BoxMesh_thigh")
+
+[node name="CalfPivotR" type="Node3D" parent="Visuals/Hips/LegR"]
+transform = Transform3D(1, 0, 0, 0, 0.966, -0.259, 0, 0.259, 0.966, 0, -0.34, 0.02)
+
+[node name="CalfMeshR" type="MeshInstance3D" parent="Visuals/Hips/LegR/CalfPivotR"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.16, 0)
+mesh = SubResource("BoxMesh_calf")
+
+[node name="FootR" type="MeshInstance3D" parent="Visuals/Hips/LegR/CalfPivotR"]
+transform = Transform3D(1, 0, 0, 0, 0.985, 0.174, 0, -0.174, 0.985, 0, -0.36, 0.05)
+mesh = SubResource("BoxMesh_foot")
+
+[node name="Torso" type="Node3D" parent="Visuals/Hips"]
+transform = Transform3D(1, 0, 0, 0, 0.9397, 0.342, 0, -0.342, 0.9397, 0, 0.10, 0.02)
+
+[node name="WaistMesh" type="MeshInstance3D" parent="Visuals/Hips/Torso"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.10, 0)
+mesh = SubResource("BoxMesh_waist")
+
+[node name="BodyMesh" type="MeshInstance3D" parent="Visuals/Hips/Torso"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.38, 0.02)
+mesh = SubResource("BoxMesh_chest")
+
+[node name="Fringe1" type="MeshInstance3D" parent="Visuals/Hips/Torso"]
+transform = Transform3D(0.966, 0, -0.259, 0, 1, 0, 0.259, 0, 0.966, -0.14, -0.04, 0.14)
+mesh = SubResource("BoxMesh_shirt_fringe")
+
+[node name="Fringe2" type="MeshInstance3D" parent="Visuals/Hips/Torso"]
+transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866, 0.06, -0.04, 0.14)
+mesh = SubResource("BoxMesh_shirt_fringe")
+
+[node name="Fringe3" type="MeshInstance3D" parent="Visuals/Hips/Torso"]
+transform = Transform3D(0.966, 0, 0.259, 0, 1, 0, -0.259, 0, 0.966, 0.16, -0.04, -0.13)
+mesh = SubResource("BoxMesh_shirt_fringe")
+
+[node name="ChestRip" type="MeshInstance3D" parent="Visuals/Hips/Torso"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.32, 0.16)
+mesh = SubResource("BoxMesh_chest_rip")
+
+[node name="ArmL" type="Node3D" parent="Visuals/Hips/Torso"]
+transform = Transform3D(0.985, 0.12, 0.12, -0.17, 0.707, 0.686, 0, -0.70, 0.714, -0.28, 0.48, 0.04)
+
+[node name="SleeveL" type="MeshInstance3D" parent="Visuals/Hips/Torso/ArmL"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.06, 0)
+mesh = SubResource("BoxMesh_sleeve")
+
+[node name="UpperArmL" type="MeshInstance3D" parent="Visuals/Hips/Torso/ArmL"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18, 0)
+mesh = SubResource("BoxMesh_arm_flesh")
+
+[node name="ForearmPivotL" type="Node3D" parent="Visuals/Hips/Torso/ArmL"]
+transform = Transform3D(1, 0, 0, 0, 0.866, 0.5, 0, -0.5, 0.866, 0, -0.30, 0.02)
+
+[node name="ForearmMeshL" type="MeshInstance3D" parent="Visuals/Hips/Torso/ArmL/ForearmPivotL"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.14, 0)
+mesh = SubResource("BoxMesh_forearm")
+
+[node name="HandL" type="Node3D" parent="Visuals/Hips/Torso/ArmL/ForearmPivotL"]
+transform = Transform3D(1, 0, 0, 0, 0.94, 0.342, 0, -0.342, 0.94, 0, -0.28, 0.01)
+
+[node name="PalmL" type="MeshInstance3D" parent="Visuals/Hips/Torso/ArmL/ForearmPivotL/HandL"]
+mesh = SubResource("BoxMesh_palm")
+
+[node name="Claw1L" type="MeshInstance3D" parent="Visuals/Hips/Torso/ArmL/ForearmPivotL/HandL"]
+transform = Transform3D(1, 0, 0, 0, 0.866, 0.5, 0, -0.5, 0.866, -0.025, -0.05, 0.02)
+mesh = SubResource("BoxMesh_claw")
+
+[node name="Claw2L" type="MeshInstance3D" parent="Visuals/Hips/Torso/ArmL/ForearmPivotL/HandL"]
+transform = Transform3D(1, 0, 0, 0, 0.866, 0.5, 0, -0.5, 0.866, 0.0, -0.055, 0.022)
+mesh = SubResource("BoxMesh_claw")
+
+[node name="Claw3L" type="MeshInstance3D" parent="Visuals/Hips/Torso/ArmL/ForearmPivotL/HandL"]
+transform = Transform3D(1, 0, 0, 0, 0.866, 0.5, 0, -0.5, 0.866, 0.025, -0.05, 0.02)
+mesh = SubResource("BoxMesh_claw")
+
+[node name="ArmR" type="Node3D" parent="Visuals/Hips/Torso"]
+transform = Transform3D(0.985, -0.12, -0.12, 0.17, 0.65, 0.74, 0, -0.74, 0.67, 0.28, 0.46, 0.02)
+
+[node name="SleeveR" type="MeshInstance3D" parent="Visuals/Hips/Torso/ArmR"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.06, 0)
+mesh = SubResource("BoxMesh_sleeve")
+
+[node name="UpperArmR" type="MeshInstance3D" parent="Visuals/Hips/Torso/ArmR"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18, 0)
+mesh = SubResource("BoxMesh_arm_flesh")
+
+[node name="ForearmPivotR" type="Node3D" parent="Visuals/Hips/Torso/ArmR"]
+transform = Transform3D(1, 0, 0, 0, 0.92, 0.39, 0, -0.39, 0.92, 0, -0.30, 0.02)
+
+[node name="ForearmMeshR" type="MeshInstance3D" parent="Visuals/Hips/Torso/ArmR/ForearmPivotR"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.14, 0)
+mesh = SubResource("BoxMesh_forearm")
+
+[node name="HandR" type="Node3D" parent="Visuals/Hips/Torso/ArmR/ForearmPivotR"]
+transform = Transform3D(1, 0, 0, 0, 0.94, 0.342, 0, -0.342, 0.94, 0, -0.28, 0.01)
+
+[node name="PalmR" type="MeshInstance3D" parent="Visuals/Hips/Torso/ArmR/ForearmPivotR/HandR"]
+mesh = SubResource("BoxMesh_palm")
+
+[node name="Claw1R" type="MeshInstance3D" parent="Visuals/Hips/Torso/ArmR/ForearmPivotR/HandR"]
+transform = Transform3D(1, 0, 0, 0, 0.866, 0.5, 0, -0.5, 0.866, -0.025, -0.05, 0.02)
+mesh = SubResource("BoxMesh_claw")
+
+[node name="Claw2R" type="MeshInstance3D" parent="Visuals/Hips/Torso/ArmR/ForearmPivotR/HandR"]
+transform = Transform3D(1, 0, 0, 0, 0.866, 0.5, 0, -0.5, 0.866, 0.0, -0.055, 0.022)
+mesh = SubResource("BoxMesh_claw")
+
+[node name="Claw3R" type="MeshInstance3D" parent="Visuals/Hips/Torso/ArmR/ForearmPivotR/HandR"]
+transform = Transform3D(1, 0, 0, 0, 0.866, 0.5, 0, -0.5, 0.866, 0.025, -0.05, 0.02)
+mesh = SubResource("BoxMesh_claw")
+
+[node name="Neck" type="Node3D" parent="Visuals/Hips/Torso"]
+transform = Transform3D(1, 0, 0, 0, 0.966, 0.259, 0, -0.259, 0.966, 0, 0.58, 0.08)
+
+[node name="NeckMesh" type="MeshInstance3D" parent="Visuals/Hips/Torso/Neck"]
+mesh = SubResource("BoxMesh_neck")
+
+[node name="Head" type="Node3D" parent="Visuals/Hips/Torso/Neck"]
+transform = Transform3D(1, 0, 0, 0, 0.985, -0.174, 0, 0.174, 0.985, 0, 0.18, 0.04)
+
+[node name="HeadMesh" type="MeshInstance3D" parent="Visuals/Hips/Torso/Neck/Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)
+mesh = SubResource("BoxMesh_cranium")
+
+[node name="BrowMesh" type="MeshInstance3D" parent="Visuals/Hips/Torso/Neck/Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14, 0.15)
+mesh = SubResource("BoxMesh_brow")
+
+[node name="EyeSocketL" type="MeshInstance3D" parent="Visuals/Hips/Torso/Neck/Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.08, 0.08, 0.17)
+mesh = SubResource("BoxMesh_socket")
+
+[node name="PupilL" type="MeshInstance3D" parent="Visuals/Hips/Torso/Neck/Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.08, 0.08, 0.18)
+mesh = SubResource("BoxMesh_pupil")
+
+[node name="EyeSocketR" type="MeshInstance3D" parent="Visuals/Hips/Torso/Neck/Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08, 0.08, 0.17)
+mesh = SubResource("BoxMesh_socket")
+
+[node name="PupilR" type="MeshInstance3D" parent="Visuals/Hips/Torso/Neck/Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08, 0.08, 0.18)
+mesh = SubResource("BoxMesh_pupil")
+
+[node name="NoseCavity" type="MeshInstance3D" parent="Visuals/Hips/Torso/Neck/Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0.17)
+mesh = SubResource("BoxMesh_nose")
+
+[node name="MouthCavity" type="MeshInstance3D" parent="Visuals/Hips/Torso/Neck/Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.06, 0.13)
+mesh = SubResource("BoxMesh_mouth_cavity")
+
+[node name="UpperTeeth" type="MeshInstance3D" parent="Visuals/Hips/Torso/Neck/Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.015, 0.16)
+mesh = SubResource("BoxMesh_teeth")
+
+[node name="JawPivot" type="Node3D" parent="Visuals/Hips/Torso/Neck/Head"]
+transform = Transform3D(1, 0, 0, 0, 0.94, -0.342, 0, 0.342, 0.94, 0, -0.08, 0.04)
+
+[node name="JawMesh" type="MeshInstance3D" parent="Visuals/Hips/Torso/Neck/Head/JawPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.02, 0.06)
+mesh = SubResource("BoxMesh_jaw")
+
+[node name="LowerTeeth" type="MeshInstance3D" parent="Visuals/Hips/Torso/Neck/Head/JawPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, 0.13)
+mesh = SubResource("BoxMesh_teeth")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_zombie")

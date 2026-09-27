@@ -20,10 +20,84 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 const GIBS_SCENE_PATH = "res://scenes/effects/cube_gibs.tscn"
 
 @onready var anim_mesh: Node3D = $Visuals
+@onready var hips_node: Node3D = get_node_or_null("Visuals/Hips")
+@onready var torso_node: Node3D = get_node_or_null("Visuals/Hips/Torso")
+@onready var head_node: Node3D = get_node_or_null("Visuals/Hips/Torso/Neck/Head")
+@onready var jaw_node: Node3D = get_node_or_null("Visuals/Hips/Torso/Neck/Head/JawPivot")
+@onready var arm_l_node: Node3D = get_node_or_null("Visuals/Hips/Torso/ArmL")
+@onready var arm_r_node: Node3D = get_node_or_null("Visuals/Hips/Torso/ArmR")
+@onready var leg_l_node: Node3D = get_node_or_null("Visuals/Hips/LegL")
+@onready var leg_r_node: Node3D = get_node_or_null("Visuals/Hips/LegR")
+
+var anim_phase: float = 0.0
+var last_anim_pos: Vector3 = Vector3.ZERO
 
 func _ready() -> void:
 	current_health = max_health
 	add_to_group("enemies")
+	last_anim_pos = global_position
+	anim_phase = randf_range(0.0, TAU)
+
+func _process(delta: float) -> void:
+	_animate_limbs(delta)
+
+func _animate_limbs(delta: float) -> void:
+	if not hips_node or is_dead:
+		return
+	
+	var is_moving = false
+	var horiz_vel = Vector2(velocity.x, velocity.z).length()
+	if horiz_vel > 0.15:
+		is_moving = true
+	else:
+		var moved_dist = Vector2(global_position.x - last_anim_pos.x, global_position.z - last_anim_pos.z).length()
+		if moved_dist > 0.008:
+			is_moving = true
+	
+	last_anim_pos = global_position
+	
+	if is_moving and not is_frozen:
+		anim_phase += delta * (speed * 1.5)
+		var swing = sin(anim_phase)
+		
+		# Bacak yürüyüş salınımı
+		if leg_l_node:
+			leg_l_node.rotation.x = 0.3 + swing * 0.45
+		if leg_r_node:
+			leg_r_node.rotation.x = -0.15 - swing * 0.45
+		
+		# Gövde ve kafa zombi sendelemesi (shamble / limp)
+		if torso_node:
+			torso_node.rotation.z = sin(anim_phase * 0.5) * 0.07
+			torso_node.rotation.x = 0.34 + abs(swing) * 0.04
+		if head_node:
+			head_node.rotation.y = sin(anim_phase * 0.5) * 0.08
+			head_node.rotation.x = -0.17 + cos(anim_phase) * 0.04
+		
+		# Kollar öne uzanmış pençelerle sendeleyerek sallanır
+		if arm_l_node:
+			arm_l_node.rotation.x = -0.7 + swing * 0.16
+		if arm_r_node:
+			arm_r_node.rotation.x = -0.74 - swing * 0.16
+		
+		# Ağız ürpertici şekilde açılıp seğirir
+		if jaw_node:
+			jaw_node.rotation.x = -0.34 + sin(anim_phase * 1.2) * 0.1
+	else:
+		# Boşta (Idle) - Ürpertici nefes alıp verme ve çene seğirmesi
+		anim_phase += delta * 2.0
+		var breath = sin(anim_phase)
+		if torso_node:
+			torso_node.rotation.x = 0.34 + breath * 0.03
+			torso_node.rotation.z = 0.0
+		if head_node:
+			head_node.rotation.x = -0.17 + breath * 0.02
+		if jaw_node:
+			jaw_node.rotation.x = -0.34 + breath * 0.04
+		if leg_l_node:
+			leg_l_node.rotation.x = 0.30
+		if leg_r_node:
+			leg_r_node.rotation.x = -0.17
 
 func _physics_process(delta: float) -> void:
 	# Yerçekimi
@@ -120,6 +194,18 @@ func _attack_player(player: CharacterBody3D) -> void:
 		return
 	if is_instance_valid(player) and player.has_method("take_damage") and not player.get("is_dead"):
 		player.take_damage(attack_damage)
+		_trigger_attack_anim.rpc()
+
+@rpc("call_local", "unreliable")
+func _trigger_attack_anim() -> void:
+	if torso_node:
+		var tw = create_tween()
+		tw.tween_property(torso_node, "rotation:x", 0.52, 0.08)
+		if jaw_node:
+			tw.parallel().tween_property(jaw_node, "rotation:x", -0.55, 0.08)
+		tw.tween_property(torso_node, "rotation:x", 0.34, 0.16)
+		if jaw_node:
+			tw.parallel().tween_property(jaw_node, "rotation:x", -0.34, 0.16)
 
 static var zombie_hurt_mat: StandardMaterial3D = null
 
@@ -134,16 +220,15 @@ static func _get_zombie_hurt_mat() -> StandardMaterial3D:
 
 @rpc("call_local", "unreliable")
 func _flash_hurt() -> void:
-	var b_mesh = $Visuals/BodyMesh
-	var h_mesh = $Visuals/HeadMesh
-	if b_mesh: b_mesh.material_override = _get_zombie_hurt_mat()
-	if h_mesh: h_mesh.material_override = _get_zombie_hurt_mat()
-	await get_tree().create_timer(0.1).timeout
+	var meshes = find_children("*", "MeshInstance3D")
+	var h_mat = _get_zombie_hurt_mat()
+	for m in meshes:
+		m.material_override = h_mat
+	await get_tree().create_timer(0.08).timeout
 	if is_instance_valid(self):
-		if b_mesh and b_mesh.material_override == _get_zombie_hurt_mat():
-			b_mesh.material_override = null
-		if h_mesh and h_mesh.material_override == _get_zombie_hurt_mat():
-			h_mesh.material_override = null
+		for m in meshes:
+			if is_instance_valid(m) and m.material_override == h_mat:
+				m.material_override = null
 
 ## Hasar Alma Metodu (Mermi isabet ettiğinde çağrılır)
 func take_damage(amount: float, is_headshot: bool = false, hit_point: Vector3 = Vector3.ZERO, attacker_id: int = 1) -> void:
@@ -266,13 +351,16 @@ func freeze(duration: float = 4.0) -> void:
 @rpc("call_local", "reliable")
 func _apply_freeze(duration: float) -> void:
 	is_frozen = true
-	var b_mesh = $Visuals/BodyMesh
-	if b_mesh: b_mesh.material_override = _get_freeze_mat()
+	var meshes = find_children("*", "MeshInstance3D")
+	var f_mat = _get_freeze_mat()
+	for m in meshes:
+		m.material_override = f_mat
 	await get_tree().create_timer(duration).timeout
 	is_frozen = false
 	if is_instance_valid(self):
-		if b_mesh and b_mesh.material_override == _get_freeze_mat():
-			b_mesh.material_override = null
+		for m in meshes:
+			if is_instance_valid(m) and m.material_override == f_mat:
+				m.material_override = null
 
 ## Yavaşlatma Fonksiyonu (Buz Muhafızı Kriyojenik Zemin)
 func apply_slow(factor: float = 0.4, duration: float = 1.0) -> void:
