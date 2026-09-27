@@ -89,17 +89,38 @@ func _cleanup_residual_downloads() -> void:
 func _setup_http_nodes() -> void:
 	check_http = HTTPRequest.new()
 	check_http.name = "CheckHTTPRequest"
-	check_http.timeout = 10.0
+	check_http.timeout = 15.0
 	check_http.max_redirects = 8
+	check_http.use_threads = true  # Ana thread'i bloklamaz
 	add_child(check_http)
 	check_http.request_completed.connect(_on_check_completed)
 	
 	download_http = HTTPRequest.new()
 	download_http.name = "DownloadHTTPRequest"
-	download_http.timeout = 60.0
+	download_http.timeout = 120.0
 	download_http.max_redirects = 8
+	download_http.use_threads = true  # İndirme ana thread'i bloklamaz
 	add_child(download_http)
 	download_http.request_completed.connect(_on_download_completed)
+
+## HTTP result kod açıklaması (tanı için)
+static func _get_result_name(result: int) -> String:
+	match result:
+		0: return "OK"
+		1: return "CHUNKED_BODY_SIZE_MISMATCH"
+		2: return "CANT_CONNECT"
+		3: return "CANT_RESOLVE"
+		4: return "CONNECTION_ERROR"
+		5: return "TLS_HANDSHAKE_ERROR"
+		6: return "NO_RESPONSE"
+		7: return "BODY_SIZE_LIMIT_EXCEEDED"
+		8: return "BODY_DECOMPRESS_FAILED"
+		9: return "REQUEST_FAILED"
+		10: return "DOWNLOAD_FILE_CANT_OPEN"
+		11: return "DOWNLOAD_FILE_WRITE_ERROR"
+		12: return "REDIRECT_LIMIT_REACHED"
+		13: return "TIMEOUT"
+		_: return "UNKNOWN(%d)" % result
 
 ## Sürüm metnini [Major, Minor, Patch] sayı dizisine çevirir
 static func parse_semver(ver: String) -> Array[int]:
@@ -152,12 +173,30 @@ func check_for_updates() -> void:
 func _on_check_completed(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
 	is_checking = false
 	
+	var result_name = _get_result_name(result)
+	print("[AutoUpdater] Sunucu yanıtı: result=%s code=%d body_size=%d" % [result_name, response_code, body.size()])
+	
 	if result != HTTPRequest.RESULT_SUCCESS or response_code != 200:
-		print("[AutoUpdater] Sunucu yanıt vermedi. Result: ", result, " Kod: ", response_code)
-		if response_code == 404:
+		# TLS hatası: bazı PC'lerde SSL sertifikası sorunu (en yaygın neden)
+		if result == 5:  # TLS_HANDSHAKE_ERROR
+			var msg = "Güncelleme sunucusu SSL bağlantı hatası. İnternet bağlantınızı kontrol edin."
+			print("[AutoUpdater] ", msg)
+			update_failed.emit(msg)
+		elif result == 13:  # TIMEOUT
+			var msg = "Güncelleme sunucusu zaman aşımına uğradi. İnternet bağlantınızı kontrol edin."
+			print("[AutoUpdater] ", msg)
+			update_failed.emit(msg)
+		elif result == 2 or result == 3 or result == 4:  # CANT_CONNECT / CANT_RESOLVE / CONNECTION_ERROR
+			var msg = "Sunucuya ulaşılamıyor (%s). İnternet bağlantınızı kontrol edin." % result_name
+			print("[AutoUpdater] ", msg)
+			update_failed.emit(msg)
+		elif response_code == 404:
+			print("[AutoUpdater] Sürüm dosyası bulunamadı (404).")
 			update_not_available.emit(current_version)
 		else:
-			update_failed.emit("Güncelleme sunucusundan yanıt alınamadı (Kod: %d)" % response_code)
+			var msg = "Güncelleme sunucusundan yanıt alınamadı (%s / HTTP %d)" % [result_name, response_code]
+			print("[AutoUpdater] ", msg)
+			update_failed.emit(msg)
 		return
 	
 	var json_str = body.get_string_from_utf8()
@@ -240,9 +279,17 @@ func _on_download_completed(result: int, response_code: int, _headers: PackedStr
 	is_downloading = false
 	download_http.download_file = "" # Dosya kilidini serbest bırak
 	
+	var result_name = _get_result_name(result)
+	print("[AutoUpdater] İndirme tamamlandı: result=%s code=%d" % [result_name, response_code])
+	
 	if result != HTTPRequest.RESULT_SUCCESS or response_code != 200:
-		print("[AutoUpdater] İndirme başarısız. Result: ", result, " Kod: ", response_code)
-		update_failed.emit("Dosya indirilemedi (Sunucu kodu: %d)" % response_code)
+		var detail = "%s / HTTP %d" % [result_name, response_code]
+		if result == 5:
+			detail = "SSL/TLS sertifika hatası"
+		elif result == 13:
+			detail = "Zaman aşımı - indirme yavaş bağlantıda tamamlanamadı"
+		print("[AutoUpdater] İndirme başarısız: ", detail)
+		update_failed.emit("Dosya indirilemedi (%s)" % detail)
 		return
 	
 	if not FileAccess.file_exists(temp_download_path):

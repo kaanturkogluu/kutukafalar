@@ -102,3 +102,10 @@ interact={
 [rendering]
 
 rendering_device/driver.windows="d3d12"
+
+[network]
+
+; TLS/SSL: Godot'nun dahili sertifika paketini kullan
+; Bu olmadan bazi PC'lerde HTTPS istekleri (GitHub raw) basarisiz olabilir
+ssl/certificates/certificate_bundle_override=""
+tls/certificate_bundle_override=""
