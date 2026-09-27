@@ -182,3 +182,19 @@ res://
   - Tracks: `highest_unlocked_floor` (1 to 99), `total_kills`, `total_boss_kills`, `total_gold_earned`, `total_floors_cleared`, `total_runs`.
   - When a floor is cleared in `_on_floor_cleared()`: automatically calls `SaveManager.record_floor_cleared()` and `SaveManager.unlock_floor(current_floor + 1)`.
   - `LevelSelect.gd` queries `SaveManager.get_highest_unlocked_floor()` and enables sector switching across all 11 sectors.
+
+## 13. Skill Tree, Meta-Progression & Class Socket Architecture
+- **Dual-Economy Separation (Roguelite Core Rule):**
+  - *In-Run Gold (Askeri Kredi):* Earned and spent strictly within the run/floor at the elevator shop (`Shop.gd`). Resets on death/run restart. Never conflicts with permanent meta-progression.
+  - *Meta-Currency (Biyo-Çekirdek / Bio-Cores):* Earned from Sector Boss kills, milestones, and clearing new floors. Persisted via `SaveManager.gd`. Spent in the Skill Tree (Main Menu / Lobby / Station).
+- **Decoupled Architecture (`ProgressionManager.gd` Autoload):**
+  - Do NOT bloat `FPSController.gd` with skill tree evaluation code.
+  - `ProgressionManager` acts as the single source of truth: stores node catalog, prerequisites, unlocked state, and calculates final aggregated `PlayerStats`.
+  - When a player spawns: `ProgressionManager.apply_to_player(player)` applies multipliers (`crit_chance`, `headshot_mult`, `dash_unlocked`, `chain_reaction`, etc.).
+- **Forward-Compatible Class Agnosticism:**
+  - The 5 core branches (Weapon, Survival, Mobility, Demolition, Utility) apply universally to ALL classes (past, present, and future).
+  - Ability augments use a **Tag System** (`[AOE]`, `[ELEMENTAL]`, `[SUPPORT]`, `[PHYSICAL]`) on spells rather than hardcoded class names.
+  - Dedicated **Class Keystone Socket**: Classes dynamically plug in their unique apex traits into a standardized socket, ensuring new classes can be added without altering the master tree structure.
+- **Node ID & Respec Resilience:**
+  - Nodes are saved as string IDs in an array (`unlocked_nodes = ["prec_01", "mob_dash"]`). Missing or new nodes never corrupt save files.
+  - Full **Respec (Yetenek Sıfırlama)** refunds 100% of spent meta-currency to let players experiment with new builds freely.

@@ -65,7 +65,14 @@ func _detonate() -> void:
 		var space_state = get_world_3d().direct_space_state
 		var query = PhysicsShapeQueryParameters3D.new()
 		var sphere = SphereShape3D.new()
-		sphere.radius = explosion_radius
+		
+		# Progression çarpanları
+		var rad_mult = ProgressionManager.get_stat("explosion_radius_mult", 1.0)
+		var dmg_mult = ProgressionManager.get_stat("barrel_damage_mult", 1.0)
+		var effective_radius = explosion_radius * rad_mult
+		var effective_damage = explosion_damage * dmg_mult
+		
+		sphere.radius = effective_radius
 		query.shape = sphere
 		query.transform = global_transform
 		query.collision_mask = 7 # Oyuncular, Düşmanlar, Variller
@@ -77,8 +84,8 @@ func _detonate() -> void:
 				continue
 
 			var dist = global_position.distance_to(collider.global_position)
-			var dist_factor = clamp(1.0 - (dist / explosion_radius), 0.2, 1.0)
-			var damage_to_deal = explosion_damage * dist_factor
+			var dist_factor = clamp(1.0 - (dist / effective_radius), 0.2, 1.0)
+			var damage_to_deal = effective_damage * dist_factor
 
 			# Oyuncu hasarı (Varil patlaması oyuncuya da ciddi zarar verir)
 			if collider.is_in_group("players") and collider.has_method("take_damage"):
@@ -89,7 +96,10 @@ func _detonate() -> void:
 				collider.take_damage(damage_to_deal, false, global_position)
 			# Zincirleme Varil Patlaması!
 			elif collider.is_in_group("barrels") and collider.has_method("take_damage"):
-				collider.take_damage(damage_to_deal, false, global_position)
+				if ProgressionManager.has_perk("chain_reaction_unlocked") and collider.has_method("explode"):
+					collider.explode()
+				else:
+					collider.take_damage(damage_to_deal, false, global_position)
 			# Barikat Duvarı Hasarı
 			elif collider.is_in_group("walls") and collider.has_method("take_damage"):
 				collider.take_damage(damage_to_deal)

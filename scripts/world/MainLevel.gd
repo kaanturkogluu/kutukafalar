@@ -14,6 +14,7 @@ const WALL_SCENE_PATH: String = "res://scenes/interactables/wall.tscn"
 @onready var pickups_container: Node3D = get_node_or_null("Pickups")
 @onready var elevator: Node3D = $Elevator
 @onready var shop_ui: CanvasLayer = $ShopUI
+@onready var skill_tree_ui: CanvasLayer = $SkillTreeUI
 @onready var default_camera: Camera3D = $DefaultCamera
 
 @onready var spawn_points: Array[Node] = $SpawnPoints.get_children()
@@ -89,7 +90,11 @@ func _ready() -> void:
 		NetworkManager.player_disconnected.connect(_on_player_disconnected)
 
 	# Seviye yüklendiğinde sunucuya hazır olduğumuzu bildir (Host ve tüm Client'lar)
-	if multiplayer.is_server():
+	if multiplayer.multiplayer_peer == null:
+		var dummy_peer = OfflineMultiplayerPeer.new()
+		multiplayer.multiplayer_peer = dummy_peer
+		_notify_peer_level_ready(1)
+	elif multiplayer.is_server():
 		_notify_peer_level_ready(1)
 	else:
 		_notify_peer_level_ready.rpc_id(1, multiplayer.get_unique_id())
@@ -178,6 +183,12 @@ func sync_spawn_player(id: int, spawn_pos: Vector3) -> void:
 	player.position = spawn_pos
 	player.player_died.connect(_on_player_died.bind(player))
 	players_container.add_child(player, true)
+	if id == multiplayer.get_unique_id():
+		if default_camera:
+			default_camera.current = false
+		var cam = player.get_node_or_null("Head/Camera3D")
+		if cam:
+			cam.current = true
 	print("[MainLevel] Oyuncu doğuruldu: ", id, " (Yerel mi: ", id == multiplayer.get_unique_id(), ")")
 
 func spawn_player(id: int) -> void:
@@ -541,6 +552,9 @@ func _on_zombie_died(zombie_ref = null, _extra = null) -> void:
 		return
 
 	if zombie_ref and is_instance_valid(zombie_ref):
+		var is_boss = zombie_ref.name.begins_with("BossZombie") or zombie_ref.is_in_group("boss")
+		if is_boss:
+			SaveManager.record_kill(true)
 		sync_despawn_node.rpc("Enemies", zombie_ref.name)
 
 	active_zombie_count = max(0, active_zombie_count - 1)
@@ -678,6 +692,12 @@ func _open_shop_ui(floor_num: int) -> void:
 func _close_shop_ui() -> void:
 	if shop_ui:
 		shop_ui.close_shop()
+
+func open_skill_tree_for_local_player() -> void:
+	var local_id = multiplayer.get_unique_id()
+	var local_player = players_container.get_node_or_null(str(local_id))
+	if skill_tree_ui and is_instance_valid(skill_tree_ui):
+		skill_tree_ui.open_for_player(local_player)
 
 func _on_next_floor_requested() -> void:
 	if multiplayer.is_server():

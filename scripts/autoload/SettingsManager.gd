@@ -33,12 +33,33 @@ const RESOLUTION_PRESETS: Array[Vector2i] = [
 func _ready() -> void:
 	load_settings()
 	apply_all_settings()
+	if current_window_mode == WindowMode.WINDOWED:
+		call_deferred("center_window")
 
 func apply_all_settings() -> void:
 	set_window_mode(current_window_mode, false)
 	set_vsync(vsync_enabled, false)
 	set_master_volume(master_volume, false)
+	if current_window_mode == WindowMode.WINDOWED:
+		center_window()
 	settings_changed.emit()
+
+func center_window() -> void:
+	if current_window_mode != WindowMode.WINDOWED:
+		return
+	var screen_id = DisplayServer.window_get_current_screen()
+	var screen_size = DisplayServer.screen_get_size(screen_id)
+	var win_size = current_resolution
+	if win_size.x <= 0 or win_size.y <= 0:
+		win_size = DisplayServer.window_get_size()
+	# Eğer pencere ekran boyutundan büyük veya eşitse, ekranın %85'ine küçült
+	if win_size.x >= screen_size.x or win_size.y >= screen_size.y:
+		win_size = Vector2i(int(screen_size.x * 0.85), int(screen_size.y * 0.85))
+		current_resolution = win_size
+	DisplayServer.window_set_size(win_size)
+	var pos = (screen_size - win_size) / 2
+	pos.y = max(pos.y, 35) # Windows başlık çubuğu için minimum boşluk
+	DisplayServer.window_set_position(pos)
 
 func set_window_mode(mode: int, auto_save: bool = true) -> void:
 	current_window_mode = mode
@@ -46,9 +67,7 @@ func set_window_mode(mode: int, auto_save: bool = true) -> void:
 		WindowMode.WINDOWED:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 			DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
-			# Pencereli modda varsayılan ekran ortalama
-			if current_resolution.x > 0 and current_resolution.y > 0:
-				DisplayServer.window_set_size(current_resolution)
+			center_window()
 		WindowMode.BORDERLESS:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 			DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true)
@@ -66,11 +85,7 @@ func set_window_mode(mode: int, auto_save: bool = true) -> void:
 func set_resolution(res: Vector2i, auto_save: bool = true) -> void:
 	current_resolution = res
 	if current_window_mode == WindowMode.WINDOWED:
-		DisplayServer.window_set_size(res)
-		# Ekranı ortala
-		var screen_size = DisplayServer.screen_get_size()
-		var pos = (screen_size - res) / 2
-		DisplayServer.window_set_position(pos)
+		center_window()
 	if auto_save:
 		save_settings()
 		settings_changed.emit()
@@ -125,13 +140,18 @@ func load_settings() -> void:
 	var cfg = ConfigFile.new()
 	var err = cfg.load(SETTINGS_FILE_PATH)
 	if err != OK:
-		# İlk kez açılıyorsa varsayılan tam ekran başla
-		current_window_mode = WindowMode.FULLSCREEN
+		# İlk kez açılıyorsa ekran boyutuna göre güvenli pencere aç ve ortala
+		var screen_size = DisplayServer.screen_get_size()
+		if screen_size.x <= 1920:
+			current_resolution = Vector2i(1600, 900)
+		else:
+			current_resolution = Vector2i(1920, 1080)
+		current_window_mode = WindowMode.WINDOWED
 		return
 	
-	current_window_mode = cfg.get_value("video", "window_mode", WindowMode.FULLSCREEN)
-	var rw = cfg.get_value("video", "resolution_w", 1920)
-	var rh = cfg.get_value("video", "resolution_h", 1080)
+	current_window_mode = cfg.get_value("video", "window_mode", WindowMode.WINDOWED)
+	var rw = cfg.get_value("video", "resolution_w", 1600)
+	var rh = cfg.get_value("video", "resolution_h", 900)
 	current_resolution = Vector2i(rw, rh)
 	vsync_enabled = cfg.get_value("video", "vsync", true)
 	master_volume = cfg.get_value("audio", "master_volume", 0.85)

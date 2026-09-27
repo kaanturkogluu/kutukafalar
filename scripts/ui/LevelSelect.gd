@@ -43,7 +43,7 @@ func _setup_sector_navigation() -> void:
 	
 	sector_nav_box = HBoxContainer.new()
 	sector_nav_box.alignment = BoxContainer.ALIGNMENT_CENTER
-	sector_nav_box.theme_override_constants.set("separation", 16)
+	sector_nav_box.add_theme_constant_override("separation", 16)
 	
 	prev_sector_btn = Button.new()
 	prev_sector_btn.text = "< ÖNCEKİ SEKTÖR"

@@ -49,13 +49,15 @@ func _process(delta: float) -> void:
 
 ## Düşman öldüğünde Ulti şarjını dengeli artır (~40 kill ile 1 ulti açılır)
 func add_ultimate_charge(amount: float = 2.5) -> void:
-	ultimate_charge = clamp(ultimate_charge + amount, 0.0, MAX_ULTIMATE)
+	var mult = ProgressionManager.get_stat("ult_charge_mult", 1.0)
+	ultimate_charge = clamp(ultimate_charge + (amount * mult), 0.0, MAX_ULTIMATE)
 
 ## [E] Taktiksel Büyü (Fırlatılabilir Proje Mekaniği)
 func cast_tactical() -> void:
 	if tactical_timer > 0:
 		return
-	tactical_timer = tactical_cooldown
+	var cd_red = ProgressionManager.get_stat("tactical_cooldown_reduction", 0.0)
+	tactical_timer = max(4.0, tactical_cooldown - cd_red)
 
 	var cam = player.get_node_or_null("Head/Camera3D")
 	var forward = -player.transform.basis.z

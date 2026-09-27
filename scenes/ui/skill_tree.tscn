@@ -1,0 +1,305 @@
+[gd_scene load_steps=8 format=3 uid="uid://skill_tree_ui_01"]
+
+[ext_resource type="Script" path="res://scripts/ui/SkillTree.gd" id="1_st"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glass_main"]
+bg_color = Color(0.035, 0.045, 0.07, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.22, 0.38, 0.58, 0.6)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_left = 10
+corner_radius_bottom_right = 10
+shadow_color = Color(0, 0, 0, 0.85)
+shadow_size = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+bg_color = Color(0.055, 0.07, 0.1, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.35, 0.5, 0.5)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_left = 8
+corner_radius_bottom_right = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_respec_btn"]
+bg_color = Color(0.25, 0.1, 0.1, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8, 0.25, 0.25, 0.7)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_left = 6
+corner_radius_bottom_right = 6
+content_margin_left = 12.0
+content_margin_right = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_btn"]
+bg_color = Color(0.12, 0.15, 0.2, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.4, 0.55, 0.6)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_left = 6
+corner_radius_bottom_right = 6
+content_margin_left = 12.0
+content_margin_right = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_core"]
+bg_color = Color(0.06, 0.12, 0.2, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.35, 0.8, 1, 0.85)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_left = 10
+corner_radius_bottom_right = 10
+shadow_color = Color(0.2, 0.6, 1, 0.3)
+shadow_size = 12
+content_margin_left = 20.0
+content_margin_top = 8.0
+content_margin_right = 20.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_btn"]
+bg_color = Color(0.1, 0.32, 0.2, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.95, 0.55, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_left = 6
+corner_radius_bottom_right = 6
+
+[node name="SkillTreeUI" type="CanvasLayer"]
+layer = 12
+script = ExtResource("1_st")
+
+[node name="ModalBackdrop" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.015, 0.02, 0.035, 0.88)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainPanel" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(1180, 680)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_glass_main")
+
+[node name="Margin" type="MarginContainer" parent="CenterContainer/MainPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/MainPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HeaderHBox" type="HBoxContainer" parent="CenterContainer/MainPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="TitleBox" type="VBoxContainer" parent="CenterContainer/MainPanel/Margin/VBox/HeaderHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/HeaderHBox/TitleBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.96, 0.98, 1)
+theme_override_font_sizes/font_size = 18
+text = "OPERASYONEL GELİŞİM VE YETENEK AĞACI"
+
+[node name="SubTitle" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/HeaderHBox/TitleBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.68, 0.85, 1)
+theme_override_font_sizes/font_size = 11
+text = "Kalıcı Biyo-Çekirdekleri kullanarak uzmanlık dallarını açın veya değiştirin."
+
+[node name="StatsBox" type="HBoxContainer" parent="CenterContainer/MainPanel/Margin/VBox/HeaderHBox"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="BioCoresLabel" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/HeaderHBox/StatsBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "BİYO-ÇEKİRDEK: 0"
+
+[node name="UnlockedCountLabel" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/HeaderHBox/StatsBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.95, 0.45, 1)
+theme_override_font_sizes/font_size = 13
+text = "AÇILAN: 0 / 18"
+
+[node name="RespecBtn" type="Button" parent="CenterContainer/MainPanel/Margin/VBox/HeaderHBox/StatsBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 32)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.85, 1)
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_respec_btn")
+text = "SIFIRLA (RESPEC)"
+
+[node name="CloseBtn" type="Button" parent="CenterContainer/MainPanel/Margin/VBox/HeaderHBox/StatsBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 32)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_close_btn")
+text = "[X] KAPAT"
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/MainPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="BodyHBox" type="HBoxContainer" parent="CenterContainer/MainPanel/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="TreeArea" type="PanelContainer" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="TreeMargin" type="MarginContainer" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox/TreeArea"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="TreeContentVBox" type="VBoxContainer" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox/TreeArea/TreeMargin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="CoreCenterBox" type="CenterContainer" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox/TreeArea/TreeMargin/TreeContentVBox"]
+layout_mode = 2
+
+[node name="CoreModuleBtn" type="Button" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox/TreeArea/TreeMargin/TreeContentVBox/CoreCenterBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 48)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.96, 1, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_core")
+text = "❖ OPERASYONEL ÇEKİRDEK ❖"
+
+[node name="ColumnsScroll" type="ScrollContainer" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox/TreeArea/TreeMargin/TreeContentVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ColumnsContainer" type="HBoxContainer" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox/TreeArea/TreeMargin/TreeContentVBox/ColumnsScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="LinesOverlay" type="Control" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox/TreeArea/TreeMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+
+[node name="DetailCard" type="PanelContainer" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(330, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="DetailMargin" type="MarginContainer" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox/DetailCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="DetailVBox" type="VBoxContainer" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox/DetailCard/DetailMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="DetailCategory" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox/DetailCard/DetailMargin/DetailVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "[ SİLAH UZMANLIĞI ]"
+
+[node name="DetailIcon" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox/DetailCard/DetailMargin/DetailVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "🎯"
+horizontal_alignment = 1
+
+[node name="DetailTitle" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox/DetailCard/DetailMargin/DetailVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.96, 0.98, 1)
+theme_override_font_sizes/font_size = 16
+text = "HASSAS NİŞAN I"
+horizontal_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox/DetailCard/DetailMargin/DetailVBox"]
+layout_mode = 2
+
+[node name="DetailDesc" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox/DetailCard/DetailMargin/DetailVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.8, 0.86, 0.92, 1)
+theme_override_font_sizes/font_size = 12
+text = "Kritik vuruş şansını +%8 artırır."
+autowrap_mode = 2
+
+[node name="DetailReqs" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox/DetailCard/DetailMargin/DetailVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 11
+text = "ÖN KOŞULLAR:\n• Başlangıç Seviyesi ✅"
+autowrap_mode = 2
+
+[node name="DetailCost" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox/DetailCard/DetailMargin/DetailVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.28, 1)
+theme_override_font_sizes/font_size = 13
+text = "MALİYET: 1 BİYO-ÇEKİRDEK"
+
+[node name="UnlockBtn" type="Button" parent="CenterContainer/MainPanel/Margin/VBox/BodyHBox/DetailCard/DetailMargin/DetailVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 1, 0.95, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_action_btn")
+text = "KİLİDİ AÇ (1 ÇEKİRDEK)"

@@ -1,6 +1,6 @@
 {
-    "version":  "v1.3.13",
+    "version":  "v1.3.14",
     "download_url":  "https://raw.githubusercontent.com/kaanturkogluu/kutukafalar/main/builds/KutuKafalar.pck",
-    "pck_size":  714680,
-    "changelog":  "- Canlı \u0026 Renkli 3D Menü Atmosferi: Hangar ortamına kafese kilitlenmiş, alarm lambalı ve parmaklıkları sarsan Tip-Z zombi test deneği eklendi.\n- Renkli Variller ve Silahlar: Yeşil radyoaktif parıldayan toksik variller, kriyojenik mavi variller, tezgah üstü silahlar ve askılık spot ışığı eklendi.\n- Ortalanmış Başlık Düzeni: \u0027KUTU KAFALAR\u0027 başlığı ve taktik alt yazısı sol üstten ekranın üst-ortasına taşınarak estetik denge sağlandı.\n- Yüksek Kontrastlı Sınıf İsimleri: 3D karakter etiketleri ve arayüz sınıf başlıkları arka plandan kolayca ayırt edilebilen parlak neon renklere ve 12px derin siyah kontura kavuşturuldu."
+    "pck_size":  754180,
+    "changelog":  "- Taktiksel Yetenek Ağacı (5 Sütunlu Matris): Silah, Hayat, Hareket, Kaos ve Taktik dallarından oluşan siber devre hatlı yeni yetenek arayüzü.\n- Oyun İçi Erişim: Yetenek ağacı artık oyun sırasında [K] tuşuyla, Duraklatma (ESC) menüsünden ve Asansör İkmal İstasyonu\u0027ndan anında açılabiliyor.\n- Biyo-Çekirdek Sistemi: Kat temizleme, sektör finalleri ve bölüm sonu boss avlarıyla yetenek puanı kazanımı entegre edildi.\n- Başlangıç ve Pencere İyileştirmeleri: Oyun penceresi ekranın tam ortasında açılacak şekilde optimize edildi, kamera ve lobi başlatma hataları giderildi."
 }

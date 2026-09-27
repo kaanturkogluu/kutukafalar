@@ -1,8 +1,9 @@
-[gd_scene load_steps=14 format=3 uid="uid://c51wup2e3a1k8"]
+[gd_scene load_steps=15 format=3 uid="uid://c51wup2e3a1k8"]
 
 [ext_resource type="Script" path="res://scripts/ui/Lobby.gd" id="1_lobby"]
 [ext_resource type="PackedScene" uid="uid://squad_bg_3d_01" path="res://scenes/ui/squad_background_3d.tscn" id="2_squad_bg"]
 [ext_resource type="PackedScene" uid="uid://level_select_scene_01" path="res://scenes/ui/level_select.tscn" id="3_lvlselect"]
+[ext_resource type="PackedScene" uid="uid://skill_tree_ui_01" path="res://scenes/ui/skill_tree.tscn" id="4_skilltree"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glass"]
 bg_color = Color(0.035, 0.045, 0.07, 0.76)
@@ -248,6 +249,19 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 alignment = 0
 text = "ÇOK OYUNCULU"
+
+[node name="NavSkillTreeBtn" type="Button" parent="MenuContainer/MainNavigation"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 46)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.95, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+alignment = 0
+text = "YETENEK AĞACI"
 
 [node name="NavSettingsBtn" type="Button" parent="MenuContainer/MainNavigation"]
 unique_name_in_owner = true
@@ -1070,5 +1084,9 @@ text = "DAHA SONRA"
 flat = true
 
 [node name="LevelSelectUI" parent="." instance=ExtResource("3_lvlselect")]
+unique_name_in_owner = true
+visible = false
+
+[node name="SkillTreeUI" parent="." instance=ExtResource("4_skilltree")]
 unique_name_in_owner = true
 visible = false

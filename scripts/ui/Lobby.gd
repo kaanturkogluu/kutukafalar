@@ -7,6 +7,7 @@ const GAME_SCENE_PATH: String = "res://scenes/levels/main_level.tscn"
 @onready var main_nav: VBoxContainer = %MainNavigation
 @onready var nav_single_btn: Button = %NavSingleBtn
 @onready var nav_multi_btn: Button = %NavMultiBtn
+@onready var nav_skill_tree_btn: Button = %NavSkillTreeBtn
 @onready var nav_settings_btn: Button = %NavSettingsBtn
 @onready var nav_quit_btn: Button = %NavQuitBtn
 
@@ -88,6 +89,9 @@ const GAME_SCENE_PATH: String = "res://scenes/levels/main_level.tscn"
 # 9. Seviye / Harita Seçim Arayüzü
 @onready var level_select_ui: CanvasLayer = %LevelSelectUI
 
+# 10. Kalıcı Yetenek Ağacı Arayüzü
+@onready var skill_tree_ui: CanvasLayer = %SkillTreeUI
+
 const CLASS_SKILLS: Dictionary = {
 	"Pyromancer": {
 		"title": "ATEŞ UZMANI",
@@ -152,6 +156,8 @@ func _ready() -> void:
 	# Ana Navigasyon Bağlantıları
 	nav_single_btn.pressed.connect(_on_nav_single_pressed)
 	nav_multi_btn.pressed.connect(_on_nav_multi_pressed)
+	if nav_skill_tree_btn and skill_tree_ui:
+		nav_skill_tree_btn.pressed.connect(func(): skill_tree_ui.open())
 	nav_settings_btn.pressed.connect(_on_nav_settings_pressed)
 	nav_quit_btn.pressed.connect(_on_nav_quit_pressed)
 	
@@ -198,7 +204,7 @@ func _ready() -> void:
 	_set_join_mode("ip")
 	
 	# 3D Sahneyi varsayılan sınıfla başlat ve yetenek kartını senkronize et
-	var default_class = NetworkManager.local_player_class if NetworkManager.local_player_class != "" else "Pyromancer"
+	var default_class = NetworkManager.local_player_info.get("class", "Pyromancer")
 	if squad_bg:
 		squad_bg.select_class(default_class, true)
 	_update_class_skill_card(default_class)
@@ -227,7 +233,10 @@ func _input(event: InputEvent) -> void:
 				_on_class_selected(idx)
 		
 	if event.is_action_pressed("ui_cancel"):
-		if settings_overlay and settings_overlay.visible:
+		if skill_tree_ui and skill_tree_ui.visible:
+			skill_tree_ui.close()
+			get_viewport().set_input_as_handled()
+		elif settings_overlay and settings_overlay.visible:
 			settings_overlay.visible = false
 			get_viewport().set_input_as_handled()
 		elif room_panel.visible:

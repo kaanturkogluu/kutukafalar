@@ -328,7 +328,7 @@ theme_override_constants/separation = 16
 alignment = 1
 
 [node name="BackToLevelsButton" type="Button" parent="Panel/VBoxContainer/HBoxActions"]
-custom_minimum_size = Vector2(230, 44)
+custom_minimum_size = Vector2(200, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_back")
@@ -336,8 +336,19 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_btn_back_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_back_hover")
 text = "GÖREV TERMİNALİ"
 
+[node name="SkillTreeButton" type="Button" parent="Panel/VBoxContainer/HBoxActions"]
+custom_minimum_size = Vector2(200, 44)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.95, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_back")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_back_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_back_hover")
+text = "YETENEK AĞACI [K]"
+
 [node name="NextFloorButton" type="Button" parent="Panel/VBoxContainer/HBoxActions"]
-custom_minimum_size = Vector2(270, 44)
+custom_minimum_size = Vector2(250, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_next")

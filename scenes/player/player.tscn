@@ -544,6 +544,18 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 alignment = 0
 text = "DEVAM ET"
 
+[node name="SkillTreeBtn" type="Button" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.95, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+alignment = 0
+text = "YETENEK AĞACI [K]"
+
 [node name="SettingsBtn" type="Button" parent="HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2

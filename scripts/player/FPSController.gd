@@ -59,6 +59,18 @@ var headshot_count: int = 0
 # Envanter: Patlayıcı Variller (G Tuşu)
 var barrel_count: int = 3
 
+# Dash (Taktiksel Atılma Mekaniği - Progression)
+var is_dash_unlocked: bool = false
+var dash_cooldown: float = 1.8
+var dash_timer: float = 0.0
+var is_dashing: bool = false
+var dash_duration_timer: float = 0.0
+const DASH_SPEED: float = 22.0
+const DASH_DURATION: float = 0.18
+var dash_dir: Vector3 = Vector3.ZERO
+var is_last_stand_active: bool = false
+var last_stand_timer: float = 0.0
+
 # Duvarcı Sınıfı Duvar Sistemi
 var wall_count: int = 10
 var max_wall_count: int = 10
@@ -72,6 +84,7 @@ const GIBS_SCENE_PATH = "res://scenes/effects/cube_gibs.tscn"
 # Durum ve Efekt Değişkenleri
 var is_dead: bool = false
 var is_in_shop: bool = false
+var is_in_skill_tree: bool = false
 var spectator_target: CharacterBody3D = null
 var all_players_dead: bool = false
 var camera_trauma: float = 0.0
@@ -139,6 +152,7 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 @onready var pause_nav: VBoxContainer = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav
 @onready var pause_settings: VBoxContainer = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseSettings
 @onready var pause_resume_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav/ResumeBtn
+@onready var pause_skill_tree_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav/SkillTreeBtn
 @onready var pause_settings_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav/SettingsBtn
 @onready var pause_restart_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav/RestartBtn
 @onready var pause_lobby_btn: Button = $HUD/PauseMenu/CenterContainer/Panel/Margin/PauseNav/LobbyBtn
@@ -194,6 +208,8 @@ func _ready() -> void:
 	
 	if pause_resume_btn:
 		pause_resume_btn.pressed.connect(_on_pause_resume_pressed)
+	if pause_skill_tree_btn:
+		pause_skill_tree_btn.pressed.connect(toggle_skill_tree)
 	if pause_settings_btn:
 		pause_settings_btn.pressed.connect(_on_pause_settings_pressed)
 	if back_from_settings_btn:
@@ -232,6 +248,8 @@ func _ready() -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		hud.visible = true
 		head_mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
+		# Kalıcı Yetenek Ağacı İlerlemesini Oyuncuya Uygula
+		ProgressionManager.apply_to_player(self)
 		_update_hud()
 		
 		# Canlandırma (Revive) Arayüzünü Oluştur
@@ -297,7 +315,30 @@ func set_in_shop(active: bool) -> void:
 		if active:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		else:
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+			if not is_in_skill_tree and not (pause_menu and pause_menu.visible):
+				Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+func set_in_skill_tree(active: bool) -> void:
+	is_in_skill_tree = active
+	if is_multiplayer_authority():
+		if active:
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		else:
+			if not is_in_shop and not (pause_menu and pause_menu.visible):
+				Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		if not active:
+			ProgressionManager.apply_to_player(self)
+
+func toggle_skill_tree() -> void:
+	var st = get_tree().get_first_node_in_group("skill_tree_ui")
+	if not st:
+		return
+	if st.visible:
+		st.close()
+	else:
+		if pause_menu and pause_menu.visible:
+			_close_pause_menu()
+		st.open_for_player(self)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not is_multiplayer_authority():
@@ -309,10 +350,22 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		return
 
+	# K TUŞU: Yetenek Ağacı Aç/Kapat (Oyun İçi Meta-Geliştirme)
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_K:
+		if not is_dead and not (scoreboard and scoreboard.visible):
+			toggle_skill_tree()
+			get_viewport().set_input_as_handled()
+			return
+
 	# ESC TUŞU: Duraklatma Menüsü Aç/Kapat
 	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE):
 		if scoreboard and scoreboard.visible:
 			_set_scoreboard_visible(false)
+			get_viewport().set_input_as_handled()
+			return
+		
+		if is_in_skill_tree:
+			toggle_skill_tree()
 			get_viewport().set_input_as_handled()
 			return
 		
@@ -343,7 +396,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	
 	# Pause menüsü, Mağaza açıkken veya fare görünürken silah ve kamera girdilerini engelle
-	if (pause_menu and pause_menu.visible) or is_in_shop or Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+	if (pause_menu and pause_menu.visible) or is_in_shop or is_in_skill_tree or Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 		return
 
 	# Fare Tekerleği ile Silah Geçişi (Mouse Scroll Wheel)
@@ -414,7 +467,7 @@ func _physics_process(delta: float) -> void:
 		return
 
 	# Duraklatma Menüsü veya Mağazadayken hareket ve aksiyonları durdur
-	if (pause_menu and pause_menu.visible) or is_in_shop:
+	if (pause_menu and pause_menu.visible) or is_in_shop or is_in_skill_tree:
 		velocity.x = move_toward(velocity.x, 0, 15.0 * delta)
 		velocity.z = move_toward(velocity.z, 0, 15.0 * delta)
 		move_and_slide()
@@ -423,6 +476,12 @@ func _physics_process(delta: float) -> void:
 	fire_timer -= delta
 	kick_timer -= delta
 	jump_cooldown_timer = max(0.0, jump_cooldown_timer - delta)
+	if dash_timer > 0:
+		dash_timer -= delta
+	if last_stand_timer > 0:
+		last_stand_timer -= delta
+		if last_stand_timer <= 0:
+			is_last_stand_active = false
 	
 	# Kombo Sayacı
 	if combo_timer > 0:
@@ -486,7 +545,26 @@ func _physics_process(delta: float) -> void:
 	input_dir = input_dir.normalized()
 
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-	if direction:
+
+	# Dash (Taktiksel Atılma) Kontrolü: Açılmışsa Shift'e basıldığında veya yön verilirken
+	if is_dash_unlocked and dash_timer <= 0 and direction != Vector3.ZERO:
+		if Input.is_action_just_pressed("sprint"):
+			is_dashing = true
+			dash_duration_timer = DASH_DURATION
+			dash_timer = dash_cooldown
+			dash_dir = direction
+			SoundManager.play_sfx("switch")
+			camera_trauma = min(1.0, camera_trauma + 0.15)
+			if ProgressionManager.has_perk("phantom_dash_unlocked"):
+				_phantom_dash_blast()
+
+	if is_dashing:
+		dash_duration_timer -= delta
+		velocity.x = dash_dir.x * DASH_SPEED
+		velocity.z = dash_dir.z * DASH_SPEED
+		if dash_duration_timer <= 0:
+			is_dashing = false
+	elif direction:
 		velocity.x = direction.x * current_speed
 		velocity.z = direction.z * current_speed
 	else:
@@ -600,10 +678,39 @@ func _fire_bullet(dmg: float, spread: Vector3) -> void:
 	elif hit_collider.is_in_group("enemies") or hit_collider.is_in_group("barrels") or hit_collider.is_in_group("destructibles"):
 		target = hit_collider
 
+	var final_dmg = dmg
+
+	# Run & Gun perk: Hareket halindeyken hasar bonusu
+	if ProgressionManager.has_perk("run_and_gun_unlocked") and velocity.length() > 0.8:
+		final_dmg *= (1.0 + ProgressionManager.get_stat("moving_damage_bonus", 0.15))
+
+	# Last Stand perk: Düşük canda ek hasar
+	if is_last_stand_active:
+		final_dmg *= 1.25
+
+	# Kritik Vuruş Kontrolü
+	var crit_chance = ProgressionManager.get_stat("crit_chance", 0.05)
+	if randf() < crit_chance:
+		var crit_mult = ProgressionManager.get_stat("crit_multiplier", 1.5)
+		final_dmg *= crit_mult
+		camera_trauma = min(1.0, camera_trauma + 0.08)
+
+	# Headshot Çarpanı
+	if is_headshot:
+		var hs_mult = ProgressionManager.get_stat("headshot_mult", 1.5)
+		final_dmg *= (hs_mult / 1.5)
+
+	# İnfazcı (Executioner perk): Düşük canı kalan zombiyi infaz et
 	if target and target.has_method("take_damage"):
 		if target.get("is_exploded") == true:
 			return
-		target.take_damage(dmg, is_headshot, hit_point, player_id)
+		if ProgressionManager.has_perk("executioner_unlocked") and target.is_in_group("enemies"):
+			var cur_hp = float(target.get("current_health")) if target.get("current_health") != null else 100.0
+			var max_hp = float(target.get("max_health")) if target.get("max_health") != null else 100.0
+			if cur_hp > 0 and (cur_hp / max_hp) <= ProgressionManager.get_stat("execute_threshold", 0.20):
+				final_dmg = max(final_dmg, cur_hp + 50.0)
+
+		target.take_damage(final_dmg, is_headshot, hit_point, player_id)
 		if target.get("is_exploded") != true:
 			_register_kill_streak()
 	
@@ -748,7 +855,7 @@ func _update_wall_hud() -> void:
 
 ## Duvar Yerleştirme (Duvarcı Sınıfı - E Tuşu)
 func try_place_wall() -> void:
-	if is_dead or is_in_shop or (pause_menu and pause_menu.visible):
+	if is_dead or is_in_shop or is_in_skill_tree or (pause_menu and pause_menu.visible):
 		return
 	if wall_count <= 0:
 		SoundManager.play_sfx("empty")
@@ -1102,18 +1209,70 @@ func _request_player_damage(amount: float) -> void:
 func _apply_player_damage(amount: float) -> void:
 	if is_dead:
 		return
-	current_health = clamp(current_health - amount, 0, max_health)
+	
+	# Hasar azaltma (Survival perk)
+	var reduction = ProgressionManager.get_stat("damage_reduction", 0.0)
+	if is_last_stand_active:
+		reduction = max(reduction, 0.30)
+	var final_amount = amount * (1.0 - reduction)
+	
+	current_health = clamp(current_health - final_amount, 0, max_health)
+	
+	# Son Direniş (Last Stand perk) kontrolü
+	if ProgressionManager.has_perk("last_stand_unlocked") and current_health > 0 and (current_health / max_health) <= 0.25:
+		if not is_last_stand_active:
+			is_last_stand_active = true
+			last_stand_timer = 5.0
+			if is_multiplayer_authority():
+				_show_weapon_notice("⚡ SON DİRENİŞ AKTİF! (%30 ZIRH + %25 HASAR)")
+				SoundManager.play_sfx("switch")
+
 	_update_hud()
 	_play_damage_effect(amount)
 	if current_health <= 0 and not is_dead:
-		# Her makinede hemen öldür (lobi sahibi dahil)
-		# Önceden sadece die.rpc() -> call_local zinciri kullanılıyordu;
-		# bu zincir lobi sahibi için bazen tetiklenmiyordu.
 		die()
-		# Sunucu, tüm client'lara ölüm sinyalini iletir.
-		# die() içindeki "if is_dead: return" koruması çift çağrıyı önler.
 		if multiplayer.is_server():
 			die.rpc()
+
+func set_dash_enabled(enabled: bool, cd: float = 1.8) -> void:
+	is_dash_unlocked = enabled
+	dash_cooldown = cd
+
+func _phantom_dash_blast() -> void:
+	var enemies = get_tree().get_nodes_in_group("enemies")
+	for e in enemies:
+		if is_instance_valid(e) and not e.get("is_dead") and global_position.distance_to(e.global_position) < 3.2:
+			if e.has_method("take_damage"):
+				e.take_damage(30.0, false, global_position)
+
+func record_kill(is_headshot: bool = false) -> void:
+	kill_count += 1
+	if is_headshot:
+		headshot_count += 1
+	
+	# Biyolojik Şifa (Kill Heal perk)
+	var heal_amt = ProgressionManager.get_stat("kill_heal", 0.0)
+	if heal_amt > 0 and current_health > 0:
+		current_health = min(max_health, current_health + heal_amt)
+		if is_multiplayer_authority():
+			_update_hud()
+			health_changed.emit(current_health)
+	
+	# Yıkım Uzmanı perk: Patlama / öldürmede ücretsiz varil şansı
+	if ProgressionManager.has_perk("demolitionist_drop_unlocked") and randf() < 0.20:
+		barrel_count += 1
+		if is_multiplayer_authority():
+			_update_barrel_hud()
+			_show_weapon_notice("💥 YIKIM BONUSU: +1 Ücretsiz Varil!")
+	
+	# Ulti şarjına katkı
+	if spell_manager and spell_manager.has_method("add_ultimate_charge"):
+		var ult_mult = ProgressionManager.get_stat("ult_charge_mult", 1.0)
+		spell_manager.add_ultimate_charge(2.5 * ult_mult)
+	
+	_register_kill_streak()
+	if is_multiplayer_authority():
+		sync_player_stats.rpc(gold, kill_count, headshot_count)
 
 func _play_damage_effect(amount: float) -> void:
 	_flash_mesh_red()
@@ -1348,7 +1507,7 @@ func is_targeting_downed_teammate() -> bool:
 	return current_reviving_target != null
 
 func _handle_revive_interaction(delta: float) -> void:
-	if not is_multiplayer_authority() or is_dead or is_in_shop or (pause_menu and pause_menu.visible):
+	if not is_multiplayer_authority() or is_dead or is_in_shop or is_in_skill_tree or (pause_menu and pause_menu.visible):
 		_reset_revive_state()
 		return
 	
@@ -1596,7 +1755,7 @@ func _close_pause_menu() -> void:
 	if not is_multiplayer_authority() or not pause_menu:
 		return
 	pause_menu.visible = false
-	if not is_in_shop and not is_dead and not (scoreboard and scoreboard.visible):
+	if not is_in_shop and not is_in_skill_tree and not is_dead and not (scoreboard and scoreboard.visible):
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _on_pause_resume_pressed() -> void:
@@ -1741,13 +1900,6 @@ func _refresh_scoreboard() -> void:
 		scoreboard_list.add_child(row)
 
 # --- İstatistik ve Ağ Senkronizasyonu ---
-
-func record_kill(is_headshot: bool) -> void:
-	kill_count += 1
-	if is_headshot:
-		headshot_count += 1
-	if is_multiplayer_authority():
-		sync_player_stats.rpc(gold, kill_count, headshot_count)
 
 @rpc("any_peer", "call_local", "reliable")
 func sync_player_stats(p_gold: int, p_kills: int = -1, p_headshots: int = -1) -> void:

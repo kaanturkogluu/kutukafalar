@@ -20,6 +20,7 @@ signal back_to_levels_requested
 @onready var card3_desc: Label = $Panel/VBoxContainer/HBoxCards/Card3/VBox/Desc
 
 @onready var back_to_levels_btn: Button = $Panel/VBoxContainer/HBoxActions/BackToLevelsButton
+@onready var skill_tree_btn: Button = $Panel/VBoxContainer/HBoxActions/SkillTreeButton
 @onready var next_floor_btn: Button = $Panel/VBoxContainer/HBoxActions/NextFloorButton
 
 var local_player: CharacterBody3D
@@ -36,8 +37,15 @@ func _ready() -> void:
 		card3_btn.pressed.connect(func(): _buy_card(2))
 	if back_to_levels_btn:
 		back_to_levels_btn.pressed.connect(_on_back_to_levels_pressed)
+	if skill_tree_btn:
+		skill_tree_btn.pressed.connect(_on_skill_tree_pressed)
 	if next_floor_btn:
 		next_floor_btn.pressed.connect(_on_next_floor_pressed)
+
+func _on_skill_tree_pressed() -> void:
+	var st = get_tree().get_first_node_in_group("skill_tree_ui")
+	if st:
+		st.open_for_player(local_player)
 
 func open_shop(p_player: CharacterBody3D, floor_num: int) -> void:
 	local_player = p_player
