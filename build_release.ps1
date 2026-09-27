@@ -63,8 +63,18 @@ $PckOut = Join-Path $GameDir "KutuKafalar.pck"
 $StandalonePck = Join-Path $BuildsRoot "KutuKafalar.pck"
 $ZipOut = Join-Path $BuildsRoot "KutuKafalar-$Version-Windows.zip"
 
+# *** KRİTİK: PCK derlenmesinden ÖNCE version.json'ı diske yaz ***
+# Aksi hâlde Godot derleme sırasında eski version string'ini PCK'ya gömer
+# ve güncelleme döngüsü oluşur (oyuncu güncelleyip yeniden başlatsa bile hep eski versiyon görünür).
+if ($vData) {
+    $vData.pck_size = 0  # Geçici sıfır; PCK boyutu derleme sonrası güncellenecek
+    $jsonString = $vData | ConvertTo-Json -Depth 5
+    [System.IO.File]::WriteAllText($VersionJsonPath, $jsonString, [System.Text.UTF8Encoding]::new($false))
+    Write-Host "1.5. version.json PCK derlemesi öncesi diske yazıldı (Sürüm: $Version)" -ForegroundColor DarkGreen
+}
+
 # 3. Godot ile KutuKafalar.pck paketini derle
-Write-Host "2. KutuKafalar.pck paketi Godot ile derleniyor..." -ForegroundColor Yellow
+Write-Host "2. KutuKafalar.pck paketi Godot ile derleniyor (version.json icinde: $Version)..." -ForegroundColor Yellow
 $proc = Start-Process -FilePath $GodotExe -ArgumentList @('--headless', '--path', $ProjectDir, '--export-pack', 'Windows', $PckOut) -Wait -PassThru
 
 if (-not (Test-Path $PckOut)) {
